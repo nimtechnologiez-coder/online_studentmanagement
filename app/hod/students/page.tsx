@@ -56,6 +56,8 @@ function avatarColor(id: number) {
   return AVATAR_COLORS[(id - 1) % AVATAR_COLORS.length];
 }
 
+
+
 /* ─────────────────────────── Component ─────────────────────── */
 
 export default function HodStudentsPage() {
@@ -196,14 +198,18 @@ export default function HodStudentsPage() {
         </div>
       </header>
 
+
+      
+
       <main className="stu-main">
         {/* ======== STAT CARDS ======== */}
         <section className="stu-stats">
-          <StatCard
+         <StatCard
+           
             icon={<UsersIcon color="#4f6cf7" />}
             color="blue"
             label="Total Students"
-            value={students.length}
+            value={STUDENTS.length}
             sub="All Years"
           />
           <StatCard

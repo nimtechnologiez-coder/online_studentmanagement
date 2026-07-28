@@ -1,32 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import "./dashboard.css";
 
-/* ---------------- HOD API Types ---------------- */
-
-type HodUser = {
-  id: number;
-  name: string;
-  department: string;
-  college: string;
-  username: string;
-};
-
-type HodStats = {
-  totalStudents: number;
-  activeStudents: number;
-  totalVideos: number;
-};
-
-const API_BASE = "http://127.0.0.1:8000";
-
-const DEFAULT_STATS: HodStats = {
-  totalStudents: 0,
-  activeStudents: 0,
-  totalVideos: 0,
-};
-
+import cloud from "./images/cloud.png";
+import { FiClock } from "react-icons/fi";
+import { Link } from "lucide-react";
 /* ---------------- Mock Data ---------------- */
 
 const defaultStats = [
@@ -190,6 +169,8 @@ const RADIUS = 56;
 const STROKE = 20;
 const CIRC = 2 * Math.PI * RADIUS;
 
+
+
 /* ---------------- Component ---------------- */
 
 export default function HodDashboard() {
@@ -294,9 +275,33 @@ export default function HodDashboard() {
   const linePoints = engagementData.map((d, i) => `${gx(i)},${gy(d.value)}`).join(" ");
   const areaPoints = `${gx(0)},${gy(0)} ${linePoints} ${gx(engagementData.length - 1)},${gy(0)}`;
 
-  const today = new Date();
-  const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
-  const monthName = today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const [today, setToday] = useState(new Date());
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setToday(new Date());
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, []);
+
+const day = today.toLocaleDateString("en-US", {
+  weekday: "short",
+});
+
+const month = today.toLocaleDateString("en-US", {
+  month: "short",
+});
+
+const date = today.getDate();
+
+const year = today.getFullYear();
+
+const time = today.toLocaleTimeString("en-US", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: true,
+});
 
   let donutOffset = 0;
 
@@ -305,50 +310,33 @@ export default function HodDashboard() {
       {/* ========== HEADER ========== */}
       <header className="hd-header">
         <div className="hd-header-left">
-          <button className="hd-icon-btn" aria-label="Menu">
+          {/* <button className="hd-icon-btn" aria-label="Menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M3 6h18M3 12h18M3 18h18" stroke="#374151" strokeWidth="2" strokeLinecap="round" />
             </svg>
-          </button>
+          </button> */}
           <span className="hd-header-title">HOD Dashboard</span>
         </div>
         <div className="hd-header-right">
           {/* Calendar */}
-          <div className="hd-icon-trigger">
-            <button
-              className={`hd-icon-btn${calendarOpen ? " is-active" : ""}`}
-              aria-label="Calendar"
-              aria-expanded={calendarOpen}
-              onClick={() => setCalendarOpen((prev) => !prev)}
-            >
-              {calendarOpen ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="4" width="18" height="18" rx="2" fill="#4f6cf7" stroke="#4f6cf7" strokeWidth="1.8" />
-                  <path d="M16 2v4M8 2v4M3 10h18" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="4" width="18" height="18" rx="2" stroke="#374151" strokeWidth="1.8" />
-                  <path d="M16 2v4M8 2v4M3 10h18" stroke="#374151" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              )}
-            </button>
+         
 
-            {calendarOpen && (
-              <>
-                <div className="hd-dropdown-backdrop" onClick={() => setCalendarOpen(false)} />
-                <div className="hd-panel hd-cal-panel">
-                  <div className="hd-cal-today hd-cal-today--only">
-                    <span className="hd-cal-today-num">{today.getDate()}</span>
-                    <div className="hd-cal-today-info">
-                      <span className="hd-cal-today-day">{dayName}</span>
-                      <span className="hd-cal-today-month">{monthName}</span>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+             
+               
+
+<div className="hd-panel hd-cal-panel">
+  <div className="hd-cal-date-time">
+    <FiClock className="hd-cal-clock-icon" />
+    <span>{day},</span>
+    <span>{month}</span>
+    <span>{date},</span>
+    <span>{year}</span>
+    <span className="hd-time">{time}</span>
+  </div>
+</div>
+              
+            
+        
 
           <div className="hd-profile">
             <div className="hd-avatar-circle">{hod?.name ? hod.name.charAt(0) : "H"}</div>
@@ -389,25 +377,14 @@ export default function HodDashboard() {
               <span className="hd-banner-meta-value">{hod?.college ?? "College"}</span>
             </div>
           </div>
-          <div className="hd-banner-illus" aria-hidden="true">
-            <svg width="120" height="90" viewBox="0 0 120 90" fill="none">
-              {/* Plant */}
-              <rect x="10" y="72" width="20" height="14" rx="3" fill="#d1fae5" stroke="#6ee7b7" strokeWidth="1" />
-              <path d="M20 72 C12 58 14 40 20 32 C26 40 28 58 20 72" fill="#22c55e" />
-              <path d="M20 72 C26 55 36 44 44 40" stroke="#16a34a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-              <path d="M20 72 C14 56 6 46 0 42" stroke="#16a34a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-              {/* Books */}
-              <rect x="68" y="50" width="48" height="12" rx="3" fill="#4f6cf7" />
-              <rect x="72" y="38" width="40" height="12" rx="3" fill="#1e2338" />
-              <rect x="76" y="28" width="32" height="10" rx="3" fill="#6366f1" />
-              <rect x="80" y="20" width="24" height="8" rx="2" fill="#4f6cf7" opacity="0.7" />
-            </svg>
-          </div>
+              <div className="hd-banner-illus">
+        <Image src={cloud} alt="Cloud" className="hd-banner-image" />
+        </div>
         </section>
 
         {/* ========== STAT CARDS ========== */}
         <section className="hd-stats-grid">
-          {renderedStats.map((s) => (
+          {stats.map((s) => (
             <div className="hd-stat-card" key={s.label}>
               <div className="hd-stat-top">
                 <div>
@@ -502,7 +479,7 @@ export default function HodDashboard() {
           <div className="hd-card">
             <div className="hd-card-header">
               <h2 className="hd-card-title">Top Performing Students</h2>
-              <button className="hd-view-all">View All</button>
+             
             </div>
             <ul className="hd-top-list">
               {topStudents.map((s) => (
@@ -528,7 +505,7 @@ export default function HodDashboard() {
           <div className="hd-card">
             <div className="hd-card-header">
               <h2 className="hd-card-title">Recent Student Activity</h2>
-              <button className="hd-view-all">View All</button>
+             
             </div>
             <ul className="hd-activity-list">
               {activities.map((a) => (
@@ -550,7 +527,7 @@ export default function HodDashboard() {
           <div className="hd-card">
             <div className="hd-card-header">
               <h2 className="hd-card-title">Recent Videos</h2>
-              <button className="hd-view-all">View All</button>
+              <a href = "/hod/videos" style = {{"fontSize":"12px","color":"blue"}}>View All</a>
             </div>
             <ul className="hd-video-list">
               {videos.map((v) => (
