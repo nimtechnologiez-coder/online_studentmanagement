@@ -139,6 +139,7 @@ export default function HodAttendancePage() {
         </div>
       </div>
 
+
       {/* Overview Statistics Cards */}
       <div className="attendance-stats-grid">
         <div className="stat-card">

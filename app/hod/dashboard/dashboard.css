@@ -87,6 +87,93 @@
 
 /* ---- Interactive header icon buttons (notification / calendar) ---- */
 
+.hd-cal-panel{
+    background:transparent;
+    box-shadow:none;
+    padding:0;
+}
+
+.hd-cal-date-time{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 14px;
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    border-radius:15px;
+    font-size:12px;
+    font-weight:500;
+    color:#64748b;
+    white-space:nowrap;
+    transition:.3s ease;
+}
+
+.hd-cal-clock-icon{
+    font-size:14px;
+    color:#2563eb;
+    flex-shrink:0;
+}
+
+.hd-time{
+    margin-left:8px;
+    padding-left:8px;
+    border-left:1px solid #cbd5e1;
+    font-weight:600;
+    color:#1e293b;
+}
+
+/* Tablet */
+@media (max-width:768px){
+    .hd-cal-date-time{
+        font-size:11px;
+        padding:7px 12px;
+        gap:5px;
+    }
+
+    .hd-cal-clock-icon{
+        font-size:13px;
+    }
+
+    .hd-time{
+        margin-left:6px;
+        padding-left:6px;
+    }
+}
+
+/* Mobile */
+@media (max-width:576px){
+    .hd-cal-date-time{
+        font-size:10px;
+        padding:6px 10px;
+        gap:4px;
+        border-radius:6px;
+    }
+
+    .hd-cal-clock-icon{
+        font-size:12px;
+    }
+
+    .hd-time{
+        margin-left:5px;
+        padding-left:5px;
+    }
+}
+
+/* Very Small Screens */
+@media (max-width:400px){
+    .hd-cal-date-time{
+        font-size:9px;
+        padding:5px 8px;
+        gap:3px;
+    }
+
+    .hd-cal-clock-icon{
+        font-size:11px;
+    }
+}
+
+
+
 .hd-icon-trigger {
   position: relative;
 }
@@ -97,32 +184,12 @@
   z-index: 39;
 }
 
-.hd-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: 300px;
-  background: var(--hd-white);
-  border-radius: 14px;
-  border: 1px solid var(--hd-border);
-  box-shadow: var(--hd-shadow-lg);
-  z-index: 40;
-  overflow: hidden;
-  animation: hd-panel-in 0.16s ease-out;
-  transform-origin: top right;
-}
 
-@keyframes hd-panel-in {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
+
 
 /* Calendar mini panel — shows the date only */
 
-.hd-cal-panel {
-  width: 190px;
-  padding: 0;
-}
+
 
 .hd-cal-today--only {
   padding: 20px 18px;
@@ -213,12 +280,19 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  background: linear-gradient(110deg, #dde6fe 0%, #e8eeff 50%, #dfe8ff 100%);
+  background: linear-gradient(110deg, #95e2f0 0%, #bde0f0 50%, #ffffff 100%);
   border-radius: var(--hd-radius-lg);
   padding: 24px 32px;
   overflow: hidden;
   position: relative;
+  height:130px;
+  overflow:hidden;
   border: 1px solid #c7d4fc;
+}
+.hd-banner-image{
+  width:300px;
+  margin-top:-70px;
+  margin-left:200px;
 }
 
 .hd-banner-icon-wrap {
@@ -311,6 +385,20 @@
   border: 1px solid var(--hd-border);
   transition: box-shadow 0.15s, transform 0.15s;
 }
+.student-card .hd-stat-card:nth-child(1) {
+  border-left: 4px solid #8b5cf6;
+  
+}
+
+.student-card .hd-stat-card:nth-child(2) {
+  border-left: 4px solid #03aa2d;
+}
+
+.student-card .hd-stat-card:nth-child(3) {
+  border-left: 4px solid #f59e0b;
+}
+
+
 .hd-stat-card:hover {
   box-shadow: var(--hd-shadow-lg);
   transform: translateY(-2px);
@@ -827,6 +915,10 @@
   .hd-mid-grid   { grid-template-columns: 1fr; }
   .hd-bottom-grid { grid-template-columns: 1fr; }
   .hd-last-grid  { grid-template-columns: 1fr; }
+  .hd-banner-image{
+    display: none;
+}
+
 }
 
 @media (max-width: 768px) {
@@ -839,4 +931,11 @@
   .hd-header { padding: 12px 16px; }
   .hd-profile-info { display: none; }
   .hd-panel { width: 260px; right: -60px; }
+  .hd-banner-image{
+  display: none;
+}
+.hd-banner{
+  height:300px;
+}
+
 }
