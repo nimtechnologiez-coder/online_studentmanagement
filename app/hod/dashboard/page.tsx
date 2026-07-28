@@ -1,14 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./dashboard.css";
+
+/* ---------------- HOD API Types ---------------- */
+
+type HodUser = {
+  id: number;
+  name: string;
+  department: string;
+  college: string;
+  username: string;
+};
+
+type HodStats = {
+  totalStudents: number;
+  activeStudents: number;
+  totalVideos: number;
+};
+
+const API_BASE = "http://127.0.0.1:8000";
+
+const DEFAULT_STATS: HodStats = {
+  totalStudents: 0,
+  activeStudents: 0,
+  totalVideos: 0,
+};
 
 /* ---------------- Mock Data ---------------- */
 
-const stats = [
+const defaultStats = [
   {
     label: "Total Students",
-    value: "356",
+    value: "0",
     sub: "All Years",
     icon: "students",
     color: "purple",
@@ -16,15 +40,15 @@ const stats = [
   },
   {
     label: "Active Students",
-    value: "320",
-    sub: "89.9% of Total",
+    value: "0",
+    sub: "0% of Total",
     icon: "active",
     color: "green",
     trend: null,
   },
   {
     label: "Total Videos",
-    value: "42",
+    value: "0",
     sub: "All Department Videos",
     icon: "video",
     color: "orange",
@@ -171,6 +195,100 @@ const CIRC = 2 * Math.PI * RADIUS;
 export default function HodDashboard() {
   const [hoverIdx, setHoverIdx] = useState(3);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [hod, setHod] = useState<HodUser | null>(null);
+  const [stats, setStats] = useState<HodStats>(DEFAULT_STATS);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    const savedHod = typeof window !== "undefined" ? localStorage.getItem("hod") || sessionStorage.getItem("hod") : null;
+    let hodId = "";
+
+    if (savedHod) {
+      try {
+        const parsed = JSON.parse(savedHod);
+        hodId = parsed?.id || "";
+      } catch (err) {
+        console.error("Failed to parse saved HOD data:", err);
+      }
+    }
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (hodId) {
+      headers["X-Hod-Id"] = String(hodId);
+    }
+
+    try {
+      let response = await fetch("/api/hod/dashboard/", {
+        method: "GET",
+        headers,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        response = await fetch(`${API_BASE}/api/hod/dashboard/`, {
+          method: "GET",
+          headers,
+          credentials: "include",
+        });
+      }
+
+      const json = await response.json();
+
+      if (json.status !== "success") {
+        throw new Error(json.message || "Unable to load HOD dashboard data.");
+      }
+
+      setHod(json.hod ?? null);
+      setStats({
+        totalStudents: json.stats?.totalStudents ?? 0,
+        activeStudents: json.stats?.activeStudents ?? 0,
+        totalVideos: json.stats?.totalVideos ?? 0,
+      });
+    } catch (err: any) {
+      console.error("Failed to load HOD dashboard:", err);
+      setError(err.message || "Failed to load dashboard data.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  const renderedStats = [
+    {
+      label: "Total Students",
+      value: String(stats.totalStudents),
+      sub: "All Years",
+      icon: "students",
+      color: "purple",
+      trend: null,
+    },
+    {
+      label: "Active Students",
+      value: String(stats.activeStudents),
+      sub: stats.totalStudents > 0 ? `${Math.round((stats.activeStudents / stats.totalStudents) * 100)}% of Total` : "0% of Total",
+      icon: "active",
+      color: "green",
+      trend: null,
+    },
+    {
+      label: "Total Videos",
+      value: String(stats.totalVideos),
+      sub: "All Department Videos",
+      icon: "video",
+      color: "orange",
+      trend: null,
+    },
+  ];
 
   const active = engagementData[hoverIdx];
   const linePoints = engagementData.map((d, i) => `${gx(i)},${gy(d.value)}`).join(" ");
@@ -233,10 +351,10 @@ export default function HodDashboard() {
           </div>
 
           <div className="hd-profile">
-            <div className="hd-avatar-circle">DA</div>
+            <div className="hd-avatar-circle">{hod?.name ? hod.name.charAt(0) : "H"}</div>
             <div className="hd-profile-info">
-              <span className="hd-profile-name">Dr. Arun Kumar</span>
-              <span className="hd-profile-role">HOD - CSE</span>
+              <span className="hd-profile-name">{hod?.name ?? "HOD"}</span>
+              <span className="hd-profile-role">{hod ? `HOD - ${hod.department}` : "HOD"}</span>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M6 9l6 6 6-6" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -256,19 +374,19 @@ export default function HodDashboard() {
             </svg>
           </div>
           <div className="hd-banner-text">
-            <h1 className="hd-banner-heading">Welcome, Dr. Arun Kumar <span>👋</span></h1>
+            <h1 className="hd-banner-heading">Welcome, {hod?.name ?? "HOD"} <span>👋</span></h1>
             <p className="hd-banner-sub">Head of Department</p>
-            <p className="hd-banner-dept">Computer Science &amp; Engineering</p>
+            <p className="hd-banner-dept">{hod?.department ?? "Department"}</p>
           </div>
           <div className="hd-banner-divider" />
           <div className="hd-banner-meta">
             <div className="hd-banner-meta-item">
               <span className="hd-banner-meta-label">Department</span>
-              <span className="hd-banner-meta-value">Computer Science &amp; Engineering</span>
+              <span className="hd-banner-meta-value">{hod?.department ?? "Department"}</span>
             </div>
             <div className="hd-banner-meta-item">
               <span className="hd-banner-meta-label">College</span>
-              <span className="hd-banner-meta-value">ABC College of Engineering</span>
+              <span className="hd-banner-meta-value">{hod?.college ?? "College"}</span>
             </div>
           </div>
           <div className="hd-banner-illus" aria-hidden="true">
@@ -289,7 +407,7 @@ export default function HodDashboard() {
 
         {/* ========== STAT CARDS ========== */}
         <section className="hd-stats-grid">
-          {stats.map((s) => (
+          {renderedStats.map((s) => (
             <div className="hd-stat-card" key={s.label}>
               <div className="hd-stat-top">
                 <div>
@@ -625,6 +743,6 @@ function OverviewIcon({ icon, color }: { icon: string; color: string }) {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg> 
+    </svg>
   );
 }

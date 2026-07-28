@@ -45,11 +45,7 @@ const menu = [
         href: "/hod/videos",
         icon: Video,
       },
-      {
-        name: "Attendance",
-        href: "/hod/attendance",
-        icon: FileText,
-      },
+
     ],
   },
   {
@@ -97,7 +93,7 @@ export default function HODSidebar() {
           >
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          
+
           <button
             className="mobile-toggle-btn"
             onClick={() => setMobileOpen(!mobileOpen)}
