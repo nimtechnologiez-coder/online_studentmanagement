@@ -433,7 +433,7 @@ const time = today.toLocaleTimeString("en-US", {
           <div className="hd-card">
             <div className="hd-card-header">
               <h2 className="hd-card-title">Recent Videos</h2>
-              <a href = "/hod/videos">View All</a>
+              <a href = "/hod/videos" style = {{"fontSize":"12px","color":"blue"}}>View All</a>
             </div>
             <ul className="hd-video-list">
               {videos.map((v) => (
