@@ -1,0 +1,340 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap");
+
+:root {
+  --navy-950: #0b1330;
+  --navy-800: #131f45;
+  --navy-700: #1b2a5c;
+  --indigo-600: #2c3d8f;
+  --gold-500: #c6a15b;
+  --gold-300: #e4cf9d;
+  --gold-100: #f4ead2;
+  --ivory-50: #faf9f5;
+  --ivory-100: #f2f0ea;
+  --slate-600: #5b6172;
+  --slate-900: #1f2430;
+  --line: rgba(198, 161, 91, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--ivory-50);
+  position: relative;
+}
+
+/* ---------------- LEFT: IMAGE / BRAND PANEL ---------------- */
+
+.left-section {
+  position: relative;
+  flex: 1.05;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(198, 161, 91, 0.16), transparent 45%),
+    linear-gradient(160deg, var(--navy-950) 0%, var(--navy-800) 48%, var(--indigo-600) 100%);
+  display: flex;
+  align-items: center;
+}
+
+/* Faint architectural grid to suggest a campus / institutional photo without a real asset.
+   Swap this block's background for background-image: url('your-photo.jpg') if you have one,
+   and keep .left-overlay for text legibility. */
+.left-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(180deg, transparent, black 30%, black 75%, transparent);
+}
+
+.left-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(11, 19, 48, 0.65), rgba(11, 19, 48, 0.15) 40%);
+}
+
+.left-content {
+  position: relative;
+  z-index: 2;
+  padding: 5rem 4.5rem;
+  max-width: 620px;
+  color: var(--ivory-50);
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--gold-500);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.brand-mark-glyph {
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--gold-300);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-300);
+  margin-bottom: 1.1rem;
+}
+
+.left-content h1 {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: clamp(2rem, 3.4vw, 2.85rem);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.4rem;
+}
+
+.left-content p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(250, 249, 245, 0.72);
+  max-width: 460px;
+  margin: 0 0 3rem;
+}
+
+.left-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(198, 161, 91, 0.28);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-value {
+  font-family: "Fraunces", serif;
+  font-size: 1.15rem;
+  color: var(--gold-300);
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(250, 249, 245, 0.55);
+}
+
+.divider-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold-500);
+  opacity: 0.7;
+}
+
+/* ---------------- SEAM TAB (signature element) ---------------- */
+
+.seam-tab {
+  position: absolute;
+  left: min(48.5%, 51%);
+  top: 3.25rem;
+  transform: translateX(-50%) rotate(-90deg);
+  transform-origin: left top;
+  background: var(--gold-500);
+  color: var(--navy-950);
+  font-family: "Manrope", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  z-index: 5;
+  box-shadow: 0 6px 16px rgba(11, 19, 48, 0.25);
+}
+
+/* ---------------- RIGHT: FORM PANEL ---------------- */
+
+.right-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ivory-50);
+  background-image: radial-gradient(circle at 85% 10%, var(--ivory-100), transparent 55%);
+  padding: 3rem 2.5rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.eyebrow-dark {
+  color: var(--gold-500);
+}
+
+.login-card h2 {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: 2rem;
+  color: var(--slate-900);
+  margin: 0 0 0.6rem;
+}
+
+.subtitle {
+  font-size: 0.92rem;
+  color: var(--slate-600);
+  line-height: 1.6;
+  margin: 0 0 2.5rem;
+}
+
+.input-box {
+  margin-bottom: 1.6rem;
+}
+
+.input-box label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-600);
+  margin-bottom: 0.6rem;
+}
+
+.input-box input {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid #d8d3c6;
+  background: transparent;
+  padding: 0.65rem 0.1rem;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.98rem;
+  color: var(--slate-900);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-box input::placeholder {
+  color: #a7a49a;
+}
+
+.input-box input:focus {
+  border-bottom-color: var(--gold-500);
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2.25rem;
+  font-size: 0.85rem;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--slate-600);
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember input {
+  accent-color: var(--gold-500);
+}
+
+.login-card button[type="submit"] {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  background: var(--navy-950);
+  color: var(--gold-300);
+  border: 1px solid var(--navy-950);
+  border-radius: 3px;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.login-card button[type="submit"]:hover {
+  background: var(--gold-500);
+  color: var(--navy-950);
+  border-color: var(--gold-500);
+}
+
+.login-card button[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+.login-card button[type="submit"]:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 3px;
+}
+
+.footer-note {
+  margin-top: 2.25rem;
+  font-size: 0.82rem;
+  color: var(--slate-600);
+  text-align: center;
+}
+
+.footer-note a {
+  color: var(--navy-700);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.footer-note a:hover {
+  border-bottom-color: var(--navy-700);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 960px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .left-section {
+    min-height: 46vh;
+  }
+
+  .left-content {
+    padding: 3rem 2rem;
+  }
+
+  .seam-tab {
+    display: none;
+  }
+
+  .right-section {
+    padding: 3rem 1.5rem 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

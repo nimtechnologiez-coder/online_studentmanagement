@@ -1,0 +1,371 @@
+/* Student My Progress Page Styles - Modern & Premium UI */
+
+.progress-container {
+  min-height: 100vh;
+  background-color: var(--background, #f8fafc);
+  padding: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .progress-container {
+    padding: 2rem;
+  }
+}
+
+/* Header */
+.prog-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .prog-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.prog-title-box h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--foreground, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .prog-title-box h1 {
+    font-size: 1.875rem;
+  }
+}
+
+.prog-title-box p {
+  color: var(--muted-text, #64748b);
+  font-size: 0.875rem;
+  margin-top: 0.35rem;
+}
+
+.download-cert-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+}
+
+.download-cert-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+/* Streak & Weekly Goal Banner */
+.streak-goal-card {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border-radius: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15);
+  margin-bottom: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 768px) {
+  .streak-goal-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.streak-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.streak-icon-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: 1rem;
+  background: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+.streak-box h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.streak-box p {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.weekly-goal-box {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .weekly-goal-box {
+    width: 300px;
+  }
+}
+
+.goal-track {
+  width: 100%;
+  height: 8px;
+  background-color: #334155;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f97316, #eab308);
+  border-radius: 9999px;
+}
+
+/* Top Stats Cards Grid */
+.prog-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .prog-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .prog-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.prog-stat-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1.125rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.125rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prog-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+.prog-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.prog-stat-icon.blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+.prog-stat-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
+.prog-stat-icon.amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.prog-stat-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+.prog-stat-info h4 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-text, #64748b);
+}
+
+.prog-stat-info .value {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--card-text, #0f172a);
+  margin-top: 0.15rem;
+}
+
+/* Charts Grid */
+.prog-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .prog-charts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.prog-chart-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1.125rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.prog-chart-card h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--card-text, #0f172a);
+  margin-bottom: 0.25rem;
+}
+
+.prog-chart-card p {
+  font-size: 0.8125rem;
+  color: var(--muted-text, #64748b);
+  margin-bottom: 1.25rem;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 280px;
+}
+
+/* Subject Progress Breakdown List */
+.subject-progress-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1.125rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.subject-progress-card h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--card-text, #0f172a);
+  margin-bottom: 1.25rem;
+}
+
+.subject-item-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.subject-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subject-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--card-text, #0f172a);
+}
+
+.subject-stats-text {
+  font-size: 0.8125rem;
+  color: var(--muted-text, #64748b);
+  font-weight: 600;
+}
+
+.track-bg {
+  width: 100%;
+  height: 8px;
+  background-color: var(--background, #f1f5f9);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.track-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 9999px;
+  transition: width 0.6s ease;
+}
+
+/* Achievements & Badges Panel */
+.achievements-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1.125rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.achievements-card h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--card-text, #0f172a);
+}
+
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem;
+  background-color: var(--background, #f8fafc);
+  border-radius: 0.875rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  transition: transform 0.2s ease;
+}
+
+.badge-item:hover {
+  transform: translateX(4px);
+}
+
+.badge-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.badge-item h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--card-text);
+  margin: 0;
+}
+
+.badge-item p {
+  font-size: 0.75rem;
+  color: var(--muted-text);
+  margin-top: 0.125rem;
+}

@@ -1,0 +1,385 @@
+/* Student My Videos Page Styles - Modern & Premium UI */
+
+video::-internal-media-controls-download-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  overflow: hidden;
+}
+
+.my-videos-container {
+  min-height: 100vh;
+  background-color: var(--background, #f8fafc);
+  padding: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .my-videos-container {
+    padding: 2rem;
+  }
+}
+
+.my-videos-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .my-videos-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.header-title-area h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--foreground, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .header-title-area h1 {
+    font-size: 1.875rem;
+  }
+}
+
+.header-title-area p {
+  color: var(--muted-text, #64748b);
+  font-size: 0.875rem;
+  margin-top: 0.35rem;
+}
+
+/* Controls Card */
+.controls-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  margin-bottom: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .controls-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .search-box {
+    width: 24rem;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-text, #94a3b8);
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 2.5rem;
+  padding-right: 1rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--card-border, #cbd5e1);
+  background-color: var(--background, #f8fafc);
+  color: var(--foreground, #0f172a);
+  outline: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  background-color: var(--card-bg, #ffffff);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tag-btn {
+  background-color: var(--background, #f1f5f9);
+  color: var(--muted-text, #475569);
+  border: 1px solid var(--card-border, #e2e8f0);
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-btn:hover {
+  background-color: #e2e8f0;
+  color: var(--foreground, #0f172a);
+}
+
+.tag-btn.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Video Cards Grid Layout */
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .videos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .videos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Corporate Video Card */
+.video-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1.125rem;
+  border: 1px solid var(--card-border, #e2e8f0);
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+}
+
+.thumbnail-wrapper {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.play-overlay {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.95);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.video-card:hover .play-overlay {
+  transform: scale(1.15);
+  background: #2563eb;
+}
+
+.duration-badge {
+  position: absolute;
+  bottom: 0.85rem;
+  right: 0.85rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.subject-badge {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.video-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.video-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--card-text, #0f172a);
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.instructor-name {
+  font-size: 0.8125rem;
+  color: var(--muted-text, #64748b);
+  margin-bottom: 1rem;
+}
+
+/* Progress bar inside card */
+.progress-area {
+  margin-bottom: 1rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.4rem;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: #f1f5f9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 9999px;
+}
+
+/* Action watch button */
+.watch-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem;
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+}
+
+.watch-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.no-videos-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  color: var(--muted-text);
+  background-color: var(--card-bg);
+  border-radius: 0.875rem;
+  border: 1px solid var(--card-border);
+}
+
+/* In-Page Video Player Modal */
+.video-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.video-modal-container {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 840px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--card-border);
+  color: var(--card-text);
+}
+
+.video-modal-header {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted-text);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+.video-player-wrapper {
+  width: 100%;
+  height: 240px;
+  background-color: #000000;
+}
+
+@media (min-width: 640px) {
+  .video-player-wrapper {
+    height: 380px;
+  }
+}
