@@ -1,177 +1,336 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import "./dashboard.css";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import {
+  GraduationCap,
+  Video,
+  Eye,
+  Search,
+  Bell,
+  ChevronDown,
+  User,
+  PlayCircle,
+  RefreshCw,
+  AlertCircle,
+  Users,
+  TrendingUp,
+  Activity,
+  Zap,
+  CheckCircle2,
+  FileSpreadsheet,
+  ArrowUpRight,
+  ShieldCheck,
+  Award,
+  BarChart3,
+  BookOpen,
+  Star,
+} from "lucide-react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+} from "recharts";
+import "./Hoddashboard.css";
 
-import cloud from "./images/cloud.png";
-import { FiClock } from "react-icons/fi";
+/* ---------------------------------- TYPES ---------------------------------- */
 
-/* ---------------- Types ---------------- */
+interface DailyView {
+  day: string;
+  views: number;
+}
 
-type HodUser = {
-  id: string;
+interface CategorySlice {
   name: string;
+  value: number;
+  color: string;
+}
+
+interface UploadedVideo {
+  title: string;
+  category: string;
+  duration: string;
+  views: number;
+  uploadDate: string;
+  thumbnail?: string;
+}
+
+interface RecentView {
+  student: string;
   department: string;
-  college: string;
-};
+  video: string;
+  watchTime: string;
+  lastViewed: string;
+}
 
-type HodStats = {
-  totalStudents: number;
-  activeStudents: number;
-  totalVideos: number;
-};
+interface StudentPerformance {
+  name: string;
+  year: string;
+  score: number;
+  views: number;
+}
 
-const DEFAULT_STATS: HodStats = {
-  totalStudents: 0,
-  activeStudents: 0,
-  totalVideos: 0,
-};
+interface LiveActivity {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  time: string;
+  badge: string;
+}
+
+interface HodDashboardData {
+  summaryCards: {
+    students: number;
+    videos: number;
+    totalViews: number;
+    watchTime: string;
+    activeStudents?: number;
+    engagementRate?: number;
+  };
+  dailyViews: DailyView[];
+  topCategories: CategorySlice[];
+  latestVideos: UploadedVideo[];
+  recentViews: RecentView[];
+  studentPerformance?: StudentPerformance[];
+  liveActivities?: LiveActivity[];
+  departmentName?: string;
+  collegeName?: string;
+  hodName?: string;
+}
+
+/* --------------------------------- HELPERS --------------------------------- */
+
+function ViewsTooltip(props: any) {
+  const { active, payload, label } = props;
+  if (!active || !payload || !payload.length) return null;
+  const value = payload[0]?.value ?? 0;
+  return (
+    <div className="chart-tooltip-glass">
+      <p className="chart-tooltip-title">{label}</p>
+      <p className="chart-tooltip-row">
+        <span className="chart-tooltip-dot" style={{ background: "#4f46e5" }} />
+        Views: <strong>{Number(value).toLocaleString()}</strong>
+      </p>
+    </div>
+  );
+}
+
+function BarTooltip(props: any) {
+  const { active, payload, label } = props;
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div className="chart-tooltip-glass">
+      <p className="chart-tooltip-title">{label}</p>
+      <p className="chart-tooltip-row">
+        <span className="chart-tooltip-dot" style={{ background: "#3b82f6" }} />
+        Views: <strong>{Number(payload[0]?.value ?? 0).toLocaleString()}</strong>
+      </p>
+    </div>
+  );
+}
+
+function CategoryTooltip(props: any) {
+  const { active, payload } = props;
+  if (!active || !payload || !payload.length) return null;
+  const item = payload[0];
+  const color = item?.payload?.color ?? "#6366f1";
+  return (
+    <div className="chart-tooltip-glass">
+      <p className="chart-tooltip-row">
+        <span className="chart-tooltip-dot" style={{ background: color }} />
+        {item.name}: <strong>{Number(item.value).toLocaleString()} students</strong>
+      </p>
+    </div>
+  );
+}
+
+function buildWeeklyData(dailyViews: DailyView[]) {
+  if (!dailyViews.length) return [];
+  const weeks: { week: string; views: number }[] = [];
+  const chunkSize = Math.ceil(dailyViews.length / 5);
+  for (let i = 0; i < 5; i++) {
+    const chunk = dailyViews.slice(i * chunkSize, (i + 1) * chunkSize);
+    weeks.push({
+      week: `Week ${i + 1}`,
+      views: chunk.reduce((sum, d) => sum + d.views, 0),
+    });
+  }
+  return weeks;
+}
+
+function buildStudentDonut(students: StudentPerformance[]) {
+  const palette = ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#94a3b8"];
+  const yearGroups: Record<string, number> = {};
+  students.forEach((s) => {
+    yearGroups[s.year] = (yearGroups[s.year] || 0) + 1;
+  });
+  return Object.entries(yearGroups).map(([year, count], i) => ({
+    name: year,
+    fullName: `Year ${year}`,
+    value: count,
+    color: palette[i] ?? "#94a3b8",
+  }));
+}
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
-/* ---------------- Mock Data ---------------- */
-
-const DEFAULT_ENGAGEMENT = [
-  { day: "Mon", value: 0 },
-  { day: "Tue", value: 0 },
-  { day: "Wed", value: 0 },
-  { day: "Thu", value: 0 },
-  { day: "Fri", value: 0 },
-  { day: "Sat", value: 0 },
-  { day: "Sun", value: 0 },
-];
-
-type DashboardSection = {
-  id?: number;
-  rank?: number;
-  name?: string;
-  year?: string;
-  score?: number;
-  action?: string;
-  time?: string;
-  icon?: string;
-  color?: string;
-  title?: string;
-  sub?: string;
-  views?: number;
-  status?: string;
-  bgColor?: string;
-  emoji?: string;
-  label?: string;
-  value?: string | number;
-  percent?: number;
-  count?: number;
-  day?: string;
-};
-
-const DEFAULT_TOP_STUDENTS: DashboardSection[] = [];
-const DEFAULT_ACTIVITIES: DashboardSection[] = [];
-const DEFAULT_VIDEOS: DashboardSection[] = [];
-const DEFAULT_YEAR_SEGMENTS: DashboardSection[] = [];
-const DEFAULT_QUICK_OVERVIEW: DashboardSection[] = [];
-const TOTAL = 0;
-
-/* ---------------- Chart Geometry ---------------- */
-const CW = 680;
-const CH = 200;
-const PX = 24;
-const PT = 16;
-const PB = 28;
-
-function gx(i: number, dataLength: number) {
-  return PX + ((CW - PX * 2) / (dataLength - 1)) * i;
-}
-function gy(v: number) {
-  const usable = CH - PT - PB;
-  return PT + usable - (usable * v) / 100;
-}
-
-const RADIUS = 56;
-const STROKE = 20;
-const CIRC = 2 * Math.PI * RADIUS;
-
-/* ---------------- Component ---------------- */
+/* --------------------------------- COMPONENT -------------------------------- */
 
 export default function HodDashboard() {
-  const [hoverIdx, setHoverIdx] = useState(3);
-  const [hod, setHod] = useState<HodUser | null>(null);
-  const [stats, setStats] = useState<HodStats>(DEFAULT_STATS);
-  const [engagementData, setEngagementData] = useState(DEFAULT_ENGAGEMENT);
-  const [topStudents, setTopStudents] = useState(DEFAULT_TOP_STUDENTS);
-  const [activities, setActivities] = useState(DEFAULT_ACTIVITIES);
-  const [videos, setVideos] = useState(DEFAULT_VIDEOS);
-  const [yearSegments, setYearSegments] = useState(DEFAULT_YEAR_SEGMENTS);
-  const [quickOverview, setQuickOverview] = useState(DEFAULT_QUICK_OVERVIEW);
+  const [profileOpen, setProfileOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [hodDisplayName, setHodDisplayName] = useState<string>("HOD");
 
-  const fetchDashboardData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    try {
+      const savedHod =
+        typeof window !== "undefined"
+          ? localStorage.getItem("hod") || sessionStorage.getItem("hod")
+          : null;
+      if (savedHod) {
+        const parsed = JSON.parse(savedHod);
+        if (parsed?.name || parsed?.hod_name) {
+          setHodDisplayName(parsed.name || parsed.hod_name);
+        }
+      }
+    } catch (e) {
+      console.error("Error reading HOD name:", e);
+    }
+  }, []);
 
+  const [dashData, setDashData] = useState<HodDashboardData>({
+    summaryCards: {
+      students: 0,
+      videos: 0,
+      totalViews: 0,
+      watchTime: "0 Hours",
+      activeStudents: 0,
+      engagementRate: 0,
+    },
+    dailyViews: [],
+    topCategories: [],
+    latestVideos: [],
+    recentViews: [],
+    studentPerformance: [],
+    liveActivities: [],
+    departmentName: "",
+    collegeName: "",
+    hodName: "",
+  });
+
+  const getHodHeaders = () => {
     const savedHod =
       typeof window !== "undefined"
         ? localStorage.getItem("hod") || sessionStorage.getItem("hod")
         : null;
     let hodId = "";
-
     if (savedHod) {
-      try {
-        const parsed = JSON.parse(savedHod);
-        hodId = parsed?.id || "";
-      } catch (err) {
-        console.error("Failed to parse saved HOD data:", err);
-      }
+      try { hodId = JSON.parse(savedHod)?.id || ""; } catch {}
     }
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (hodId) headers["X-Hod-Id"] = String(hodId);
+    return headers;
+  };
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (hodId) {
-      headers["X-Hod-Id"] = String(hodId);
-    }
-
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const response = await fetch(`${API_BASE}/api/hod/dashboard/`, {
+      const response = await fetch(`${API_BASE}/api/hod/dashboard/?period=week`, {
         method: "GET",
-        headers,
+        headers: getHodHeaders(),
         credentials: "include",
       });
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      const json = await response.json();
 
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+      if (json.status === "success") {
+        /* Map HOD API response → HodDashboardData */
+        const eng = json.engagementData || [];
+        const topSt = json.topStudents || [];
+        const acts = json.recentActivities || [];
+        const vids = json.recentVideos || [];
+
+        /* Build dailyViews from engagement (count → views alias) */
+        const dailyViews: DailyView[] = eng.map((e: any) => ({ day: e.day, views: e.value ?? 0 }));
+
+        /* Build recentViews from activities */
+        const recentViews: RecentView[] = acts.map((a: any) => ({
+          student: a.name || "",
+          department: json.hod?.department || "",
+          video: a.action?.replace(/^(watched|completed)\s*"?/, "").replace(/"$/, "") || "",
+          watchTime: "",
+          lastViewed: a.time || "",
+        }));
+
+        /* Build latestVideos from recent videos */
+        const latestVideos: UploadedVideo[] = vids.map((v: any) => ({
+          title: v.title || "",
+          category: "Department",
+          duration: "—",
+          views: v.views || 0,
+          uploadDate: v.sub || "",
+          thumbnail: undefined,
+        }));
+
+        /* Build student performance */
+        const studentPerformance: StudentPerformance[] = topSt.map((s: any) => ({
+          name: s.name || "",
+          year: s.year || "I",
+          score: s.score || 0,
+          views: 0,
+        }));
+
+        /* Build live activities */
+        const liveActivities: LiveActivity[] = acts.map((a: any, i: number) => ({
+          id: String(a.id ?? i),
+          type: a.icon || "play",
+          title: a.name || "",
+          description: `${a.name || ""} ${a.action || ""}`,
+          time: a.time || "",
+          badge: a.icon === "check" ? "Completed" : "Watched",
+        }));
+
+        setDashData({
+          summaryCards: {
+            students: json.stats?.totalStudents ?? 0,
+            videos: json.stats?.totalVideos ?? 0,
+            totalViews: 0,
+            watchTime: "0 Hours",
+            activeStudents: json.stats?.activeStudents ?? 0,
+            engagementRate: 0,
+          },
+          dailyViews,
+          topCategories: [],
+          latestVideos,
+          recentViews,
+          studentPerformance,
+          liveActivities,
+          departmentName: json.hod?.department || "",
+          collegeName: json.hod?.college || "",
+          hodName: json.hod?.name || hodDisplayName,
+        });
+
+        if (json.hod?.name) setHodDisplayName(json.hod.name);
+        setLastUpdated(new Date());
+      } else {
+        throw new Error(json.message || "API returned an error");
       }
-
-      const text = await response.text();
-      let json: any = null;
-
-      try {
-        json = text ? JSON.parse(text) : null;
-      } catch (parseErr) {
-        throw new Error("The server returned an invalid response.");
-      }
-
-      if (!json || json.status !== "success") {
-        throw new Error(json?.message || "Unable to load HOD dashboard data.");
-      }
-
-      setHod(json.hod ?? null);
-      setStats({
-        totalStudents: json.stats?.totalStudents ?? 0,
-        activeStudents: json.stats?.activeStudents ?? 0,
-        totalVideos: json.stats?.totalVideos ?? 0,
-      });
-      setEngagementData((json.engagementData || DEFAULT_ENGAGEMENT).map((item: any) => ({ day: item.day, value: item.value })));
-      setTopStudents((json.topStudents || DEFAULT_TOP_STUDENTS).map((item: any) => ({ rank: item.rank, name: item.name, year: item.year, score: item.score })));
-      setActivities((json.recentActivities || DEFAULT_ACTIVITIES).map((item: any) => ({ id: item.id, name: item.name, action: item.action, time: item.time, icon: item.icon, color: item.color })));
-      setVideos((json.recentVideos || DEFAULT_VIDEOS).map((item: any) => ({ id: item.id, title: item.title, sub: item.sub, views: item.views, status: item.status, bgColor: item.bgColor, emoji: item.emoji })));
-      setYearSegments((json.yearDistribution || DEFAULT_YEAR_SEGMENTS).map((item: any) => ({ label: item.label, count: item.count, percent: item.percent, color: item.color })));
-      setQuickOverview((json.quickOverview || DEFAULT_QUICK_OVERVIEW).map((item: any) => ({ label: item.label, value: item.value, icon: item.icon, color: item.color })));
     } catch (err: any) {
-      console.error("Failed to load HOD dashboard:", err);
       setError(err.message || "Failed to load dashboard data.");
+      console.error("HOD Dashboard fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -181,546 +340,518 @@ export default function HodDashboard() {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const renderedStats = [
+  const {
+    summaryCards: s = {
+      students: 0, videos: 0, totalViews: 0,
+      watchTime: "0 Hours", activeStudents: 0, engagementRate: 0,
+    },
+    dailyViews = [],
+    latestVideos = [],
+    recentViews = [],
+    studentPerformance = [],
+    liveActivities = [],
+    departmentName = "",
+    collegeName = "",
+  } = dashData || {};
+
+  const engagement = s.engagementRate ?? (s.students > 0 ? Math.round(((s.activeStudents || 0) / s.students) * 100) : 0);
+
+  const weeklyViews = useMemo(() => buildWeeklyData(dailyViews), [dailyViews]);
+  const studentDonut = useMemo(() => buildStudentDonut(studentPerformance ?? []), [studentPerformance]);
+  const totalDonutStudents = studentDonut.reduce((sum, d) => sum + d.value, 0);
+
+  const filteredStudentPerformance = useMemo(() => {
+    if (!searchQuery.trim()) return studentPerformance;
+    const q = searchQuery.toLowerCase();
+    return (studentPerformance ?? []).filter(
+      (d) => d.name.toLowerCase().includes(q) || d.year.toLowerCase().includes(q)
+    );
+  }, [studentPerformance, searchQuery]);
+
+  const filteredLatestVideos = useMemo(() => {
+    if (!searchQuery.trim()) return latestVideos;
+    const q = searchQuery.toLowerCase();
+    return latestVideos.filter((v) => v.title.toLowerCase().includes(q) || v.category.toLowerCase().includes(q));
+  }, [latestVideos, searchQuery]);
+
+  const filteredRecentViews = useMemo(() => {
+    if (!searchQuery.trim()) return recentViews;
+    const q = searchQuery.toLowerCase();
+    return recentViews.filter(
+      (r) => r.student.toLowerCase().includes(q) || r.video.toLowerCase().includes(q)
+    );
+  }, [recentViews, searchQuery]);
+
+  const kpiCards = [
     {
       label: "Total Students",
-      value: String(stats.totalStudents),
-      sub: "All Years",
-      icon: "students",
-      color: "purple",
-      trend: null as "up" | null,
-    },
-    {
-      label: "Active Students",
-      value: String(stats.activeStudents),
-      sub:
-        stats.totalStudents > 0
-          ? `${Math.round((stats.activeStudents / stats.totalStudents) * 100)}% of Total`
-          : "0% of Total",
-      icon: "active",
-      color: "green",
-      trend: null as "up" | null,
+      value: s.students.toLocaleString(),
+      subtext: `${s.activeStudents || 0} active learners`,
+      icon: Users,
+      tone: "indigo",
+      trend: "",
     },
     {
       label: "Total Videos",
-      value: String(stats.totalVideos),
-      sub: "All Department Videos",
-      icon: "video",
-      color: "orange",
-      trend: null as "up" | null,
+      value: s.videos.toLocaleString(),
+      subtext: "Published course videos",
+      icon: Video,
+      tone: "violet",
+      trend: "",
+    },
+    {
+      label: "Active Students",
+      value: String(s.activeStudents || 0),
+      subtext: "Engaged this week",
+      icon: GraduationCap,
+      tone: "teal",
+      trend: "",
+    },
+    {
+      label: "Engagement Rate",
+      value: `${engagement}%`,
+      subtext: "Active participation rate",
+      icon: TrendingUp,
+      tone: "amber",
+      trend: "",
     },
   ];
 
-  const active = engagementData[hoverIdx] ?? engagementData[0];
-  const linePoints = engagementData.map((d, i) => `${gx(i, engagementData.length)},${gy(d.value)}`).join(" ");
-  const areaPoints = `${gx(0, engagementData.length)},${gy(0)} ${linePoints} ${gx(engagementData.length - 1, engagementData.length)},${gy(0)}`;
-
-  const [today, setToday] = useState(new Date());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setToday(new Date());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const day = today.toLocaleDateString("en-US", { weekday: "short" });
-  const month = today.toLocaleDateString("en-US", { month: "short" });
-  const date = today.getDate();
-  const year = today.getFullYear();
-  const time = today.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  let donutOffset = 0;
-
-  if (loading) {
-    return (
-      <div className="hd-page">
-        <main className="hd-main">
-          <p>Loading dashboard...</p>
-        </main>
-      </div>
-    );
-  }
-
   return (
-    <div className="hd-page">
-      {/* ========== HEADER ========== */}
-      <header className="hd-header">
-        <div className="hd-header-left">
-          <span className="hd-header-title">HOD Dashboard</span>
+    <div className="dash-corp-main">
+      {/* ===== TOP HEADER ===== */}
+      <header className="dash-corp-header">
+        {/* Brand */}
+        <div className="dash-header-brand">
+          <div className="dash-corp-logo">HD</div>
+          <div>
+            <h1 className="dash-header-title">HOD Dashboard</h1>
+            <span className="dash-header-subtitle">
+              {departmentName ? `${departmentName} — ${collegeName}` : "Department Analytics Portal"}
+            </span>
+          </div>
         </div>
-        <div className="hd-header-right">
-          <div className="hd-panel hd-cal-panel">
-            <div className="hd-cal-date-time">
-              <FiClock className="hd-cal-clock-icon" />
-              <span>{day},</span>
-              <span>{month}</span>
-              <span>{date},</span>
-              <span>{year}</span>
-              <span className="hd-time">{time}</span>
-            </div>
+
+        {/* Search — center */}
+        <div className="dash-search-container">
+          <Search size={16} className="search-icon" />
+          <input
+            id="hod-dashboard-search"
+            type="text"
+            placeholder="Search students, videos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <kbd className="search-kbd">⌘K</kbd>
+        </div>
+
+        {/* Right actions */}
+        <div className="dash-header-actions">
+          <button
+            type="button"
+            className="dash-action-btn"
+            onClick={fetchDashboardData}
+            disabled={loading}
+            title="Refresh Dashboard"
+          >
+            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
+            <span className="btn-text">Sync</span>
+          </button>
+
+          <div className="dash-notif-btn">
+            <Bell size={17} />
+            <span className="notif-badge" />
           </div>
 
-          <div className="hd-profile">
-            <div className="hd-avatar-circle">{hod?.name ? hod.name.charAt(0) : "H"}</div>
-            <div className="hd-profile-info">
-              <span className="hd-profile-name">{hod?.name ?? "HOD"}</span>
-              <span className="hd-profile-role">{hod ? `HOD - ${hod.department}` : "HOD"}</span>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M6 9l6 6 6-6" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <div className="dash-profile-wrapper">
+            <button
+              type="button"
+              className="dash-profile-trigger"
+              onClick={() => setProfileOpen((v) => !v)}
+            >
+              <div className="dash-profile-avatar"><User size={15} /></div>
+              <div className="dash-profile-info">
+                <span className="profile-name">{hodDisplayName}</span>
+                <span className="profile-role">Head of Department</span>
+              </div>
+              <ChevronDown size={13} className="profile-arrow" />
+            </button>
+
+            {profileOpen && (
+              <div className="dash-profile-dropdown">
+                <a href="/hod/students"><Users size={14} /> My Students</a>
+                <a href="/hod/videos"><Video size={14} /> Videos</a>
+                <div className="dropdown-divider" />
+                <button type="button" onClick={() => (window.location.href = "/")}>Logout</button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      {error && (
-        <div className="hd-error-banner" role="alert">
-          {error}
-        </div>
-      )}
+      {/* ===== MAIN BODY ===== */}
+      <main className="dash-corp-body">
 
-      <main className="hd-main">
-        {/* ========== WELCOME BANNER ========== */}
-        <section className="hd-banner">
-          <div className="hd-banner-icon-wrap">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <rect width="48" height="48" rx="12" fill="#3b5bdb" />
-              <path
-                d="M24 8L10 16v10c0 8.5 6 16.4 14 18.4 8-2 14-9.9 14-18.4V16L24 8z"
-                fill="white"
-                fillOpacity="0.2"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-              />
-              <text x="24" y="32" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="monospace">
-                {"</>"}
-              </text>
-            </svg>
-          </div>
-          <div className="hd-banner-text">
-            <h1 className="hd-banner-heading">
-              Welcome, {hod?.name ?? "HOD"} <span>👋</span>
-            </h1>
-            <p className="hd-banner-sub">Head of Department</p>
-            <p className="hd-banner-dept">{hod?.department ?? "Department"}</p>
-          </div>
-          <div className="hd-banner-divider" />
-          <div className="hd-banner-meta">
-            <div className="hd-banner-meta-item">
-              <span className="hd-banner-meta-label">Department</span>
-              <span className="hd-banner-meta-value">{hod?.department ?? "Department"}</span>
+        {/* Welcome Banner */}
+        <section className="dash-welcome-banner">
+          <div className="banner-content">
+            <div className="banner-badge">
+              <ShieldCheck size={14} />
+              <span>Department Management Portal</span>
             </div>
-            <div className="hd-banner-meta-item">
-              <span className="hd-banner-meta-label">College</span>
-              <span className="hd-banner-meta-value">{hod?.college ?? "College"}</span>
-            </div>
+            <h2>Welcome back, {hodDisplayName} 👋</h2>
+            <p>{departmentName ? `Managing ${departmentName} — ${collegeName}` : "Here's what's happening in your department today."}</p>
           </div>
-          <div className="hd-banner-illus">
-            <Image src={cloud} alt="Cloud" className="hd-banner-image" loading="eager" />
+          <div className="banner-date-pill">
+            <span className="banner-date-icon">📅</span>
+            <div>
+              <span className="banner-date-value">
+                {new Date().toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}
+              </span>
+              <span className="banner-date-day">
+                {new Date().toLocaleDateString("en-US", { weekday: "long" })}
+              </span>
+            </div>
           </div>
         </section>
 
-        {/* ========== STAT CARDS ========== */}
-        <section className="hd-stats-grid">
-          {renderedStats.map((s) => (
-            <div className="hd-stat-card" key={s.label}>
-              <div className="hd-stat-top">
-                <div>
-                  <p className="hd-stat-label">{s.label}</p>
-                  <p className="hd-stat-value">{s.value}</p>
-                </div>
-                <div className={`hd-stat-icon hd-stat-icon--${s.color}`}>
-                  <StatSvg icon={s.icon} color={s.color} />
-                </div>
-              </div>
-              <p className={`hd-stat-sub ${s.trend === "up" ? "hd-stat-sub--up" : ""}`}>{s.sub}</p>
-            </div>
-          ))}
-        </section>
-
-        {/* ========== CHART ROW ========== */}
-        <section className="hd-mid-grid">
-          {/* Engagement Chart */}
-          <div className="hd-card">
-            <div className="hd-card-header">
-              <h2 className="hd-card-title">Student Engagement (This Week)</h2>
-              <button className="hd-dropdown-btn">
-                This Week
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9l6 6 6-6" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
-            <div className="hd-chart-wrap">
-              <div className="hd-chart-yaxis">
-                {["100%", "75%", "50%", "25%", "0%"].map((v) => (
-                  <span key={v}>{v}</span>
-                ))}
-              </div>
-              <div className="hd-chart-area">
-                <svg viewBox={`0 0 ${CW} ${CH}`} className="hd-chart-svg" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="hdAreaFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#4f6cf7" stopOpacity="0.18" />
-                      <stop offset="100%" stopColor="#4f6cf7" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  {[0, 25, 50, 75, 100].map((v) => (
-                    <line key={v} x1={PX} x2={CW - PX} y1={gy(v)} y2={gy(v)} stroke="#f0f1f5" strokeWidth="1" />
-                  ))}
-                  <polygon points={areaPoints} fill="url(#hdAreaFill)" />
-                  <polyline points={linePoints} fill="none" stroke="#4f6cf7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  {engagementData.map((d, i) => (
-                    <circle
-                      key={d.day}
-                      cx={gx(i, engagementData.length)}
-                      cy={gy(d.value)}
-                      r={hoverIdx === i ? 6 : 4}
-                      fill="#fff"
-                      stroke="#4f6cf7"
-                      strokeWidth="2.5"
-                      style={{ cursor: "pointer" }}
-                      onMouseEnter={() => setHoverIdx(i)}
-                    />
-                  ))}
-                  {hoverIdx !== null && (
-                    <line
-                      x1={gx(hoverIdx, engagementData.length)}
-                      x2={gx(hoverIdx, engagementData.length)}
-                      y1={gy(active.value)}
-                      y2={CH - PB}
-                      stroke="#4f6cf7"
-                      strokeDasharray="4 3"
-                      strokeWidth="1.2"
-                    />
+        {/* ===== KPI CARDS ===== */}
+        <section className="kpi-cards-grid">
+          {kpiCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div className={`kpi-card kpi-${card.tone}`} key={card.label}>
+                <div className="kpi-card-top">
+                  <div className={`kpi-icon-box kpi-icon-${card.tone}`}>
+                    <Icon size={22} />
+                  </div>
+                  {card.trend && (
+                    <span className="kpi-trend-pill">
+                      <ArrowUpRight size={11} />{card.trend}
+                    </span>
                   )}
-                </svg>
-                <div
-                  className="hd-chart-tooltip"
-                  style={{
-                    left: `${(gx(hoverIdx, engagementData.length) / CW) * 100}%`,
-                    top: `${(gy(active.value) / CH) * 100}%`,
-                  }}
-                >
-                  {active.value}%
                 </div>
+                <div className="kpi-card-value">{card.value}</div>
+                <div className="kpi-card-label">{card.label}</div>
+                <div className="kpi-card-sub">{card.subtext}</div>
               </div>
-            </div>
-            <div className="hd-chart-xaxis">
-              {engagementData.map((d) => (
-                <span key={d.day}>{d.day}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* Top Performing Students */}
-          <div className="hd-card">
-            <div className="hd-card-header">
-              <h2 className="hd-card-title">Top Performing Students</h2>
-            </div>
-            <ul className="hd-top-list">
-              {topStudents.length > 0 ? (
-                topStudents.map((s) => (
-                  <li className="hd-top-item" key={s.rank}>
-                    <span className={`hd-rank hd-rank--${s.rank}`}>{s.rank}</span>
-                    <div className="hd-top-info">
-                      <span className="hd-top-name">{s.name}</span>
-                      <span className="hd-top-year">{s.year}</span>
-                    </div>
-                    <div className="hd-bar-track">
-                      <div className="hd-bar-fill" style={{ width: `${s.score}%` }} />
-                    </div>
-                    <span className="hd-top-score">{s.score}%</span>
-                  </li>
-                ))
-              ) : (
-                <li className="hd-top-item">
-                  <span className="hd-top-name">No student activity yet.</span>
-                </li>
-              )}
-            </ul>
-          </div>
+            );
+          })}
         </section>
 
-        {/* ========== BOTTOM ROW ========== */}
-        <section className="hd-bottom-grid">
-          {/* Recent Activity */}
-          <div className="hd-card">
-            <div className="hd-card-header">
-              <h2 className="hd-card-title">Recent Student Activity</h2>
-            </div>
-            <ul className="hd-activity-list">
-              {activities.length > 0 ? (
-                activities.map((a) => (
-                  <li className="hd-activity-item" key={a.id}>
-                    <span className={`hd-act-icon hd-act-icon--${a.color}`}>
-                      <ActIcon type={a.icon} color={a.color} />
-                    </span>
-                    <div className="hd-act-text">
-                      <span className="hd-act-name">{a.name}</span>{" "}
-                      <span className="hd-act-action">{a.action}</span>
-                    </div>
-                    <span className="hd-act-time">{a.time}</span>
-                  </li>
-                ))
-              ) : (
-                <li className="hd-activity-item">
-                  <span className="hd-act-text">No recent activity yet.</span>
-                </li>
-              )}
-            </ul>
+        {error && (
+          <div className="dash-error-banner">
+            <AlertCircle size={18} />
+            <span>{error}</span>
+            <button onClick={fetchDashboardData}>Try Again</button>
           </div>
+        )}
 
-          {/* Recent Videos */}
-          <div className="hd-card">
-            <div className="hd-card-header">
-              <h2 className="hd-card-title">Recent Videos</h2>
-              <a href="/hod/videos" style={{ fontSize: "12px", color: "blue" }}>
-                View All
-              </a>
-            </div>
-            <ul className="hd-video-list">
-              {videos.length > 0 ? (
-                videos.map((v) => (
-                  <li className="hd-video-item" key={v.id}>
-                    <div className="hd-video-thumb" style={{ background: v.bgColor }}>
-                      <span>{v.emoji}</span>
-                    </div>
-                    <div className="hd-video-info">
-                      <span className="hd-video-title">{v.title}</span>
-                      <span className="hd-video-sub">{v.sub}</span>
-                    </div>
-                    <div className="hd-video-meta">
-                      <span className="hd-video-views">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#9ca3af" strokeWidth="2" />
-                          <circle cx="12" cy="12" r="3" stroke="#9ca3af" strokeWidth="2" />
-                        </svg>
-                        {v.views} Views
-                      </span>
-                      <span className="hd-video-badge">{v.status}</span>
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <li className="hd-video-item">
-                  <span className="hd-video-title">No videos uploaded yet.</span>
-                </li>
-              )}
-            </ul>
+        {loading && !lastUpdated ? (
+          <div className="dash-loading-state">
+            <RefreshCw size={32} className="animate-spin" style={{ color: "var(--p-indigo)" }} />
+            <p>Loading department analytics...</p>
           </div>
-        </section>
+        ) : (
+          <>
+            {/* ===== CHARTS ROW 1 ===== */}
+            <section className="dash-charts-row">
 
-        {/* ========== BOTTOM SECOND ROW ========== */}
-        <section className="hd-last-grid">
-          {/* Year-wise Distribution */}
-          <div className="hd-card">
-            <h2 className="hd-card-title" style={{ marginBottom: 16 }}>
-              Year-wise Student Distribution
-            </h2>
-            <div className="hd-dist-body">
-              <div className="hd-donut-wrap">
-                <svg viewBox="0 0 160 160" className="hd-donut-svg">
-                  <g transform="rotate(-90 80 80)">
-                    {yearSegments.map((seg) => {
-                      const percent = seg.percent ?? 0;
-                      const dash = (percent / 100) * CIRC;
-                      const el = (
-                        <circle
-                          key={seg.label}
-                          cx="80"
-                          cy="80"
-                          r={RADIUS}
-                          fill="none"
-                          stroke={seg.color}
-                          strokeWidth={STROKE}
-                          strokeDasharray={`${dash} ${CIRC - dash}`}
-                          strokeDashoffset={-donutOffset}
-                        />
-                      );
-                      donutOffset += dash;
-                      return el;
-                    })}
-                  </g>
-                </svg>
-                <div className="hd-donut-center">
-                  <span className="hd-donut-val">{yearSegments.reduce((sum, seg) => sum + (seg.count || 0), 0)}</span>
-                  <span className="hd-donut-lbl">Total</span>
-                </div>
-              </div>
-              <div className="hd-year-cols">
-                {yearSegments.map((seg) => (
-                  <div className="hd-year-col" key={seg.label}>
-                    <span className="hd-year-label" style={{ color: seg.color }}>
-                      {seg.label}
-                    </span>
-                    <span className="hd-year-count" style={{ color: seg.color }}>
-                      {seg.count}
-                    </span>
-                    <span className="hd-year-pct">({seg.percent}%)</span>
-                    <span className="hd-year-arrow" style={{ color: seg.color }}>
-                      ▲
-                    </span>
+              {/* Student Engagement Area Chart */}
+              <div className="corp-card chart-card chart-wide">
+                <div className="corp-card-header">
+                  <div>
+                    <h3><TrendingUp size={17} className="header-icon" style={{ color: "#4f46e5" }} /> Student Engagement Overview</h3>
+                    <p className="card-subtitle">Video watch activity (Last 7 Days)</p>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Overview */}
-          <div className="hd-card">
-            <h2 className="hd-card-title" style={{ marginBottom: 16 }}>
-              Quick Overview
-            </h2>
-            <div className="hd-overview-grid">
-              {quickOverview.length > 0 ? (
-                quickOverview.map((item) => (
-                  <div className="hd-overview-item" key={item.label}>
-                    <span className={`hd-ov-icon hd-ov-icon--${item.color}`}>
-                      <OverviewIcon icon={item.icon} color={item.color} />
-                    </span>
-                    <span className="hd-ov-label">{item.label}</span>
-                    <span className="hd-ov-value">{item.value}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="hd-overview-item">
-                  <span className="hd-ov-label">No overview data yet.</span>
+                  <span className="chart-badge">7 Days</span>
                 </div>
-              )}
-            </div>
-          </div>
-        </section>
+                <div className="chart-container">
+                  {dailyViews.length === 0 ? (
+                    <div className="chart-empty-state">No engagement data available.</div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={220}>
+                      <AreaChart data={dailyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="hodEngageGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <Tooltip content={<ViewsTooltip />} />
+                        <Area type="monotone" dataKey="views" stroke="#4f46e5" strokeWidth={2.5} fillOpacity={1} fill="url(#hodEngageGrad)"
+                          dot={{ r: 4, fill: "#4f46e5", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+
+              {/* Students by Year Donut */}
+              <div className="corp-card chart-card">
+                <div className="corp-card-header">
+                  <div>
+                    <h3><Users size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Students by Year</h3>
+                  </div>
+                </div>
+                <div className="chart-container donut-chart-box" style={{ position: "relative" }}>
+                  {studentDonut.length === 0 ? (
+                    <div className="chart-empty-state">No student data.</div>
+                  ) : (
+                    <>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: 220 }}>
+                        <div style={{ position: "relative", width: 140, height: 140, flexShrink: 0 }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie data={studentDonut} dataKey="value" nameKey="name" innerRadius={42} outerRadius={68} paddingAngle={3}>
+                                {studentDonut.map((entry) => (
+                                  <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
+                                ))}
+                              </Pie>
+                              <Tooltip content={<CategoryTooltip />} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="donut-center-label">
+                            <span className="donut-center-value">{totalDonutStudents.toLocaleString()}</span>
+                            <span className="donut-center-sub">Students</span>
+                          </div>
+                        </div>
+                        <div className="donut-custom-legend">
+                          {studentDonut.map((d) => {
+                            const pct = totalDonutStudents > 0 ? Math.round((d.value / totalDonutStudents) * 100) : 0;
+                            return (
+                              <div className="legend-row-item" key={d.name}>
+                                <span className="legend-dot" style={{ background: d.color }} />
+                                <span className="legend-name">{d.name} Year</span>
+                                <span className="legend-val">{pct}% ({d.value})</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Video Views Bar Chart (Weekly) */}
+              <div className="corp-card chart-card">
+                <div className="corp-card-header">
+                  <div>
+                    <h3><BarChart3 size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Video Views (This Month)</h3>
+                  </div>
+                  <span className="chart-badge">This Month</span>
+                </div>
+                <div className="chart-container">
+                  {weeklyViews.length === 0 ? (
+                    <div className="chart-empty-state">No view data available.</div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={weeklyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
+                        <XAxis dataKey="week" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} />
+                        <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={52} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* ===== QUICK ACTIONS + LIVE ACTIVITY ===== */}
+            <section className="dash-insights-grid">
+              <div className="corp-card actions-card">
+                <div className="corp-card-header">
+                  <h3><Zap size={18} className="header-icon" style={{ color: "#f59e0b" }} /> Quick Actions</h3>
+                  <span className="header-badge">Shortcuts</span>
+                </div>
+                <div className="quick-actions-buttons">
+                  <a href="/hod/students" className="quick-btn btn-indigo">
+                    <GraduationCap size={16} /><span>Manage Students</span>
+                  </a>
+                  <a href="/hod/videos" className="quick-btn btn-teal">
+                    <Video size={16} /><span>Video Library</span>
+                  </a>
+                  <a href="/hod/performance" className="quick-btn btn-violet">
+                    <Award size={16} /><span>Performance</span>
+                  </a>
+                  <button onClick={fetchDashboardData} className="quick-btn btn-emerald">
+                    <FileSpreadsheet size={16} /><span>Refresh Portal</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="corp-card live-activity-card">
+                <div className="corp-card-header">
+                  <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time Activity Stream</h3>
+                  <span className="header-badge live-dot-badge"><span className="pulse-dot" /> Live</span>
+                </div>
+                <div className="activity-feed-list">
+                  {liveActivities.length === 0 ? (
+                    <div className="empty-feed">No recent activity logged yet.</div>
+                  ) : (
+                    liveActivities.slice(0, 4).map((act) => (
+                      <div key={act.id} className="feed-item">
+                        <div className="feed-icon-dot"><CheckCircle2 size={14} /></div>
+                        <div className="feed-body">
+                          <div className="feed-title">{act.description}</div>
+                          <div className="feed-meta">
+                            <span className="feed-badge">{act.badge}</span>
+                            <span className="feed-time">{act.time}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* ===== STUDENT PERFORMANCE MATRIX ===== */}
+            {filteredStudentPerformance.length > 0 && (
+              <section className="corp-card dept-matrix-card">
+                <div className="corp-card-header">
+                  <div>
+                    <h3><Star size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Student Performance Matrix</h3>
+                    <p className="card-subtitle">Video completion progress for department students.</p>
+                  </div>
+                  <a href="/hod/students" className="card-header-link">
+                    View All Students <ArrowUpRight size={14} />
+                  </a>
+                </div>
+                <div className="dept-matrix-grid">
+                  {filteredStudentPerformance.map((student) => (
+                    <div className="dept-matrix-item" key={student.name}>
+                      <div className="dept-item-top">
+                        <div>
+                          <span className="dept-code-pill">{student.year} Year</span>
+                          <h4 className="dept-title">{student.name}</h4>
+                        </div>
+                        <span className="dept-rate-text">{student.score}% Score</span>
+                      </div>
+                      <div className="dept-progress-track">
+                        <div className="dept-progress-fill" style={{ width: `${Math.min(100, student.score)}%` }} />
+                      </div>
+                      <div className="dept-item-bottom">
+                        <span><GraduationCap size={12} /> {student.year} Year</span>
+                        <span><Eye size={12} /> {student.score}% Completion</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* ===== TABLES GRID ROW ===== */}
+            <section className="dash-tables-grid">
+              {/* Recent Activity Table */}
+              <div className="corp-card table-card-corp">
+                <div className="corp-card-header">
+                  <div>
+                    <h3><Activity size={18} className="header-icon" style={{ color: "#0d9488" }} /> Recent Activity</h3>
+                    <p className="card-subtitle">Real-time log of student video watch sessions</p>
+                  </div>
+                  <div className="recent-header-actions">
+                    <button
+                      className="table-refresh-btn"
+                      onClick={fetchDashboardData}
+                      disabled={loading}
+                      title="Refresh Recent Activity"
+                    >
+                      <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+                    </button>
+                    <span className="table-count-badge">
+                      {Math.min(filteredRecentViews.length, 4)} Logged
+                    </span>
+                    <a href="/hod/students" className="card-header-link">
+                      View All <ArrowUpRight size={13} />
+                    </a>
+                  </div>
+                </div>
+                <div className="corp-table-wrap">
+                  <table className="corp-table">
+                    <thead>
+                      <tr>
+                        <th>Student Name</th>
+                        <th>Activity</th>
+                        <th>Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredRecentViews.length === 0 ? (
+                        <tr><td colSpan={3} className="empty-table-cell">No recent student activity found.</td></tr>
+                      ) : (
+                        filteredRecentViews.slice(0, 4).map((row, idx) => (
+                          <tr key={`${row.student}-${idx}`}>
+                            <td>
+                              <div className="student-cell-profile">
+                                <div className="avatar-circle">
+                                  {row.student.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()}
+                                </div>
+                                <span style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{row.student}</span>
+                              </div>
+                            </td>
+                            <td style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
+                            <td style={{ color: "var(--p-text-muted)", fontSize: 12.5 }}>{row.lastViewed}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Latest Videos Table */}
+              <div className="corp-card table-card-corp">
+                <div className="corp-card-header">
+                  <div>
+                    <h3><PlayCircle size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Latest Published Videos</h3>
+                    <p className="card-subtitle">Recently uploaded educational videos</p>
+                  </div>
+                  <span className="table-count-badge">{filteredLatestVideos.length} Videos</span>
+                </div>
+                <div className="corp-table-wrap">
+                  <table className="corp-table">
+                    <thead>
+                      <tr>
+                        <th>Media</th>
+                        <th>Video Title</th>
+                        <th>Category</th>
+                        <th>Views</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredLatestVideos.length === 0 ? (
+                        <tr><td colSpan={4} className="empty-table-cell">No videos match your filter.</td></tr>
+                      ) : (
+                        filteredLatestVideos.slice(0, 4).map((video, idx) => (
+                          <tr key={`${video.title}-${idx}`}>
+                            <td>
+                              <div className="table-media-thumb">
+                                <div className="table-media-fallback" style={{ display: "flex" }}>
+                                  <PlayCircle size={18} />
+                                </div>
+                              </div>
+                            </td>
+                            <td style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{video.title}</td>
+                            <td><span className="table-cat-badge">{video.category}</span></td>
+                            <td style={{ fontWeight: 600 }}>{video.views.toLocaleString()}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
     </div>
-  );
-}
-
-/* ---------------- Icon Components ---------------- */
-
-function StatSvg({ icon, color }: { icon: string; color: string }) {
-  const colorMap: Record<string, string> = {
-    blue: "#4f6cf7",
-    green: "#22c55e",
-    purple: "#8b5cf6",
-    orange: "#f97316",
-  };
-  const c = colorMap[color] || "#4f6cf7";
-
-  if (icon === "students")
-    return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="9" cy="7" r="3" stroke={c} strokeWidth="2" />
-        <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke={c} strokeWidth="2" strokeLinecap="round" />
-        <circle cx="17" cy="8" r="2.5" stroke={c} strokeWidth="2" />
-        <path d="M14.5 20c.3-2.6 2-4.5 4.5-5" stroke={c} strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    );
-  if (icon === "active")
-    return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="10" cy="7" r="3" stroke={c} strokeWidth="2" />
-        <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke={c} strokeWidth="2" strokeLinecap="round" />
-        <path d="M16 9l1.5 1.5L21 7" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  if (icon === "video")
-    return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="5" width="15" height="14" rx="2" stroke={c} strokeWidth="2" />
-        <path d="M17 9l5-3v12l-5-3V9z" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M3 17l6-6 4 4 8-9" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M15 6h6v6" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function ActIcon({ type, color }: { type?: string; color?: string }) {
-  const colorMap: Record<string, string> = {
-    blue: "#4f6cf7",
-    green: "#22c55e",
-    purple: "#8b5cf6",
-    orange: "#f97316",
-    red: "#ef4444",
-  };
-  const c = colorMap[color || ""] || "#4f6cf7";
-  if (type === "check")
-    return (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <path d="M20 6L9 17l-5-5" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-      <polygon points="5,3 19,12 5,21" fill={c} />
-    </svg>
-  );
-}
-
-function OverviewIcon({ icon, color }: { icon?: string; color?: string }) {
-  const colorMap: Record<string, string> = {
-    purple: "#8b5cf6",
-    blue: "#4f6cf7",
-    red: "#ef4444",
-    teal: "#06b6d4",
-    orange: "#f97316",
-    yellow: "#eab308",
-  };
-  const c = colorMap[color || ""] || "#4f6cf7";
-  if (icon === "video-sm")
-    return (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="5" width="15" height="14" rx="2" stroke={c} strokeWidth="2" />
-        <path d="M17 9l5-3v12l-5-3V9z" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  if (icon === "eye-sm")
-    return (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke={c} strokeWidth="2" />
-        <circle cx="12" cy="12" r="3" stroke={c} strokeWidth="2" />
-      </svg>
-    );
-  if (icon === "calendar-sm")
-    return (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="4" width="18" height="18" rx="2" stroke={c} strokeWidth="2" />
-        <path d="M16 2v4M8 2v4M3 10h18" stroke={c} strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    );
-  if (icon === "chart-sm")
-    return (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-        <path d="M3 17l6-6 4 4 8-9" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  if (icon === "clock-sm")
-    return (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke={c} strokeWidth="2" />
-        <path d="M12 7v5l4 2" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-        stroke={c}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

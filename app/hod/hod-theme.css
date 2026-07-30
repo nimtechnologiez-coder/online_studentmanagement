@@ -1,0 +1,113 @@
+/* ============================================================
+   HOD THEME — Centralized Design Token System
+   Identical to principal-theme.css; used by HOD dashboard CSS.
+   ============================================================ */
+
+/* ================================ LIGHT THEME (default) ================================ */
+:root {
+  --font-heading: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Page backgrounds */
+  --p-bg-main:          #f1f5f9;
+  --p-bg-card:          rgba(255, 255, 255, 0.92);
+  --p-bg-elevated:      #ffffff;
+  --p-bg-subtle:        #f8fafc;
+  --p-bg-input:         #f1f5f9;
+
+  /* Borders */
+  --p-border:           rgba(226, 232, 240, 0.85);
+  --p-border-strong:    #cbd5e1;
+  --p-border-table:     #e2e8f0;
+  --p-border-table-row: #f1f5f9;
+
+  /* Text */
+  --p-text-primary:     #0f172a;
+  --p-text-muted:       #64748b;
+  --p-text-light:       #94a3b8;
+
+  /* Header */
+  --p-header-bg:        rgba(255, 255, 255, 0.88);
+  --p-header-border:    rgba(226, 232, 240, 0.8);
+
+  /* Cards */
+  --p-shadow-card:      0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --p-shadow-card-hover: 0 12px 30px -4px rgba(15, 23, 42, 0.10), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+  --p-shadow-modal:     0 24px 60px rgba(15, 23, 42, 0.25);
+  --p-shadow-dropdown:  0 10px 25px rgba(15, 23, 42, 0.10);
+
+  /* Buttons */
+  --p-btn-bg:           #ffffff;
+  --p-btn-border:       rgba(226, 232, 240, 0.85);
+  --p-btn-hover:        #f8fafc;
+  --p-btn-text:         #0f172a;
+
+  /* Dropdowns / misc */
+  --p-dropdown-bg:      #ffffff;
+  --p-table-hover:      #f8fafc;
+
+  /* Accent — Indigo */
+  --p-indigo:           #4f46e5;
+  --p-indigo-dark:      #3730a3;
+  --p-indigo-soft:      rgba(79, 70, 229, 0.10);
+
+  /* Accent — Teal */
+  --p-teal:             #0d9488;
+  --p-teal-soft:        rgba(13, 148, 136, 0.10);
+
+  /* Accent — Amber */
+  --p-amber:            #d97706;
+  --p-amber-soft:       rgba(217, 119, 6, 0.10);
+
+  /* Accent — Emerald */
+  --p-emerald:          #10b981;
+  --p-emerald-soft:     rgba(16, 185, 129, 0.10);
+
+  /* Accent — Violet */
+  --p-violet:           #7c3aed;
+  --p-violet-soft:      rgba(124, 58, 237, 0.10);
+
+  /* Accent — Red */
+  --p-red:              #ef4444;
+  --p-red-soft:         rgba(239, 68, 68, 0.10);
+
+  /* Border radius */
+  --p-radius-sm:        8px;
+  --p-radius-md:        12px;
+  --p-radius-lg:        16px;
+  --p-radius-xl:        20px;
+}
+
+/* ================================ DARK THEME overrides ================================ */
+html.dark {
+  --p-bg-main:          #0d1117;
+  --p-bg-card:          rgba(22, 27, 34, 0.96);
+  --p-bg-elevated:      #1c2330;
+  --p-bg-subtle:        #161b22;
+  --p-bg-input:         #161b22;
+  --p-border:           rgba(48, 54, 61, 0.90);
+  --p-border-strong:    #30363d;
+  --p-border-table:     #21262d;
+  --p-border-table-row: rgba(33, 38, 45, 0.8);
+  --p-text-primary:     #e6edf3;
+  --p-text-muted:       #8b949e;
+  --p-text-light:       #6e7681;
+  --p-header-bg:        rgba(13, 17, 23, 0.94);
+  --p-header-border:    rgba(48, 54, 61, 0.8);
+  --p-shadow-card:      0 4px 20px -2px rgba(0, 0, 0, 0.30), 0 2px 6px -1px rgba(0, 0, 0, 0.20);
+  --p-shadow-card-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.40), 0 4px 12px -2px rgba(0, 0, 0, 0.25);
+  --p-shadow-modal:     0 24px 60px rgba(0, 0, 0, 0.60);
+  --p-shadow-dropdown:  0 10px 25px rgba(0, 0, 0, 0.40);
+  --p-btn-bg:           #1c2330;
+  --p-btn-border:       rgba(48, 54, 61, 0.90);
+  --p-btn-hover:        #21262d;
+  --p-btn-text:         #e6edf3;
+  --p-dropdown-bg:      #1c2330;
+  --p-table-hover:      rgba(33, 38, 45, 0.6);
+  --p-indigo-soft:      rgba(79, 70, 229, 0.15);
+  --p-teal-soft:        rgba(13, 148, 136, 0.15);
+  --p-amber-soft:       rgba(217, 119, 6, 0.15);
+  --p-emerald-soft:     rgba(16, 185, 129, 0.15);
+  --p-violet-soft:      rgba(124, 58, 237, 0.15);
+  --p-red-soft:         rgba(239, 68, 68, 0.15);
+}

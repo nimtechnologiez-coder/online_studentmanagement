@@ -705,7 +705,7 @@ export default function PrincipalDashboard() {
 
             {/* ===== TABLES GRID ROW — Recent Activity + Latest Published Videos ===== */}
             <section className="dash-tables-grid">
-              {/* ===== RECENT ACTIVITY TABLE ===== */}
+              {/* =====  TABLE ===== */}
               <div className="corp-card table-card-corp">
                 <div className="corp-card-header">
                   <div>
