@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/principal/Sidebar";
+import "../principal/principal-theme.css";
 
 export default function PrincipalLayout({
   children,
@@ -14,13 +15,17 @@ export default function PrincipalLayout({
   const isLoginPage = pathname === "/principal/login";
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-slate-100">{children}</div>;
+    return (
+      <div className="principal-themed min-h-screen" style={{ background: "var(--p-bg-main)" }}>
+        {children}
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
+    <div className="principal-themed principal-layout-root">
       <Sidebar />
-      <main className="flex-1 min-w-0 transition-all duration-300">
+      <main className="principal-layout-main">
         {children}
       </main>
     </div>

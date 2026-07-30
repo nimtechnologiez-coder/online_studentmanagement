@@ -12,8 +12,10 @@ import {
 import "./departments.css";
 
 /* ---------------------------------- DATA ---------------------------------- */
-const departmentsData = [
+const departmentsData: DepartmentData[] = [
   {
+    id: 1,
+    code: "CSE",
     name: "Computer Science",
     hod: "Dr. Alan Turing",
     students: 640,
@@ -24,6 +26,8 @@ const departmentsData = [
     color: "blue",
   },
   {
+    id: 2,
+    code: "MECH",
     name: "Mechanical Engg.",
     hod: "Dr. R. Sharma",
     students: 512,
@@ -34,6 +38,8 @@ const departmentsData = [
     color: "indigo",
   },
   {
+    id: 3,
+    code: "EEE",
     name: "Electrical Engg.",
     hod: "Prof. K. Nair",
     students: 470,
@@ -44,6 +50,8 @@ const departmentsData = [
     color: "teal",
   },
   {
+    id: 4,
+    code: "BIO",
     name: "Biotechnology",
     hod: "Dr. M. Fernandes",
     students: 305,
@@ -54,6 +62,8 @@ const departmentsData = [
     color: "emerald",
   },
   {
+    id: 5,
+    code: "MGT",
     name: "Management Studies",
     hod: "Dr. S. Rao",
     students: 410,

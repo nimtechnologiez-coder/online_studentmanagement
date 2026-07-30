@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Trash2 } from "lucide-react";
 import {
   GraduationCap,
   Search,
@@ -18,6 +17,15 @@ import {
   RefreshCw,
   AlertCircle,
   Users,
+  Download,
+  Filter,
+  CheckCircle2,
+  Trash2,
+  Lock,
+  Copy,
+  Check,
+  Building2,
+  Award,
 } from "lucide-react";
 import "./StudentsPage.css";
 
@@ -40,14 +48,16 @@ interface Student {
   lastLogin: string;
   recentVideos: string[];
   recentActivity: string[];
+  college?: string;
+  joinDate?: string;
 }
 
 /* ---------------------------------- CONSTANTS ---------------------------------- */
 
 const ALL_DEPTS = "All Departments";
 const ALL_STATUS = "All Status";
-const statuses: Array<typeof ALL_STATUS | StudentStatus> = [ALL_STATUS, "Active", "Inactive"];
-const PAGE_SIZE = 5;
+const ALL_PERF = "All Performance Tiers";
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /* --------------------------------- HELPERS --------------------------------- */
 
@@ -61,17 +71,22 @@ function StatusBadge({ status }: { status: StudentStatus }) {
 }
 
 function ProgressBar({ value }: { value: number }) {
+  let colorClass = "fill-indigo";
+  if (value >= 75) colorClass = "fill-emerald";
+  else if (value >= 35) colorClass = "fill-amber";
+
   return (
     <div className="mini-progress">
       <div className="mini-progress-track">
-        <div className="mini-progress-fill" style={{ width: `${value}%` }} />
+        <div className={`mini-progress-fill ${colorClass}`} style={{ width: `${value}%` }} />
       </div>
-      <span>{value}%</span>
+      <span className="progress-percent-text">{value}%</span>
     </div>
   );
 }
 
 function initials(name: string): string {
+  if (!name) return "ST";
   return name
     .split(" ")
     .filter(Boolean)
@@ -84,19 +99,36 @@ function initials(name: string): string {
 
 function PasswordCell({ password }: { password: string }) {
   const [visible, setVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
   const display = visible ? password : "•".repeat(Math.min(password.length || 8, 10));
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(password);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="password-cell">
       <span className="password-text">{display}</span>
-      <button
-        type="button"
-        className="password-toggle-btn"
-        onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Hide password" : "Show password"}
-      >
-        {visible ? <EyeOff size={14} strokeWidth={2} /> : <Eye size={14} strokeWidth={2} />}
-      </button>
+      <div className="password-actions">
+        <button
+          type="button"
+          className="password-toggle-btn"
+          onClick={() => setVisible((v) => !v)}
+          title={visible ? "Hide password" : "Show password"}
+        >
+          {visible ? <EyeOff size={13} /> : <Eye size={13} />}
+        </button>
+        <button
+          type="button"
+          className="password-toggle-btn"
+          onClick={handleCopy}
+          title="Copy password"
+        >
+          {copied ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+        </button>
+      </div>
     </div>
   );
 }
@@ -104,17 +136,17 @@ function PasswordCell({ password }: { password: string }) {
 /* --------------------------------- MODAL -------------------------------- */
 
 function CompletionRing({ value }: { value: number }) {
-  const radius = 30;
+  const radius = 32;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / 100) * circumference;
 
   return (
     <div className="completion-ring">
-      <svg width="72" height="72" viewBox="0 0 72 72">
-        <circle cx="36" cy="36" r={radius} className="ring-track" strokeWidth="7" fill="none" />
+      <svg width="78" height="78" viewBox="0 0 78 78">
+        <circle cx="39" cy="39" r={radius} className="ring-track" strokeWidth="7" fill="none" />
         <circle
-          cx="36"
-          cy="36"
+          cx="39"
+          cy="39"
           r={radius}
           className="ring-progress"
           strokeWidth="7"
@@ -122,7 +154,7 @@ function CompletionRing({ value }: { value: number }) {
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          transform="rotate(-90 36 36)"
+          transform="rotate(-90 39 39)"
         />
       </svg>
       <div className="ring-label">
@@ -161,9 +193,12 @@ function StudentReportModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h3 id="student-report-title">Student Report</h3>
+          <div>
+            <h3 id="student-report-title">Student Academic Report</h3>
+            <p className="modal-subtitle">Learning progress breakdown and history</p>
+          </div>
           <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-            <X size={18} strokeWidth={2} />
+            <X size={18} />
           </button>
         </div>
 
@@ -177,18 +212,18 @@ function StudentReportModal({
               <div className="modal-student-dept">{student.department} Department</div>
               <div className="modal-meta-row">
                 <span className="modal-meta-item">
-                  <Mail size={12} strokeWidth={2} />
+                  <Mail size={12} />
                   {student.email}
                 </span>
                 <span className="modal-meta-item">
-                  <Clock size={12} strokeWidth={2} />
-                  {student.lastLogin}
+                  <Clock size={12} />
+                  Last active: {student.lastLogin}
                 </span>
               </div>
-              <div className="modal-meta-row">
+              <div className="modal-meta-row" style={{ marginTop: "4px" }}>
                 <span className="modal-meta-item">
-                  <User size={12} strokeWidth={2} />
-                  {student.username}
+                  <User size={12} />
+                  ID: {student.username}
                 </span>
               </div>
             </div>
@@ -200,15 +235,15 @@ function StudentReportModal({
             <div className="modal-stats-grid">
               <div className="modal-stat">
                 <span className="modal-stat-value">{student.totalVideos}</span>
-                <span className="modal-stat-label">Videos Available</span>
+                <span className="modal-stat-label">Assigned Videos</span>
               </div>
               <div className="modal-stat">
                 <span className="modal-stat-value">{student.viewedVideos}</span>
-                <span className="modal-stat-label">Viewed Videos</span>
+                <span className="modal-stat-label">Viewed Courses</span>
               </div>
               <div className="modal-stat modal-stat-wide">
                 <span className="modal-stat-value">{student.totalViews}</span>
-                <span className="modal-stat-label">Total Views</span>
+                <span className="modal-stat-label">Total Watch Views</span>
               </div>
             </div>
           </div>
@@ -217,20 +252,20 @@ function StudentReportModal({
 
           <div className="modal-section">
             <h4>
-              <PlayCircle size={15} strokeWidth={2} />
-              Recent Videos
+              <PlayCircle size={15} />
+              Recent Watched Videos
             </h4>
-            {student.recentVideos.length > 0 ? (
+            {student.recentVideos && student.recentVideos.length > 0 ? (
               <ul className="modal-list">
                 {student.recentVideos.map((title) => (
                   <li key={title}>
-                    <PlayCircle size={13} strokeWidth={2} className="modal-list-icon" />
-                    {title}
+                    <PlayCircle size={13} className="modal-list-icon" />
+                    <span>{title}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="modal-empty">No videos watched yet.</p>
+              <p className="modal-empty">No video watch records available yet.</p>
             )}
           </div>
 
@@ -238,27 +273,27 @@ function StudentReportModal({
 
           <div className="modal-section">
             <h4>
-              <Activity size={15} strokeWidth={2} />
-              Recent Activity
+              <Activity size={15} />
+              Activity Log & Timeline
             </h4>
-            {student.recentActivity.length > 0 ? (
+            {student.recentActivity && student.recentActivity.length > 0 ? (
               <ul className="modal-timeline">
                 {student.recentActivity.map((activity, idx) => (
                   <li key={`${activity}-${idx}`}>
                     <span className="timeline-dot" />
-                    {activity}
+                    <span>{activity}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="modal-empty">No recent activity.</p>
+              <p className="modal-empty">No recent activity recorded.</p>
             )}
           </div>
         </div>
 
         <div className="modal-footer">
           <button type="button" className="modal-btn-secondary" onClick={onClose}>
-            Close
+            Close Report
           </button>
         </div>
       </div>
@@ -266,7 +301,7 @@ function StudentReportModal({
   );
 }
 
-/* --------------------------------- COMPONENT -------------------------------- */
+/* --------------------------------- MAIN COMPONENT -------------------------------- */
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -275,9 +310,13 @@ export default function StudentsPage() {
 
   const [department, setDepartment] = useState<string>(ALL_DEPTS);
   const [status, setStatus] = useState<string>(ALL_STATUS);
+  const [perfTier, setPerfTier] = useState<string>(ALL_PERF);
   const [query, setQuery] = useState<string>("");
+
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
   const [deleteStudentId, setDeleteStudentId] = useState<string | null>(null);
   const [deleteStudentName, setDeleteStudentName] = useState<string>("");
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -288,7 +327,10 @@ export default function StudentsPage() {
     try {
       let principalId = "";
       try {
-        const savedPrincipal = typeof window !== "undefined" ? (localStorage.getItem("principal") || sessionStorage.getItem("principal")) : null;
+        const savedPrincipal =
+          typeof window !== "undefined"
+            ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
+            : null;
         if (savedPrincipal) {
           const parsed = JSON.parse(savedPrincipal);
           principalId = parsed?.id || "";
@@ -302,18 +344,32 @@ export default function StudentsPage() {
         headers["X-Principal-Id"] = String(principalId);
       }
 
-      let response: Response;
-      try {
-        response = await fetch("/api/principal/students/", { headers, credentials: "include" });
-      } catch (fetchErr) {
-        response = await fetch("http://127.0.0.1:8000/api/principal/students/", { headers, credentials: "include" });
+      const apiBase = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3001";
+      const apiUrls = [
+        "/api/principal/students/",
+        `${apiBase}/api/principal/students/`,
+        "http://127.0.0.1:8000/api/principal/students/",
+      ];
+
+      let response: Response | null = null;
+      let lastError: Error | null = null;
+
+      for (const url of apiUrls) {
+        try {
+          response = await fetch(url, { headers, credentials: "include" });
+          if (response.ok) break;
+          lastError = new Error(`Server error: ${response.status}`);
+        } catch (fetchErr: any) {
+          lastError = fetchErr;
+        }
       }
 
-      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      if (!response || !response.ok) {
+        throw new Error(lastError?.message || "Failed to load students.");
+      }
       const json = await response.json();
 
       if (json.status === "success" && Array.isArray(json.data)) {
-        // Map the backend fields to the frontend Student interface
         const mapped: Student[] = json.data.map((s: any) => ({
           id: s.student_id || String(s.id),
           name: s.full_name || "Unknown",
@@ -323,7 +379,6 @@ export default function StudentsPage() {
           password: s.password || "N/A",
           college: s.college || json.college || "N/A",
           joinDate: s.join_date || "2026-07-21",
-          endDate: s.end_date || "2030-07-21",
           viewedVideos: s.viewedVideos ?? 0,
           totalVideos: s.totalVideos ?? 0,
           totalViews: s.totalViews ?? 0,
@@ -331,7 +386,7 @@ export default function StudentsPage() {
           status: s.status
             ? ((s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase()) as StudentStatus)
             : "Active",
-          lastLogin: s.lastLogin || s.join_date || "Recently",
+          lastLogin: s.lastLogin || "Recently",
           recentVideos: s.recentVideos || [],
           recentActivity: s.recentActivity || [],
         }));
@@ -357,18 +412,30 @@ export default function StudentsPage() {
     try {
       let principalId = "";
       try {
-        const saved = typeof window !== "undefined" ? (localStorage.getItem("principal") || sessionStorage.getItem("principal")) : null;
+        const saved =
+          typeof window !== "undefined"
+            ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
+            : null;
         if (saved) principalId = JSON.parse(saved)?.id || "";
-      } catch {}
+      } catch { }
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (principalId) headers["X-Principal-Id"] = String(principalId);
 
+      const apiBase = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3001";
       let res: Response;
       try {
-        res = await fetch(`/api/principal/students/${deleteStudentId}/delete/`, { method: "POST", headers, credentials: "include" });
+        res = await fetch(`/api/principal/students/${deleteStudentId}/delete/`, {
+          method: "POST",
+          headers,
+          credentials: "include",
+        });
       } catch {
-        res = await fetch(`http://127.0.0.1:8000/api/principal/students/${deleteStudentId}/delete/`, { method: "POST", headers, credentials: "include" });
+        res = await fetch(`http://127.0.0.1:8000/api/principal/students/${deleteStudentId}/delete/`, {
+          method: "POST",
+          headers,
+          credentials: "include",
+        });
       }
 
       const json = await res.json();
@@ -387,47 +454,111 @@ export default function StudentsPage() {
     }
   }, [deleteStudentId]);
 
-  // Build department list dynamically from actual student data
+  // Dynamic department options from actual data
   const departments = useMemo(() => {
     const depts = Array.from(new Set(students.map((s) => s.department).filter(Boolean)));
     depts.sort();
     return [ALL_DEPTS, ...depts];
   }, [students]);
 
-  // Derived summary stats from real data
+  // CSV Export feature
+  const exportToCSV = () => {
+    if (students.length === 0) return;
+    const headers = [
+      "Student ID",
+      "Full Name",
+      "Department",
+      "Email",
+      "Username",
+      "Viewed Videos",
+      "Total Views",
+      "Progress (%)",
+      "Status",
+    ];
+
+    const rows = filteredStudents.map((s) => [
+      s.id,
+      `"${s.name}"`,
+      `"${s.department}"`,
+      `"${s.email}"`,
+      `"${s.username}"`,
+      s.viewedVideos,
+      s.totalViews,
+      s.progress,
+      s.status,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `student_performance_report_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Stats computation
   const totalStudents = students.length;
   const activeStudents = students.filter((s) => s.status === "Active").length;
   const inactiveStudents = students.filter((s) => s.status === "Inactive").length;
+  const totalDepts = departments.length - 1;
 
+  // Aggregate watch hours: each view ≈ estimated 8 min avg session, expressed in hours
+  const totalWatchViews = students.reduce((sum, s) => sum + (s.totalViews || 0), 0);
+  const totalWatchHours = parseFloat((totalWatchViews * 8 / 60).toFixed(1));
+
+  // Engagement rate: students who have viewed at least 1 video / total students
+  const engagedStudents = students.filter((s) => (s.viewedVideos || 0) > 0).length;
+  const engagementRate = totalStudents > 0 ? Math.round((engagedStudents / totalStudents) * 100) : 0;
+
+  // Filtered dataset
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
       const matchesDept = department === ALL_DEPTS || student.department === department;
       const matchesStatus = status === ALL_STATUS || student.status === status;
-      const matchesQuery =
-        student.name.toLowerCase().includes(query.trim().toLowerCase()) ||
-        student.email.toLowerCase().includes(query.trim().toLowerCase()) ||
-        student.username.toLowerCase().includes(query.trim().toLowerCase());
-      return matchesDept && matchesStatus && matchesQuery;
-    });
-  }, [students, department, status, query]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / PAGE_SIZE));
+      let matchesPerf = true;
+      if (perfTier === "High Performance (>75%)") {
+        matchesPerf = student.progress >= 75;
+      } else if (perfTier === "Moderate (25-75%)") {
+        matchesPerf = student.progress >= 25 && student.progress < 75;
+      } else if (perfTier === "Needs Support (<25%)") {
+        matchesPerf = student.progress < 25;
+      }
+
+      const q = query.trim().toLowerCase();
+      const matchesQuery =
+        !q ||
+        student.name.toLowerCase().includes(q) ||
+        student.email.toLowerCase().includes(q) ||
+        student.username.toLowerCase().includes(q) ||
+        student.department.toLowerCase().includes(q);
+
+      return matchesDept && matchesStatus && matchesPerf && matchesQuery;
+    });
+  }, [students, department, status, perfTier, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / pageSize));
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [department, status, query]);
+  }, [department, status, perfTier, query, pageSize]);
 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [totalPages, currentPage]);
 
   const paginatedStudents = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredStudents.slice(start, start + PAGE_SIZE);
-  }, [filteredStudents, currentPage]);
+    const start = (currentPage - 1) * pageSize;
+    return filteredStudents.slice(start, start + pageSize);
+  }, [filteredStudents, currentPage, pageSize]);
 
-  const rangeStart = filteredStudents.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(currentPage * PAGE_SIZE, filteredStudents.length);
+  const rangeStart = filteredStudents.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, filteredStudents.length);
 
   const pageNumbers = useMemo(() => {
     const pages: number[] = [];
@@ -440,160 +571,219 @@ export default function StudentsPage() {
   }, [currentPage, totalPages]);
 
   return (
-    <div className="dash-main">
-      {/* Header */}
-      <header className="dash-header">
-        <div className="dash-header-left">
-          <GraduationCap size={20} strokeWidth={1.8} className="dash-header-icon" />
-          <span className="dash-header-title">Students</span>
+    <div className="dash-corp-main">
+      {/* Sticky Header */}
+      <header className="dash-corp-header">
+        <div className="dash-header-brand">
+          <div className="dash-corp-logo">CP</div>
+          <div>
+            <h1 className="dash-header-title">Student Management</h1>
+            <span className="dash-header-subtitle">Institutional Academic Records & Activity</span>
+          </div>
         </div>
 
-        <div className="dash-search">
-          <Search size={17} strokeWidth={1.8} />
+        <div className="dash-search-container">
+          <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Search by name, email or username..."
+            placeholder="Search by student name, email, or username..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+          {query && (
+            <button className="search-clear-btn" onClick={() => setQuery("")}>
+              <X size={14} />
+            </button>
+          )}
         </div>
 
-        <div className="dash-header-right">
+        <div className="dash-header-actions">
           <button
             type="button"
-            className="dash-icon-btn"
+            className="dash-action-btn"
             onClick={fetchStudents}
-            aria-label="Refresh students"
-            title="Refresh"
+            title="Refresh Students List"
             disabled={loading}
           >
-            <RefreshCw size={17} strokeWidth={1.8} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} />
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            <span className="btn-text">Sync</span>
           </button>
-          <div className="dash-profile">
-            <div className="dash-avatar">
-              <User size={18} strokeWidth={1.8} />
+
+          <button type="button" className="dash-action-btn btn-export" onClick={exportToCSV}>
+            <Download size={16} />
+            <span className="btn-text">Export CSV</span>
+          </button>
+
+          <div className="dash-profile-wrapper">
+            <div className="dash-profile-trigger">
+              <div className="dash-profile-avatar">
+                <User size={16} />
+              </div>
+              <span className="profile-name">Principal</span>
             </div>
-            <span className="dash-profile-name">Principal</span>
           </div>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="dash-content">
-        <div className="dash-page-title">
-          <h2>Student Management</h2>
-          <p>Monitor students&apos; video learning activity.</p>
+      {/* Main Content Area */}
+      <main className="dash-corp-body">
+        {/* Title Header */}
+        <div className="dash-page-title-row">
+          <div>
+            <h2>Institutional Student Records</h2>
+            <p>Monitor student progress, video watch metrics, and academic engagement.</p>
+          </div>
         </div>
 
         {/* Error banner */}
         {error && (
-          <div style={{
-            display: "flex", alignItems: "center", gap: "8px",
-            padding: "12px 16px", marginBottom: "16px",
-            background: "#fef2f2", border: "1px solid #fecaca",
-            borderRadius: "8px", color: "#dc2626", fontSize: "13px"
-          }}>
-            <AlertCircle size={15} />
-            {error}
-            <button
-              onClick={fetchStudents}
-              style={{ marginLeft: "auto", fontSize: "12px", color: "#dc2626", textDecoration: "underline", background: "none", border: "none", cursor: "pointer" }}
-            >
-              Retry
-            </button>
+          <div className="dash-error-banner">
+            <AlertCircle size={18} />
+            <span>{error}</span>
+            <button onClick={fetchStudents}>Retry</button>
           </div>
         )}
 
-        {loading ? (
-          <div style={{ padding: "60px 20px", textAlign: "center", color: "#94a3b8" }}>
-            <RefreshCw size={28} style={{ animation: "spin 1s linear infinite", marginBottom: "12px" }} />
-            <p>Loading students data...</p>
+        {loading && !students.length ? (
+          <div className="dash-loading-state">
+            <RefreshCw size={32} className="animate-spin text-indigo-600" />
+            <p>Fetching real-time student data...</p>
           </div>
         ) : (
           <>
-            {/* Summary cards — dynamically computed */}
-            <section className="summary-grid">
-              <div className="summary-card">
-                <div className="summary-icon tone-indigo">
-                  <GraduationCap size={20} strokeWidth={1.8} />
+            {/* KPI Summary Cards Grid */}
+            <section className="summary-cards-grid">
+              {/* Card 1: Total Students */}
+
+
+              {/* Card 2: Active Students */}
+              <div className="corp-card summary-card-corp">
+                <div className="card-top-row">
+                  <div className="summary-icon-box tone-emerald">
+                    <Users size={20} />
+                  </div>
+                  <span className="card-trend-pill trend-up">
+                    {totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0}%
+                  </span>
                 </div>
-                <div className="summary-body">
-                  <span className="summary-value">{totalStudents}</span>
-                  <span className="summary-label">Total Students</span>
-                </div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-icon tone-emerald">
-                  <Users size={20} strokeWidth={1.8} />
-                </div>
-                <div className="summary-body">
-                  <span className="summary-value">{activeStudents}</span>
-                  <span className="summary-label">Active Students</span>
-                </div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-icon tone-amber">
-                  <Eye size={20} strokeWidth={1.8} />
-                </div>
-                <div className="summary-body">
-                  <span className="summary-value">{inactiveStudents}</span>
-                  <span className="summary-label">Inactive Students</span>
+                <div className="card-bottom-row">
+                  <span className="summary-card-value">{activeStudents}</span>
+                  <span className="summary-card-label">Active Learning Students</span>
                 </div>
               </div>
-              <div className="summary-card">
-                <div className="summary-icon tone-teal">
-                  <PlayCircle size={20} strokeWidth={1.8} />
+
+              {/* Card 3: Inactive Students */}
+              <div className="corp-card summary-card-corp">
+                <div className="card-top-row">
+                  <div className="summary-icon-box tone-amber">
+                    <AlertCircle size={20} />
+                  </div>
+                  <span className="card-trend-pill trend-neutral">Needs Attention</span>
                 </div>
-                <div className="summary-body">
-                  <span className="summary-value">{departments.length - 1}</span>
-                  <span className="summary-label">Departments</span>
+                <div className="card-bottom-row">
+                  <span className="summary-card-value">{inactiveStudents}</span>
+                  <span className="summary-card-label">Inactive Students</span>
+                </div>
+              </div>
+
+              {/* Card 4: Active Departments */}
+              <div className="corp-card summary-card-corp">
+                <div className="card-top-row">
+                  <div className="summary-icon-box tone-teal">
+                    <Building2 size={20} />
+                  </div>
+                  <span className="card-trend-pill">Divisions</span>
+                </div>
+                <div className="card-bottom-row">
+                  <span className="summary-card-value">{totalDepts}</span>
+                  <span className="summary-card-label">Active Departments</span>
+                </div>
+              </div>
+
+              {/* Card 5: Total Watch Hours */}
+              <div className="corp-card summary-card-corp card-highlight-watch">
+                <div className="card-top-row">
+                  <div className="summary-icon-box tone-violet">
+                    <Clock size={20} />
+                  </div>
+                  <span className="card-trend-pill trend-up">Learning Time</span>
+                </div>
+                <div className="card-bottom-row">
+                  <span className="summary-card-value">
+                    {totalWatchHours}
+                    <span className="summary-card-unit">hrs</span>
+                  </span>
+                  <span className="summary-card-label">Total Watch Hours</span>
+                  <span className="summary-card-sub">Aggregate learning duration across {totalWatchViews} session{totalWatchViews !== 1 ? 's' : ''}</span>
+                </div>
+              </div>
+
+              {/* Card 6: Active Engagement Rate */}
+              <div className="corp-card summary-card-corp card-highlight-engage">
+                <div className="card-top-row">
+                  <div className="summary-icon-box tone-rose">
+                    <Activity size={20} />
+                  </div>
+                  <span className="card-trend-pill trend-up">Participation</span>
+                </div>
+                <div className="card-bottom-row">
+                  <span className="summary-card-value">
+                    {engagementRate}
+                    <span className="summary-card-unit">%</span>
+                  </span>
+                  <span className="summary-card-label">Active Student Engagement</span>
+                  <span className="summary-card-sub">{engagedStudents} of {totalStudents} students actively learning</span>
                 </div>
               </div>
             </section>
 
-            {/* Filters */}
-            <section className="filters-bar">
-              <select
-                className="filter-select"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                aria-label="Filter by department"
-              >
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
+            {/* Advanced Filters Toolbar */}
+            <section className="filters-bar-corp">
+              <div className="filter-select-group">
+                <Filter size={15} className="text-slate-400" />
+                <select
+                  className="corp-select"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                >
+                  {departments.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
 
-              <select
-                className="filter-select"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                aria-label="Filter by status"
-              >
-                {statuses.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                <select
+                  className="corp-select"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value={ALL_STATUS}>All Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
 
-              <div className="filter-search">
-                <Search size={15} strokeWidth={1.8} />
-                <input
-                  type="text"
-                  placeholder="Search by name, email..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
+                <select
+                  className="corp-select"
+                  value={perfTier}
+                  onChange={(e) => setPerfTier(e.target.value)}
+                >
+                  <option value={ALL_PERF}>All Performance Tiers</option>
+                  <option value="High Performance (>75%)">High Performance (&gt;75%)</option>
+                  <option value="Moderate (25-75%)">Moderate (25-75%)</option>
+                  <option value="Needs Support (<25%)">Needs Support (&lt;25%)</option>
+                </select>
+              </div>
+
+              <div className="results-count">
+                Showing <strong>{filteredStudents.length}</strong> student{filteredStudents.length !== 1 ? "s" : ""}
               </div>
             </section>
 
-            {/* Students table */}
-            <section className="card table-card">
-              <div className="table-wrap">
-                <table>
+            {/* Students Data Table */}
+            <section className="corp-card table-card-corp">
+              <div className="corp-table-wrap">
+                <table className="corp-table">
                   <thead>
                     <tr>
                       <th>Student</th>
@@ -601,37 +791,37 @@ export default function StudentsPage() {
                       <th>Email</th>
                       <th>Username</th>
                       <th>Password</th>
-                      <th>Viewed Videos</th>
-                      <th>Total Views</th>
+                      <th style={{ textAlign: "center" }}>Viewed Videos</th>
+                      <th style={{ textAlign: "center" }}>Total Views</th>
                       <th>Progress</th>
                       <th>Status</th>
-                      <th style={{ textAlign: "right", paddingRight: "16px" }}>Action</th>
+                      <th style={{ textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedStudents.length === 0 ? (
                       <tr>
-                        <td colSpan={10} style={{ textAlign: "center", padding: "40px 16px", color: "#94a3b8", fontSize: "13px" }}>
+                        <td colSpan={10} className="empty-table-cell">
                           {students.length === 0
                             ? "No students found in the database."
-                            : "No students match the current filters."}
+                            : "No students match the selected filter criteria."}
                         </td>
                       </tr>
                     ) : (
                       paginatedStudents.map((student) => (
                         <tr key={student.id}>
                           <td>
-                            <div className="student-name-cell">
-                              <div className="student-avatar">{initials(student.name)}</div>
-                              <span className="student-name-text">{student.name}</span>
+                            <div className="student-cell-profile">
+                              <div className="avatar-circle">{initials(student.name)}</div>
+                              <span className="font-semibold text-slate-800">{student.name}</span>
                             </div>
                           </td>
                           <td>
-                            <span className="dept-badge">{student.department}</span>
+                            <span className="table-dept-pill">{student.department}</span>
                           </td>
-                          <td className="email-text">{student.email}</td>
+                          <td className="text-slate-600 font-medium">{student.email}</td>
                           <td>
-                            <code className="code-text">{student.username}</code>
+                            <code className="corp-code-badge">{student.username}</code>
                           </td>
                           <td>
                             <PasswordCell password={student.password} />
@@ -644,14 +834,14 @@ export default function StudentsPage() {
                           <td>
                             <StatusBadge status={student.status} />
                           </td>
-                          <td style={{ textAlign: "right", paddingRight: "16px" }}>
+                          <td style={{ textAlign: "right" }}>
                             <div className="table-actions">
                               <button
                                 type="button"
-                                className="view-report-btn"
+                                className="action-btn-view"
                                 onClick={() => setSelectedStudent(student)}
                               >
-                                <Eye size={13} strokeWidth={2} />
+                                <Eye size={13} />
                                 View Report
                               </button>
                             </div>
@@ -663,33 +853,44 @@ export default function StudentsPage() {
                 </table>
               </div>
 
-              {/* Pagination */}
-              <div className="pagination-row">
-                <span className="pagination-summary">
-                  {filteredStudents.length === 0
-                    ? "No results"
-                    : `Showing ${rangeStart}–${rangeEnd} of ${filteredStudents.length} student${filteredStudents.length !== 1 ? "s" : ""}`}
-                </span>
+              {/* Polished Pagination Controls */}
+              <div className="pagination-bar-corp">
+                <div className="pagination-size-selector">
+                  <span>Show per page:</span>
+                  <select
+                    className="corp-select size-select"
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                  >
+                    {PAGE_SIZE_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="range-summary">
+                    Showing {rangeStart}–{rangeEnd} of {filteredStudents.length}
+                  </span>
+                </div>
 
-                <div className="pagination-controls">
+                <div className="pagination-nav">
                   <button
                     type="button"
-                    className="pagination-btn"
+                    className="page-btn"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                   >
-                    <ChevronLeft size={15} strokeWidth={2} />
+                    <ChevronLeft size={16} />
                     Prev
                   </button>
 
-                  <div className="pagination-pages">
+                  <div className="page-numbers">
                     {pageNumbers.map((page) => (
                       <button
                         key={page}
                         type="button"
-                        className={`pagination-page ${page === currentPage ? "pagination-page-active" : ""}`}
+                        className={`page-num-btn ${page === currentPage ? "active" : ""}`}
                         onClick={() => setCurrentPage(page)}
-                        aria-current={page === currentPage ? "page" : undefined}
                       >
                         {page}
                       </button>
@@ -698,12 +899,12 @@ export default function StudentsPage() {
 
                   <button
                     type="button"
-                    className="pagination-btn"
+                    className="page-btn"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                   >
                     Next
-                    <ChevronRight size={15} strokeWidth={2} />
+                    <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
@@ -712,38 +913,49 @@ export default function StudentsPage() {
         )}
       </main>
 
+      {/* Student Performance Modal */}
       {selectedStudent && (
         <StudentReportModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Modal */}
       {deleteStudentId && (
-        <div className="delete-modal-overlay" onClick={() => { if (!deleteLoading) { setDeleteStudentId(null); setDeleteStudentName(""); } }}>
-          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="delete-modal-icon">
-              <Trash2 size={32} strokeWidth={1.5} />
+        <div
+          className="modal-backdrop"
+          onClick={() => {
+            if (!deleteLoading) {
+              setDeleteStudentId(null);
+              setDeleteStudentName("");
+            }
+          }}
+        >
+          <div className="modal-panel delete-modal-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-icon-box">
+              <Trash2 size={32} className="text-red-600" />
             </div>
-            <h3 className="delete-modal-title">Delete Student?</h3>
-            <p className="delete-modal-desc">
-              Are you sure you want to permanently delete <strong>{deleteStudentName}</strong>?{" "}
-              This action cannot be undone.
+            <h3 className="delete-title">Delete Student Record?</h3>
+            <p className="delete-desc">
+              Are you sure you want to delete student <strong>{deleteStudentName}</strong>? This action cannot be undone.
             </p>
-            <div className="delete-modal-actions">
+            <div className="delete-actions">
               <button
                 type="button"
-                className="delete-modal-cancel"
-                onClick={() => { setDeleteStudentId(null); setDeleteStudentName(""); }}
+                className="modal-btn-secondary"
+                onClick={() => {
+                  setDeleteStudentId(null);
+                  setDeleteStudentName("");
+                }}
                 disabled={deleteLoading}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="delete-modal-confirm"
+                className="btn-danger-confirm"
                 onClick={handleDeleteStudent}
                 disabled={deleteLoading}
               >
-                {deleteLoading ? "Deleting..." : "Yes, Delete"}
+                {deleteLoading ? "Deleting..." : "Confirm Delete"}
               </button>
             </div>
           </div>

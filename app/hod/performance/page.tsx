@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./performance.css";
 
 /* ═══════════════════════════ Types ═══════════════════════════ */
@@ -19,7 +19,35 @@ type StudentRow = {
 
 type DayPoint = { label: string; value: number };
 
-/* ═══════════════════════════ Static / derived mock data ═══════════════════════════ */
+type HodUser = {
+  id?: string;
+  name: string;
+  department: string;
+  college: string;
+};
+
+type PerformancePayload = {
+  hod: HodUser;
+  stats: {
+    totalStudents: number;
+    activeStudents: number;
+    totalVideos: number;
+    totalViews: number;
+  };
+  weeklyProgress: DayPoint[];
+  watchTimeWeek: DayPoint[];
+  students: StudentRow[];
+  topStudents: Array<{ name: string; score: number }>;
+  mostWatchedVideos: Array<{ title: string; views: number }>;
+  summary: {
+    high: number;
+    avg: number;
+    low: number;
+    overallAvg: number;
+  };
+};
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 const AVATAR_COLORS = [
   "#3b5bfa", "#15a15a", "#e8590c", "#7c3aed",
@@ -29,100 +57,13 @@ const avatarColor = (id: number) => AVATAR_COLORS[id % AVATAR_COLORS.length];
 const initials = (name: string) =>
   name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 
-const WEEKLY_PROGRESS: DayPoint[] = [
-  { label: "Mon", value: 8 },
-  { label: "Tue", value: 12 },
-  { label: "Wed", value: 16 },
-  { label: "Thu", value: 22 },
-  { label: "Fri", value: 14 },
-  { label: "Sat", value: 17 },
-  { label: "Sun", value: 24 },
-];
-
-const WATCH_TIME_WEEK: DayPoint[] = [
-  { label: "Mon", value: 45 },
-  { label: "Tue", value: 70 },
-  { label: "Wed", value: 55 },
-  { label: "Thu", value: 35 },
-  { label: "Fri", value: 40 },
-  { label: "Sat", value: 60 },
-  { label: "Sun", value: 42 },
-];
-
-const TOP_STUDENTS = [
-  { name: "Arun Kumar", score: 96 },
-  { name: "Priya", score: 92 },
-  { name: "Keerthana", score: 90 },
-  { name: "Vignesh", score: 88 },
-  { name: "Karthik", score: 86 },
-  { name: "Lavanya", score: 83 },
-  { name: "Deepak", score: 80 },
-  { name: "Harini", score: 78 },
-  { name: "Sanjay", score: 76 },
-  { name: "Meena", score: 74 },
-];
-
-const MOST_WATCHED_VIDEOS = [
-  { title: "Python Basics", views: 278 },
-  { title: "Django Models", views: 212 },
-  { title: "Database Design", views: 186 },
-  { title: "AI Introduction", views: 164 },
-  { title: "Computer Networks", views: 146 },
-];
-
-const FIRST_NAMES = [
-  "Arun", "Priya", "Rahul", "Sandhya", "Vignesh", "Meena", "Karthik", "Lavanya",
-  "Deepak", "Harini", "Sanjay", "Keerthana", "Aravind", "Divya", "Suresh", "Anitha",
-  "Ravi", "Swetha", "Murugan", "Nandhini", "Ashwin", "Pooja", "Harish", "Kavya",
-];
-const LAST_NAMES = [
-  "Kumar", "Dharshini", "Raja", "Priya", "Devi", "Babu", "Nair", "Shankar",
-  "Kumari", "Ram", "Raj", "Sri", "Prasad", "Krishnan", "Iyer", "Menon",
-];
-
 function formatWatchTime(totalMinutes: number) {
   const h = Math.floor(totalMinutes / 60);
   const m = totalMinutes % 60;
   return h > 0 ? `${h}h ${String(m).padStart(2, "0")}m` : `${m}m`;
 }
 
-function levelFromScore(score: number): PerfLevel {
-  if (score >= 75) return "High Performer";
-  if (score >= 50) return "Average Performer";
-  return "Needs Improvement";
-}
-
-const ACTIVITY_PATTERNS = [
-  "Today, 10:15 AM", "Today, 11:20 AM", "Today, 09:45 AM", "Today, 02:05 PM",
-  "Yesterday, 04:30 PM", "Yesterday, 08:10 PM", "Yesterday, 11:00 AM",
-  "2 days ago", "3 days ago", "5 days ago",
-];
-
-const TOTAL_STUDENTS = 356;
-
-function generateStudents(count: number): StudentRow[] {
-  const rows: StudentRow[] = [];
-  for (let i = 0; i < count; i++) {
-    const first = FIRST_NAMES[i % FIRST_NAMES.length];
-    const last = LAST_NAMES[(i * 7 + 3) % LAST_NAMES.length];
-    const name = i < FIRST_NAMES.length ? first : `${first} ${last}`;
-    const score = 30 + ((i * 29) % 70);
-    const avgProgress = Math.max(5, Math.min(100, score + (((i * 13) % 7) - 3)));
-    const watchMinutes = 60 + ((i * 53) % 700);
-    rows.push({
-      id: i + 1,
-      name,
-      avgProgress,
-      watchMinutes,
-      score,
-      lastActivity: ACTIVITY_PATTERNS[i % ACTIVITY_PATTERNS.length],
-      level: levelFromScore(score),
-    });
-  }
-  return rows;
-}
-
-const ALL_STUDENTS = generateStudents(TOTAL_STUDENTS);
+/* ═══════════════════════════ Small UI pieces ═══════════════════════════ */
 
 /* ═══════════════════════════ Small chart primitives ═══════════════════════════ */
 
@@ -135,14 +76,21 @@ function LineChart({
   const W = 620, H = 230, padL = 34, padR = 12, padT = 30, padB = 26;
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
-  const stepX = innerW / (data.length - 1);
-  const yTicks = Array.from({ length: yMax / yStep + 1 }, (_, i) => i * yStep);
+  const safeData = Array.isArray(data) && data.length > 0
+    ? data.filter((item): item is DayPoint => Boolean(item) && typeof item.value === "number" && Number.isFinite(item.value))
+    : [{ label: "No data", value: 0 }];
+  const safeYMax = Math.max(yMax || 1, 10, ...safeData.map((item) => item.value || 0));
+  const stepX = safeData.length > 1 ? innerW / (safeData.length - 1) : 0;
+  const yTicks = Array.from({ length: Math.max(1, Math.ceil(safeYMax / yStep) + 1) }, (_, i) => i * yStep);
 
   const xAt = (i: number) => padL + i * stepX;
-  const yAt = (v: number) => padT + innerH - (v / yMax) * innerH;
+  const yAt = (v: number) => {
+    const safeValue = Number.isFinite(v) ? v : 0;
+    return padT + innerH - (safeValue / safeYMax) * innerH;
+  };
 
-  const linePath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${xAt(i)} ${yAt(d.value)}`).join(" ");
-  const areaPath = `${linePath} L ${xAt(data.length - 1)} ${padT + innerH} L ${xAt(0)} ${padT + innerH} Z`;
+  const linePath = safeData.map((d, i) => `${i === 0 ? "M" : "L"} ${xAt(i)} ${yAt(d.value)}`).join(" ");
+  const areaPath = `${linePath} L ${xAt(safeData.length - 1)} ${padT + innerH} L ${xAt(0)} ${padT + innerH} Z`;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-56">
@@ -165,8 +113,8 @@ function LineChart({
       <path d={areaPath} fill={`url(#${fillId})`} />
       <path d={linePath} fill="none" stroke={stroke} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
 
-      {data.map((d, i) => (
-        <g key={d.label}>
+      {safeData.map((d, i) => (
+        <g key={`${d.label}-${i}`}>
           <circle cx={xAt(i)} cy={yAt(d.value)} r={4} fill="#fff" stroke={stroke} strokeWidth={2.5} />
           <text x={xAt(i)} y={yAt(d.value) - 12} textAnchor="middle" className="fill-slate-700 font-bold" fontSize="11">
             {d.value}{suffix}
@@ -185,9 +133,16 @@ function BarChart({ data, yMax, yStep, color }: { data: DayPoint[]; yMax: number
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
   const gap = 18;
-  const barW = (innerW - gap * (data.length - 1)) / data.length;
-  const yTicks = Array.from({ length: yMax / yStep + 1 }, (_, i) => i * yStep);
-  const yAt = (v: number) => padT + innerH - (v / yMax) * innerH;
+  const safeData = Array.isArray(data) && data.length > 0
+    ? data.filter((item): item is DayPoint => Boolean(item) && typeof item.value === "number" && Number.isFinite(item.value))
+    : [{ label: "No data", value: 0 }];
+  const safeYMax = Math.max(yMax || 1, 10, ...safeData.map((item) => item.value || 0));
+  const barW = safeData.length > 1 ? (innerW - gap * (safeData.length - 1)) / safeData.length : Math.max(40, innerW / Math.max(safeData.length, 1));
+  const yTicks = Array.from({ length: Math.max(1, Math.ceil(safeYMax / yStep) + 1) }, (_, i) => i * yStep);
+  const yAt = (v: number) => {
+    const safeValue = Number.isFinite(v) ? v : 0;
+    return padT + innerH - (safeValue / safeYMax) * innerH;
+  };
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-56">
@@ -197,12 +152,13 @@ function BarChart({ data, yMax, yStep, color }: { data: DayPoint[]; yMax: number
           <text x={padL - 8} y={yAt(t) + 4} textAnchor="end" className="fill-slate-400" fontSize="10">{t}</text>
         </g>
       ))}
-      {data.map((d, i) => {
+      {safeData.map((d, i) => {
         const x = padL + i * (barW + gap);
-        const barH = (d.value / yMax) * innerH;
+        const safeValue = Number.isFinite(d.value) ? d.value : 0;
+        const barH = (safeValue / safeYMax) * innerH;
         const y = padT + innerH - barH;
         return (
-          <g key={d.label}>
+          <g key={`${d.label}-${i}`}>
             <rect x={x} y={y} width={barW} height={barH} rx={5} fill={color} />
             <text x={x + barW / 2} y={y - 8} textAnchor="middle" className="fill-slate-700 font-bold" fontSize="11">
               {d.value}
@@ -377,12 +333,68 @@ export default function HodPerformancePage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [payload, setPayload] = useState<PerformancePayload | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPerformance = async () => {
+      setLoading(true);
+      setError(null);
+
+      const savedHod = typeof window !== "undefined" ? localStorage.getItem("hod") || sessionStorage.getItem("hod") : null;
+      let hodId = "";
+
+      if (savedHod) {
+        try {
+          const parsed = JSON.parse(savedHod);
+          hodId = parsed?.id || "";
+        } catch (err) {
+          console.error("Failed to parse saved HOD data:", err);
+        }
+      }
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (hodId) headers["X-Hod-Id"] = String(hodId);
+
+      try {
+        const response = await fetch(`${API_BASE}/api/hod/performance/`, {
+          method: "GET",
+          headers,
+          credentials: "include",
+        });
+
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+
+        const json = await response.json();
+        if (!json || json.status !== "success") throw new Error(json?.message || "Unable to load performance data.");
+
+        setPayload(json);
+      } catch (err: any) {
+        console.error("Failed to load HOD performance:", err);
+        setError(err.message || "Failed to load performance data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPerformance();
+  }, []);
+
+  const students = payload?.students ?? [];
+  const weeklyProgress = Array.isArray(payload?.weeklyProgress) ? payload.weeklyProgress : [];
+  const watchTimeWeek = Array.isArray(payload?.watchTimeWeek) ? payload.watchTimeWeek : [];
+  const topStudents = payload?.topStudents ?? [];
+  const mostWatchedVideos = payload?.mostWatchedVideos ?? [];
+  const summary = payload?.summary ?? { high: 0, avg: 0, low: 0, overallAvg: 0 };
+  const hod = payload?.hod ?? { name: "HOD", department: "Department", college: "College" };
+  const stats = payload?.stats ?? { totalStudents: 0, activeStudents: 0, totalVideos: 0, totalViews: 0 };
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return ALL_STUDENTS;
-    return ALL_STUDENTS.filter((s) => s.name.toLowerCase().includes(q));
-  }, [search]);
+    if (!q) return students;
+    return students.filter((s) => s.name.toLowerCase().includes(q));
+  }, [search, students]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -390,17 +402,14 @@ export default function HodPerformancePage() {
 
   const goPage = (p: number) => setPage(Math.max(1, Math.min(p, totalPages)));
 
-  const summary = useMemo(() => {
-    const high = ALL_STUDENTS.filter((s) => s.score >= 75).length;
-    const avg = ALL_STUDENTS.filter((s) => s.score >= 50 && s.score < 75).length;
-    const low = ALL_STUDENTS.filter((s) => s.score < 50).length;
-    const overallAvg = ALL_STUDENTS.reduce((sum, s) => sum + s.score, 0) / ALL_STUDENTS.length;
-    return { high, avg, low, overallAvg: overallAvg.toFixed(1) };
-  }, []);
-
-  const topAvgScore = (TOP_STUDENTS.reduce((s, t) => s + t.score, 0) / TOP_STUDENTS.length).toFixed(1);
-  const maxViews = Math.max(...MOST_WATCHED_VIDEOS.map((v) => v.views));
-
+  const topAvgScore = topStudents.length > 0
+    ? (topStudents.reduce((s, t) => s + t.score, 0) / topStudents.length).toFixed(1)
+    : "0.0";
+  const maxViews = mostWatchedVideos.length > 0 ? Math.max(...mostWatchedVideos.map((v) => v.views)) : 0;
+  const chartWeeklyData = weeklyProgress.length > 0 ? weeklyProgress : [{ label: "No data", value: 0 }];
+  const chartWatchData = watchTimeWeek.length > 0 ? watchTimeWeek : [{ label: "No data", value: 0 }];
+  const weeklyMax = Math.max(10, ...chartWeeklyData.map((item) => item.value || 0));
+  const watchMax = Math.max(20, ...chartWatchData.map((item) => item.value || 0));
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
     .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
     .reduce<(number | "…")[]>((acc, p, i, arr) => {
@@ -411,7 +420,6 @@ export default function HodPerformancePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
-      {/* ══════════ HEADER ══════════ */}
       <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-7 py-4 flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight text-slate-900">Student Performance</h1>
@@ -426,7 +434,7 @@ export default function HodPerformancePage() {
           </button>
           <button className="flex items-center gap-2 h-10 px-3.5 rounded-xl border border-slate-200 bg-white text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition">
             <Icon.Building />
-            Computer Science &amp; Engineering
+            {hod.department}
             <Icon.Chevron />
           </button>
           <button className="flex items-center gap-2.5 h-10 pl-1.5 pr-3 rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition">
@@ -437,7 +445,7 @@ export default function HodPerformancePage() {
               AK
             </div>
             <span className="text-left leading-tight">
-              <span className="block text-[12.5px] font-bold text-slate-800">Dr. Arun Kumar</span>
+              <span className="block text-[12.5px] font-bold text-slate-800">{hod.name}</span>
               <span className="block text-[10.5px] text-slate-500">HOD</span>
             </span>
             <Icon.Chevron />
@@ -446,33 +454,18 @@ export default function HodPerformancePage() {
       </header>
 
       <main className="max-w-[1600px] mx-auto px-7 py-6 flex flex-col gap-5">
-        {/* ══════════ STAT CARDS ══════════ */}
+        {loading && <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">Loading performance data…</div>}
+        {error && <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>}
+
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <StatCard
-            icon={<Icon.Users />} iconBg="#e8ecff" cardBg="bg-[#f4f6ff]"
-            label="Total Students" value={TOTAL_STUDENTS.toString()} sub="All Department"
-          />
-          <StatCard
-            icon={<Icon.TrendUp />} iconBg="#dcfce7" cardBg="bg-[#f2fbf5]"
-            label="Weekly Learning Progress" value="18.6%" sub="↑ 4.8% from last week" subClass="text-emerald-600 font-semibold"
-          />
-          <StatCard
-            icon={<Icon.Trophy />} iconBg="#ede9fe" cardBg="bg-[#f8f6ff]"
-            label="Top 10 Students (Avg Score)" value={`${topAvgScore}%`} sub="Average Score"
-          />
-          <StatCard
-            icon={<Icon.Clock />} iconBg="#fef3c7" cardBg="bg-[#fffbf0]"
-            label="Average Watch Time" value="38m 45s" sub="Per Student"
-          />
-          <StatCard
-            icon={<Icon.Play color="#dc2626" />} iconBg="#fde8e8" cardBg="bg-[#fff5f5]"
-            label="Most Watched Video" value={MOST_WATCHED_VIDEOS[0].title} sub={`${MOST_WATCHED_VIDEOS[0].views} Views`}
-          />
+          <StatCard icon={<Icon.Users />} iconBg="#e8ecff" cardBg="bg-[#f4f6ff]" label="Total Students" value={String(stats.totalStudents)} sub="All Department" />
+          <StatCard icon={<Icon.TrendUp />} iconBg="#dcfce7" cardBg="bg-[#f2fbf5]" label="Weekly Learning Progress" value={`${chartWeeklyData.reduce((sum, item) => sum + (item.value || 0), 0)} Active`} sub="Last 7 days" subClass="text-emerald-600 font-semibold" />
+          <StatCard icon={<Icon.Trophy />} iconBg="#ede9fe" cardBg="bg-[#f8f6ff]" label="Top 10 Students (Avg Score)" value={`${topAvgScore}%`} sub="Average Score" />
+          <StatCard icon={<Icon.Clock />} iconBg="#fef3c7" cardBg="bg-[#fffbf0]" label="Average Watch Time" value={`${Math.round(stats.totalViews / Math.max(stats.totalStudents, 1))}m`} sub="Per Student" />
+          <StatCard icon={<Icon.Play color="#dc2626" />} iconBg="#fde8e8" cardBg="bg-[#fff5f5]" label="Most Watched Video" value={mostWatchedVideos[0]?.title ?? "No videos yet"} sub={`${mostWatchedVideos[0]?.views ?? 0} Views`} />
         </section>
 
-        {/* ══════════ ROW 2: charts + top students ══════════ */}
         <section className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-          {/* Weekly Learning Progress */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-[14.5px] font-bold text-slate-900 flex items-center gap-1.5">
@@ -483,13 +476,9 @@ export default function HodPerformancePage() {
                 Last 7 Days <Icon.Chevron />
               </button>
             </div>
-            <LineChart
-              data={WEEKLY_PROGRESS} yMax={40} yStep={10} stroke="#3b5bfa"
-              fillId="wlpFill" gradientFrom="#3b5bfa" gradientTo="#3b5bfa"
-            />
+            <LineChart data={chartWeeklyData} yMax={weeklyMax} yStep={10} stroke="#3b5bfa" fillId="wlpFill" gradientFrom="#3b5bfa" gradientTo="#3b5bfa" />
           </div>
 
-          {/* Top 10 Students */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[14.5px] font-bold text-slate-900">
@@ -498,7 +487,7 @@ export default function HodPerformancePage() {
               <a href="#" className="text-[12.5px] font-bold text-[#3b5bfa] hover:underline">View All</a>
             </div>
             <ol className="flex flex-col gap-3">
-              {TOP_STUDENTS.map((s, i) => (
+              {topStudents.length > 0 ? topStudents.map((s, i) => (
                 <li key={s.name} className="flex items-center gap-3">
                   <span className="w-4 text-[12.5px] font-bold text-slate-400 shrink-0">{i + 1}.</span>
                   <span className="w-24 text-[12.5px] font-semibold text-slate-700 truncate shrink-0">{s.name}</span>
@@ -507,11 +496,10 @@ export default function HodPerformancePage() {
                   </div>
                   <span className="w-9 text-right text-[12.5px] font-bold text-slate-700 shrink-0">{s.score}%</span>
                 </li>
-              ))}
+              )) : <li className="text-sm text-slate-400">No student activity yet.</li>}
             </ol>
           </div>
 
-          {/* Average Watch Time */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-[14.5px] font-bold text-slate-900">
@@ -521,24 +509,18 @@ export default function HodPerformancePage() {
                 This Week <Icon.Chevron />
               </button>
             </div>
-            <LineChart
-              data={WATCH_TIME_WEEK} yMax={100} yStep={20} stroke="#7c3aed"
-              fillId="awtFill" gradientFrom="#7c3aed" gradientTo="#7c3aed"
-              suffix=""
-            />
+            <LineChart data={chartWatchData} yMax={watchMax} yStep={20} stroke="#7c3aed" fillId="awtFill" gradientFrom="#7c3aed" gradientTo="#7c3aed" suffix="" />
           </div>
         </section>
 
-        {/* ══════════ ROW 3: videos + bar chart + summary ══════════ */}
         <section className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-          {/* Most Watched Videos */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[14.5px] font-bold text-slate-900">Most Watched Videos</h2>
               <a href="#" className="text-[12.5px] font-bold text-[#3b5bfa] hover:underline">View All</a>
             </div>
             <ol className="flex flex-col gap-3.5">
-              {MOST_WATCHED_VIDEOS.map((v, i) => (
+              {mostWatchedVideos.length > 0 ? mostWatchedVideos.map((v, i) => (
                 <li key={v.title} className="flex items-center gap-3">
                   <span className="w-4 text-[12.5px] font-bold text-slate-400 shrink-0">{i + 1}.</span>
                   <div className="w-9 h-7 rounded-md bg-slate-900 flex items-center justify-center shrink-0">
@@ -546,23 +528,21 @@ export default function HodPerformancePage() {
                   </div>
                   <span className="w-28 text-[12.5px] font-semibold text-slate-700 truncate shrink-0">{v.title}</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full rounded-full bg-[#3b5bfa]" style={{ width: `${(v.views / maxViews) * 100}%` }} />
+                    <div className="h-full rounded-full bg-[#3b5bfa]" style={{ width: `${maxViews > 0 ? (v.views / maxViews) * 100 : 0}%` }} />
                   </div>
                   <span className="w-16 text-right text-[12px] font-semibold text-slate-500 shrink-0">{v.views} Views</span>
                 </li>
-              ))}
+              )) : <li className="text-sm text-slate-400">No watched videos yet.</li>}
             </ol>
           </div>
 
-          {/* Average Watch Time by Day */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <h2 className="text-[14.5px] font-bold text-slate-900 mb-2">
               Average Watch Time by Day <span className="font-medium text-slate-400">(Minutes)</span>
             </h2>
-            <BarChart data={WATCH_TIME_WEEK} yMax={100} yStep={20} color="#15a15a" />
+            <BarChart data={chartWatchData} yMax={watchMax} yStep={20} color="#15a15a" />
           </div>
 
-          {/* Student Performance Overview Summary */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <h2 className="text-[14.5px] font-bold text-slate-900 mb-4">
               Student Performance Overview <span className="font-medium text-slate-400">(Summary)</span>
@@ -604,7 +584,6 @@ export default function HodPerformancePage() {
           </div>
         </section>
 
-        {/* ══════════ DETAILED TABLE ══════════ */}
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-slate-200">
             <h2 className="text-[15px] font-bold text-slate-900">
@@ -646,10 +625,7 @@ export default function HodPerformancePage() {
                     <td className="px-4 py-3 text-[12.5px] font-bold text-slate-500">{(safePage - 1) * pageSize + idx + 1}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0"
-                          style={{ background: avatarColor(s.id) }}
-                        >
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0" style={{ background: avatarColor(s.id) }}>
                           {initials(s.name)}
                         </div>
                         <span className="text-[13px] font-bold text-slate-800 whitespace-nowrap">{s.name}</span>
@@ -700,10 +676,7 @@ export default function HodPerformancePage() {
                   <button
                     key={p}
                     onClick={() => goPage(p as number)}
-                    className={`w-8 h-8 rounded-lg text-[12.5px] font-bold transition ${safePage === p
-                      ? "bg-[#3b5bfa] text-white"
-                      : "border border-slate-200 text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900"
-                      }`}
+                    className={`w-8 h-8 rounded-lg text-[12.5px] font-bold transition ${safePage === p ? "bg-[#3b5bfa] text-white" : "border border-slate-200 text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900"}`}
                   >
                     {p}
                   </button>

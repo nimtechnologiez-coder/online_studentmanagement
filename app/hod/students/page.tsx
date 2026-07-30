@@ -9,7 +9,7 @@ type Student = {
   id: number;
   name: string;
   username: string;
-  password: string;
+  password?: string;
   email: string;
   year: string;
   joinDate: string;
@@ -70,7 +70,7 @@ export default function HodStudentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE = "http://127.0.0.1:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -97,30 +97,34 @@ export default function HodStudentsPage() {
     }
 
     try {
-      let response = await fetch("/api/hod/students/", {
+      const response = await fetch(`${API_BASE}/api/hod/students/`, {
         method: "GET",
         headers,
         credentials: "include",
       });
 
       if (!response.ok) {
-        response = await fetch(`${API_BASE}/api/hod/students/`, {
-          method: "GET",
-          headers,
-          credentials: "include",
-        });
+        throw new Error(`Request failed with status ${response.status}`);
       }
 
-      const json = await response.json();
-      if (json.status !== "success") {
-        throw new Error(json.message || "Failed to load students.");
+      const text = await response.text();
+      let json: any = null;
+
+      try {
+        json = text ? JSON.parse(text) : null;
+      } catch (parseErr) {
+        throw new Error("The server returned an invalid response.");
+      }
+
+      if (!json || json.status !== "success") {
+        throw new Error(json?.message || "Failed to load students.");
       }
 
       const studentData: Student[] = (json.students || []).map((student: any) => ({
         id: student.id,
         name: student.name,
         username: student.username,
-        password: "",
+        password: student.password || "",
         email: student.email,
         year: student.year,
         joinDate: student.joinDate || "",
@@ -320,9 +324,9 @@ export default function HodStudentsPage() {
                       {/* Username */}
                       <td className="stu-td-strong">{s.username}</td>
 
-                      {/* Password shown in plain text */}
+                      {/* Password */}
                       <td>
-                        <span className="stu-password">{s.password}</span>
+                        <span className="stu-password">{s.password ? "Password visible" : "—"}</span>
                       </td>
 
                       {/* Email */}
@@ -460,16 +464,6 @@ export default function HodStudentsPage() {
                         <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                       {modal.username}
-                    </div>
-                  </div>
-                  <div className="stu-modal-field">
-                    <span className="stu-modal-field-label">Password</span>
-                    <div className="stu-modal-field-val stu-modal-field-val--pass">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                        <rect x="4" y="10" width="16" height="10" rx="2" stroke="#6b7280" strokeWidth="2" />
-                        <path d="M8 10V7a4 4 0 018 0v3" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" />
-                      </svg>
-                      {modal.password}
                     </div>
                   </div>
                 </div>

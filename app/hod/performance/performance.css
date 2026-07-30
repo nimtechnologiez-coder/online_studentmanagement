@@ -1,8 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
 /* ===================== Student Performance Page — Supplementary CSS ===================== */
 /* Tailwind utility classes handle almost all styling directly in performance.tsx.        */
 /* This file only covers font loading, scrollbars, and small details Tailwind can't reach. */
-
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 .font-sans {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

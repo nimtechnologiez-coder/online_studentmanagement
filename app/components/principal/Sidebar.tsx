@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -14,29 +14,33 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  Sparkles,
+  SlidersHorizontal,
+  Building2,
+  PlaySquare,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import "./Sidebar.css";
 
 const menuGroups = [
   {
-    label: "Overview",
+    label: "OVERVIEW",
     items: [
       { title: "Dashboard", href: "/principal/dashboard", icon: LayoutDashboard },
       { title: "Student Management", href: "/principal/students", icon: Users },
-      { title: "Department Overview", href: "/principal/departments", icon: GraduationCap },
+      { title: "Department Overview", href: "/principal/departments", icon: Building2 },
     ],
   },
   {
-    label: "Reports",
+    label: "REPORTS",
     items: [
-      { title: "Video Reports", href: "/principal/video_report", icon: Video },
-      { title: "Attendance", href: "/principal/attendance_reports", icon: CalendarDays },
+      { title: "Video Reports", href: "/principal/video_report", icon: PlaySquare },
+      { title: "Attendance Reports", href: "/principal/attendance_reports", icon: CalendarDays },
     ],
   },
   {
-    label: "Account",
+    label: "ACCOUNT",
     items: [
       { title: "Profile", href: "/principal/principal_profile", icon: User },
     ],
@@ -48,6 +52,40 @@ export default function Sidebar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [principalName, setPrincipalName] = useState("Principal");
+  const [principalEmail, setPrincipalEmail] = useState("");
+  const [collegeName, setCollegeName] = useState("Institutional Portal");
+
+  useEffect(() => {
+    try {
+      const saved =
+        typeof window !== "undefined"
+          ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
+          : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const name =
+          parsed?.principal_name ||
+          parsed?.name ||
+          parsed?.full_name ||
+          parsed?.username ||
+          "Principal";
+        const email =
+          parsed?.principal_email || parsed?.email || "";
+        const college =
+          parsed?.college ||
+          parsed?.college_name ||
+          parsed?.institution ||
+          "Institutional Portal";
+
+        setPrincipalName(name);
+        setPrincipalEmail(email);
+        setCollegeName(college);
+      }
+    } catch (e) {
+      console.error("Error reading principal info:", e);
+    }
+  }, []);
 
   const handleLogout = () => {
     router.push("/");
@@ -62,22 +100,26 @@ export default function Sidebar() {
       {/* Mobile Top Header (Visible only on mobile/tablet < 1024px) */}
       <div className="principal-mobile-header">
         <div className="mobile-brand flex items-center gap-2">
-          <div className="logo-circle-principal text-sm">P</div>
-          <span className="font-bold text-white text-base">Principal Portal</span>
+          <div className="sidebar-logo-icon">
+            <Sparkles size={18} />
+          </div>
+          <div>
+            <span className="font-bold text-base block leading-tight">College Portal</span>
+            <span className="text-xs text-slate-400">Principal Dashboard</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Mobile Theme Toggle */}
           <button
-            className="mobile-theme-btn-principal text-slate-300 hover:text-white"
+            className="mobile-theme-btn-principal"
             onClick={toggleTheme}
             aria-label="Toggle theme"
           >
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          
+
           <button
-            className="mobile-menu-btn-principal text-slate-300 hover:text-white"
+            className="mobile-menu-btn-principal"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -96,21 +138,23 @@ export default function Sidebar() {
 
       {/* Main Sidebar Drawer */}
       <aside className={`sidebar ${mobileOpen ? "mobile-open" : ""}`}>
-        {/* Mobile close icon inside sidebar header */}
-        <div className="sidebar-mobile-close-principal">
-          <button onClick={closeMobileSidebar} aria-label="Close sidebar">
-            <X size={20} />
+        {/* Header with Star Icon & Title */}
+        <div className="sidebar-header">
+          <div className="sidebar-brand-wrapper">
+            <div className="sidebar-logo-icon">
+              <Sparkles size={20} className="text-white" />
+            </div>
+            <div className="sidebar-brand-text">
+              <h1 className="sidebar-logo">College Portal</h1>
+              <p className="sidebar-subtitle">Principal Dashboard</p>
+            </div>
+          </div>
+          <button className="sidebar-menu-toggle-btn" title="Toggle layout">
+            <SlidersHorizontal size={16} />
           </button>
         </div>
 
-        {/* Logo */}
-        <div className="sidebar-header">
-          <span className="sidebar-eyebrow">Institutional Access</span>
-          <h1 className="sidebar-logo">College Portal</h1>
-          <p className="sidebar-subtitle">Principal Dashboard</p>
-        </div>
-
-        {/* Menu */}
+        {/* Menu Groups */}
         <nav className="sidebar-nav">
           {menuGroups.map((group) => (
             <div className="sidebar-group" key={group.label}>
@@ -127,10 +171,9 @@ export default function Sidebar() {
                     className={`sidebar-link ${active ? "sidebar-link-active" : ""}`}
                   >
                     <span className="sidebar-icon-wrap">
-                      <Icon size={18} strokeWidth={1.75} className="sidebar-icon" />
+                      <Icon size={18} strokeWidth={2} className="sidebar-icon" />
                     </span>
                     <span className="sidebar-link-text">{menu.title}</span>
-                    {active && <span className="sidebar-active-dot" />}
                   </Link>
                 );
               })}
@@ -138,30 +181,39 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        {/* Bottom Profile & Theme Toggler */}
+        {/* Footer */}
         <div className="sidebar-footer">
-          {/* Theme Toggle Button */}
-          <button
-            className="theme-toggle-btn-sidebar"
-            onClick={toggleTheme}
-            style={{ marginBottom: "0.75rem", border: "1px solid rgba(255,255,255,0.08)" }}
-          >
-            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
-            <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
-          </button>
-
-          <div className="sidebar-profile">
-            <div className="sidebar-avatar">
-              <User size={18} strokeWidth={1.75} />
+          {/* Theme Toggle Pill Switch */}
+          <div className="theme-toggle-row" onClick={toggleTheme}>
+            <div className="theme-toggle-label">
+              <Sun size={16} className="theme-icon" />
+              <span>Light Mode</span>
             </div>
-            <div className="sidebar-profile-text">
-              <h2 className="sidebar-profile-name">Principal</h2>
-              <p className="sidebar-profile-email">principal@college.com</p>
+            <div className={`theme-switch-track ${theme === "dark" ? "switch-dark" : "switch-light"}`}>
+              <div className="theme-switch-thumb" />
             </div>
           </div>
 
-          <button type="button" className="sidebar-logout" onClick={handleLogout}>
-            <LogOut size={17} strokeWidth={1.75} />
+          {/* Profile Card */}
+          <div className="sidebar-profile-card">
+            <div className="profile-avatar-box">
+              <User size={20} />
+            </div>
+            <div className="sidebar-profile-text">
+              <span className="sidebar-profile-name">{principalName}</span>
+              <p className="sidebar-profile-role">Principal</p>
+              {principalEmail && (
+                <p className="sidebar-profile-email" style={{ fontSize: "11px", opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {principalEmail}
+                </p>
+              )}
+              <p className="sidebar-profile-college">{collegeName}</p>
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <button type="button" className="sidebar-logout-btn" onClick={handleLogout}>
+            <LogOut size={16} strokeWidth={2} />
             <span>Logout</span>
           </button>
         </div>

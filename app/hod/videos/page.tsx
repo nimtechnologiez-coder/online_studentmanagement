@@ -440,24 +440,12 @@ function VideoTable({
   showBreadcrumb = true,
 }: VideoTableProps) {
   const totalPages = Math.max(1, Math.ceil(videos.length / perPage));
+  const safePage = Math.min(Math.max(1, page), totalPages);
 
-  // FIX: clamp the current page whenever the underlying video count changes
-  // (e.g. after delete, search, or new uploads) so a stale page number can
-  // never point past the end of the list or leave it stuck out of range.
-  useEffect(() => {
-    if (page > totalPages) {
-      onPageChange(totalPages);
-    }
-  }, [totalPages, page, onPageChange]);
-
-  // FIX: always slice exactly `perPage` items for the *current* page only —
-  // this, combined with unique keys + the clamp above, is what makes
-  // pagination stable no matter how many times Next/Prev/page numbers are clicked.
   const pageItems = useMemo(() => {
-    const safePage = Math.min(Math.max(1, page), totalPages);
     const start = (safePage - 1) * perPage;
     return videos.slice(start, start + perPage);
-  }, [videos, page, perPage, totalPages]);
+  }, [videos, safePage, perPage]);
 
   return (
     <div className="card">
@@ -510,7 +498,7 @@ function VideoTable({
             {pageItems.map((video, index) => (
               <tr key={video.id}>
                 <td data-label="S.No" className="col-sno">
-                  {(Math.min(Math.max(1, page), totalPages) - 1) * perPage + index + 1}
+                  {(safePage - 1) * perPage + index + 1}
                 </td>
 
                 <td data-label="Thumbnail">
@@ -557,20 +545,16 @@ function VideoTable({
       <div className="table-footer">
         <span>
           Showing{" "}
-          {videos.length === 0
-            ? 0
-            : (Math.min(Math.max(1, page), totalPages) - 1) * perPage + 1}
+          {videos.length === 0 ? 0 : (safePage - 1) * perPage + 1}
           -
-          {Math.min(Math.max(1, page), totalPages) * perPage > videos.length
-            ? videos.length
-            : Math.min(Math.max(1, page), totalPages) * perPage}{" "}
+          {safePage * perPage > videos.length ? videos.length : safePage * perPage}{" "}
           of {videos.length} videos
         </span>
 
         <div className="pagination-numbers">
           <button
-            onClick={() => onPageChange(Math.max(1, page - 1))}
-            disabled={page === 1} className = "pagination-button"
+            onClick={() => onPageChange(Math.max(1, safePage - 1))}
+            disabled={safePage === 1} className = "pagination-button"
           >
             Previous
           </button>
@@ -579,15 +563,15 @@ function VideoTable({
             <button
               key={i}
               onClick={() => onPageChange(i + 1)}
-              className={page === i + 1 ? "page-btn active" : "page-btn"}
+              className={safePage === i + 1 ? "page-btn active" : "page-btn"}
                >
               {i + 1}
             </button>
           ))}
 
           <button
-            onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-            disabled={page === totalPages}
+            onClick={() => onPageChange(Math.min(totalPages, safePage + 1))}
+            disabled={safePage === totalPages}
           >
             Next
           </button>
@@ -916,6 +900,8 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData }: UploadModalProp
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>(initialVideos);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [searchAll, setSearchAll] = useState("");
   const [searchMine, setSearchMine] = useState("");
@@ -926,6 +912,84 @@ export default function VideosPage() {
   const [viewingVideo, setViewingVideo] = useState<Video | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<UploadFormData | null>(null);
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setLoading(true);
+      setError(null);
+
+      const savedHod = typeof window !== "undefined" ? localStorage.getItem("hod") || sessionStorage.getItem("hod") : null;
+      let hodId = "";
+
+      if (savedHod) {
+        try {
+          const parsed = JSON.parse(savedHod);
+          hodId = parsed?.id || "";
+        } catch (err) {
+          console.error("Failed to parse saved HOD data:", err);
+        }
+      }
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (hodId) {
+        headers["X-Hod-Id"] = String(hodId);
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/hod/videos/`, {
+          method: "GET",
+          headers,
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const text = await response.text();
+        let json: any = null;
+
+        try {
+          json = text ? JSON.parse(text) : null;
+        } catch (parseErr) {
+          throw new Error("The server returned an invalid response.");
+        }
+
+        if (!json || json.status !== "success") {
+          throw new Error(json?.message || "Failed to load videos.");
+        }
+
+        const mappedVideos: Video[] = (json.videos || []).map((video: any) => ({
+          id: Number(video.id),
+          title: video.title,
+          category: video.category,
+          duration: video.duration,
+          description: video.description || "",
+          thumbnail: video.thumbnail || "https://picsum.photos/90/50?0",
+          isMine: Boolean(video.isMine),
+          videoUrl: video.videoUrl || SAMPLE_VIDEO_URL,
+          uploadedBy: video.uploadedBy || "HOD",
+          uploadDate: video.uploadDate || "",
+          views: Number(video.views || 0),
+          status: video.status || "Published",
+        }));
+
+        setVideos(mappedVideos);
+      } catch (err: any) {
+        console.error("Failed to load HOD videos:", err);
+        setError(err.message || "Failed to load videos.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, [API_BASE]);
 
   const allVideos = useMemo(
     () =>
@@ -1022,6 +1086,9 @@ export default function VideosPage() {
 
   return (
     <div className="videos-page">
+      {loading && <p className="videos-loading">Loading videos…</p>}
+      {error && <p className="videos-error">{error}</p>}
+
       {/* ALL VIDEOS */}
       <VideoTable
         title="All Videos"

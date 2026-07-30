@@ -69,6 +69,7 @@ const videos: Video[] = [
     completionRate: 78,
     description: "Introduction to Artificial Intelligence and its applications.",
     thumbnail: "AI",
+    videoUrl: "/videos/ai-basics.mp4",
   },
   {
     id: "v2",
@@ -83,6 +84,7 @@ const videos: Video[] = [
     completionRate: 82,
     description: "Step-by-step guidance on crafting a resume that stands out to recruiters.",
     thumbnail: "RB",
+    videoUrl: "/videos/resume-building.mp4",
   },
   {
     id: "v3",
@@ -97,6 +99,7 @@ const videos: Video[] = [
     completionRate: 65,
     description: "A beginner-friendly walkthrough of Python syntax, variables, and control flow.",
     thumbnail: "PY",
+    videoUrl: "/videos/python-basics.mp4",
   },
   {
     id: "v4",
@@ -111,6 +114,7 @@ const videos: Video[] = [
     completionRate: 71,
     description: "Practical tips for answering common interview questions with confidence.",
     thumbnail: "IS",
+    videoUrl: "/videos/interview-skills.mp4",
   },
   {
     id: "v5",
@@ -125,6 +129,7 @@ const videos: Video[] = [
     completionRate: 59,
     description: "Techniques to prioritize tasks and stay productive under deadlines.",
     thumbnail: "TM",
+    videoUrl: "/videos/time-management.mp4",
   },
   {
     id: "v6",
@@ -139,6 +144,7 @@ const videos: Video[] = [
     completionRate: 68,
     description: "Building clarity and confidence in verbal and written workplace communication.",
     thumbnail: "CS",
+    videoUrl: "/videos/communication-skills.mp4",
   },
   {
     id: "v7",
@@ -153,6 +159,7 @@ const videos: Video[] = [
     completionRate: 34,
     description: "Quick-fire tips to fix the most common resume mistakes before you apply.",
     thumbnail: "RT",
+    videoUrl: "/videos/resume-tips.mp4",
   },
   {
     id: "v8",
@@ -167,6 +174,7 @@ const videos: Video[] = [
     completionRate: 55,
     description: "Core principles of leading teams, delegating, and giving feedback.",
     thumbnail: "LF",
+    videoUrl: "/videos/leadership-fundamentals.mp4",
   },
   {
     id: "v9",
@@ -181,6 +189,7 @@ const videos: Video[] = [
     completionRate: 22,
     description: "Deeper dive into decorators, generators, and Python's object model.",
     thumbnail: "AP",
+    videoUrl: "/videos/advanced-python.mp4",
   },
   {
     id: "v10",
@@ -195,6 +204,7 @@ const videos: Video[] = [
     completionRate: 63,
     description: "How to contribute effectively and stand out in group discussion rounds.",
     thumbnail: "GD",
+    videoUrl: "/videos/group-discussion-skills.mp4",
   },
   {
     id: "v11",
@@ -209,6 +219,7 @@ const videos: Video[] = [
     completionRate: 70,
     description: "Practical ways AI tools are used across everyday professional tasks.",
     thumbnail: "AE",
+    videoUrl: "/videos/ai-everyday-work.mp4",
   },
   {
     id: "v12",
@@ -223,6 +234,7 @@ const videos: Video[] = [
     completionRate: 28,
     description: "A full mock interview session broken down question by question.",
     thumbnail: "MI",
+    videoUrl: "/videos/mock-interview-walkthrough.mp4",
   },
 ];
 
