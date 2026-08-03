@@ -7,74 +7,205 @@
   --font-body: "Inter", sans-serif;
 }
 
+html,
 body {
   margin: 0;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
+/* ============================================================
+   CSS CUSTOM PROPERTIES — Light Theme (default)
+   ============================================================ */
 :root {
-  --background: #f8fafc;
+  --background: #f1f5f9;
   --foreground: #0f172a;
 
   --card-bg: #ffffff;
-  --card-border: #e2e8f0;
-  --card-text: #1e293b;
-  --muted-text: #64748b;
+  --card-border: #cbd5e1;
+  --card-text: #0f172a;
+  --muted-text: #475569;
 
-  --sidebar-bg: #0f172a;
-  --sidebar-border: #1e293b;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --input-placeholder: #64748b;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e2e8f0;
+
+  --tag-bg: #e2e8f0;
+  --tag-text: #334155;
+  --tag-active-bg: #2563eb;
+  --tag-active-text: #ffffff;
+
+  --table-head-bg: #f8fafc;
+  --table-row-hover: #f1f5f9;
+  --table-border: #e2e8f0;
+
+  --progress-track: #e2e8f0;
+  --badge-bg: #eff6ff;
+  --badge-text: #1d4ed8;
+
+  --hero-card-bg: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
 }
 
+/* ============================================================
+   CSS CUSTOM PROPERTIES — Dark Theme
+   ============================================================ */
 html.dark {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  --background: #0c111d;
+  --foreground: #f0f4ff;
 
-  --card-bg: #1e293b;
-  --card-border: #334155;
+  --card-bg: #131929;
+  --card-border: #1e293b;
   --card-text: #f8fafc;
-  --muted-text: #94a3b8;
+  --muted-text: #8ea3c7;
 
-  --sidebar-bg: #090d16;
-  --sidebar-border: #172033;
+  --input-bg: #090e1a;
+  --input-border: #1e293b;
+  --input-text: #ffffff;
+  --input-placeholder: #4a5c7d;
+
+  --sidebar-bg: #090d18;
+  --sidebar-border: #1a2336;
+
+  --tag-bg: #162033;
+  --tag-text: #8ea3c7;
+  --tag-active-bg: #2563eb;
+  --tag-active-text: #ffffff;
+
+  --table-head-bg: #0f172a;
+  --table-row-hover: #162033;
+  --table-border: #1e293b;
+
+  --progress-track: #1a2336;
+  --badge-bg: rgba(37, 99, 235, 0.15);
+  --badge-text: #60a5fa;
+
+  --hero-card-bg: linear-gradient(135deg, #070d24 0%, #0d173a 50%, #08102b 100%);
 }
 
+/* ============================================================
+   BASE BODY + PAGE BACKGROUND
+   ============================================================ */
 body {
   background-color: var(--background) !important;
   color: var(--foreground) !important;
   font-family: 'Inter', Arial, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Base card dark mode wrapper rules */
-.bg-white {
+/* Student Sidebar Collapsed State Layout Transition */
+body.student-sidebar-collapsed main {
+  padding-left: 80px !important;
+}
+
+@media (max-width: 1023px) {
+  body.student-sidebar-collapsed main {
+    padding-left: 0 !important;
+  }
+}
+
+/* ============================================================
+   GLOBAL TAILWIND CLASS OVERRIDES (dark mode)
+   These ensure inline Tailwind classes used in page.tsx get dark-themed
+   ============================================================ */
+html.dark .bg-white {
   background-color: var(--card-bg) !important;
-  border-color: var(--card-border) !important;
-  color: var(--card-text) !important;
 }
 
-.text-slate-800,
-.text-slate-700 {
-  color: var(--card-text) !important;
-}
-
-.text-slate-500,
-.text-slate-600 {
-  color: var(--muted-text) !important;
-}
-
-.bg-slate-100,
-.bg-slate-50 {
+html.dark .bg-slate-50 {
   background-color: var(--background) !important;
 }
 
-.border-slate-200,
-.border-slate-100 {
+html.dark .bg-slate-100 {
+  background-color: #111827 !important;
+}
+
+html.dark .bg-slate-200 {
+  background-color: #1a2540 !important;
+}
+
+html.dark .bg-slate-900 {
+  background-color: #060c17 !important;
+}
+
+html.dark .text-slate-800,
+html.dark .text-slate-900 {
+  color: var(--card-text) !important;
+}
+
+html.dark .text-slate-700 {
+  color: #c5d2e8 !important;
+}
+
+html.dark .text-slate-600 {
+  color: #9aaac5 !important;
+}
+
+html.dark .text-slate-500 {
+  color: var(--muted-text) !important;
+}
+
+html.dark .text-slate-400 {
+  color: #4f6080 !important;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-100,
+html.dark .border-slate-300 {
   border-color: var(--card-border) !important;
 }
 
-/* Sidebar overriding dark variables */
+html.dark .divide-slate-200>*+* {
+  border-color: var(--card-border) !important;
+}
+
+html.dark .shadow-sm {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Inputs */
+html.dark input[type="text"],
+html.dark input[type="search"],
+html.dark input[type="email"],
+html.dark select,
+html.dark textarea {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--input-text) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+/* Hover states for bg */
+html.dark .hover\:bg-slate-100:hover {
+  background-color: #1a2540 !important;
+}
+
+html.dark .hover\:bg-slate-50:hover {
+  background-color: #111827 !important;
+}
+
+/* ============================================================
+   STUDENT LAYOUT BACKGROUND
+   ============================================================ */
+html.dark .min-h-screen.bg-slate-50,
+html.dark .min-h-screen.bg-slate-100 {
+  background-color: var(--background) !important;
+}
+
+/* ============================================================
+   SIDEBAR (Student)
+   ============================================================ */
 .student-sidebar {
   background: var(--sidebar-bg) !important;
   border-right: 1px solid var(--sidebar-border) !important;
+  color: var(--card-text) !important;
 }
 
 .sidebar-header,
@@ -87,7 +218,155 @@ body {
   border-bottom: 1px solid var(--sidebar-border) !important;
 }
 
-/* Page content background variables overrides */
+/* Light mode explicit sidebar & card overrides */
+html:not(.dark) .student-sidebar {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .sidebar-header {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .sidebar-footer {
+  border-top-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .brand-info h2 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .brand-info p {
+  color: #475569 !important;
+}
+
+html:not(.dark) .menu-item {
+  color: #334155 !important;
+}
+
+html:not(.dark) .menu-item:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .menu-item.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: #ffffff !important;
+}
+
+html:not(.dark) .sp-sidebar-promo-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%) !important;
+  border: 1px solid #bfdbfe !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08) !important;
+}
+
+html:not(.dark) .sp-promo-tag {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+html:not(.dark) .sp-promo-ring-inner {
+  background-color: #ffffff !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+html:not(.dark) .sp-promo-val {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .sp-promo-lbl {
+  color: #64748b !important;
+}
+
+html:not(.dark) .sp-promo-btn:hover {
+  background-color: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Light Mode Redesign — Student Welcome Hero Banner */
+html:not(.dark) .sdb-hero-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 50%, #dbeafe 100%) !important;
+  border: 1px solid #bfdbfe !important;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.08) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .sdb-banner-content h2 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .sdb-banner-content p {
+  color: #475569 !important;
+}
+
+html:not(.dark) .sdb-btn-glass {
+  background-color: #ffffff !important;
+  color: #2563eb !important;
+  border: 1px solid #93c5fd !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1) !important;
+}
+
+html:not(.dark) .sdb-btn-glass:hover {
+  background-color: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #1d4ed8 !important;
+}
+
+html:not(.dark) .sdb-hstat-item {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+html:not(.dark) .sdb-hstat-val {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .sdb-hstat-lbl {
+  color: #64748b !important;
+}
+
+html:not(.dark) .sdb-banner-illustration {
+  opacity: 0.15 !important;
+}
+
+html:not(.dark) .sp-switch-label {
+  color: #334155 !important;
+}
+
+html:not(.dark) .theme-toggle-btn-sidebar,
+html:not(.dark) .logout-btn {
+  color: #475569 !important;
+}
+
+html:not(.dark) .theme-toggle-btn-sidebar:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .logout-btn:hover {
+  background-color: #fef2f2 !important;
+  color: #ef4444 !important;
+}
+
+html:not(.dark) .version-tag {
+  color: #94a3b8 !important;
+}
+
+html:not(.dark) .sidebar-toggle-btn {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .sidebar-toggle-btn:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   MY VIDEOS PAGE (/Student/MyVideos)
+   ============================================================ */
 .my-videos-container {
   background-color: var(--background) !important;
   color: var(--foreground) !important;
@@ -99,4 +378,775 @@ body {
 
 .my-videos-header p {
   color: var(--muted-text) !important;
+}
+
+html.dark .controls-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .search-box {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+}
+
+html.dark .search-input {
+  background-color: transparent !important;
+  color: var(--input-text) !important;
+}
+
+html.dark .search-input::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+html.dark .search-icon {
+  color: var(--muted-text) !important;
+}
+
+html.dark .tag-btn {
+  background-color: var(--tag-bg) !important;
+  color: var(--tag-text) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .tag-btn.active {
+  background-color: var(--tag-active-bg) !important;
+  color: var(--tag-active-text) !important;
+  border-color: var(--tag-active-bg) !important;
+}
+
+html.dark .video-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .video-card:hover {
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15) !important;
+}
+
+html.dark .video-title {
+  color: var(--card-text) !important;
+}
+
+html.dark .video-meta,
+html.dark .video-desc {
+  color: var(--muted-text) !important;
+}
+
+html.dark .watch-btn {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+html.dark .duration-badge {
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: #e8f0fe !important;
+}
+
+html.dark .subject-badge {
+  background: rgba(37, 99, 235, 0.8) !important;
+  color: #ffffff !important;
+}
+
+html.dark .video-content {
+  background-color: var(--card-bg) !important;
+}
+
+html.dark .progress-bar-bg {
+  background-color: var(--progress-track) !important;
+}
+
+html.dark .empty-state {
+  color: var(--muted-text) !important;
+}
+
+/* ============================================================
+   CONTINUE WATCHING PAGE (/Student/ContinueWatching)
+   ============================================================ */
+.continue-watching-container {
+  background-color: var(--background) !important;
+}
+
+html.dark .cw-header h1 {
+  color: var(--foreground) !important;
+}
+
+html.dark .cw-header p {
+  color: var(--muted-text) !important;
+}
+
+html.dark .hero-player-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .video-info-bar {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .video-info-bar h2 {
+  color: var(--card-text) !important;
+}
+
+html.dark .video-info-bar p {
+  color: var(--muted-text) !important;
+}
+
+html.dark .hero-progress-box {
+  background: transparent !important;
+}
+
+html.dark .progress-track-bg {
+  background-color: var(--progress-track) !important;
+}
+
+html.dark .progress-track-fill {
+  background: linear-gradient(90deg, #2563eb, #60a5fa) !important;
+}
+
+html.dark .progress-labels span {
+  color: var(--muted-text) !important;
+}
+
+html.dark .cw-resume-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: #ffffff !important;
+}
+
+html.dark .section-title {
+  color: var(--foreground) !important;
+}
+
+html.dark .cw-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .cw-card:hover {
+  border-color: #2563eb !important;
+}
+
+html.dark .cw-card-body h3 {
+  color: var(--card-text) !important;
+}
+
+html.dark .cw-card-body p {
+  color: var(--muted-text) !important;
+}
+
+html.dark .cw-subject-chip {
+  background: rgba(37, 99, 235, 0.8) !important;
+  color: #fff !important;
+}
+
+html.dark .cw-time-left {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #e8f0fe !important;
+}
+
+html.dark .cw-time-badge {
+  color: var(--muted-text) !important;
+}
+
+html.dark .cw-progress-bar-bg {
+  background-color: var(--progress-track) !important;
+}
+
+html.dark .section-empty-state {
+  color: var(--muted-text) !important;
+}
+
+html.dark .modal-backdrop {
+  background: rgba(0, 0, 0, 0.75) !important;
+}
+
+html.dark .video-modal-content {
+  background: #0f1929 !important;
+  border-color: #1e2d45 !important;
+}
+
+html.dark .modal-header {
+  border-color: #1e2d45 !important;
+}
+
+html.dark .modal-header h2 {
+  color: var(--card-text) !important;
+}
+
+html.dark .modal-close-btn {
+  color: var(--muted-text) !important;
+  background: #1a2540 !important;
+}
+
+html.dark .modal-info {
+  border-color: #1e2d45 !important;
+}
+
+html.dark .modal-info p {
+  color: var(--muted-text) !important;
+}
+
+html.dark .modal-video-meta span {
+  color: var(--muted-text) !important;
+}
+
+/* ============================================================
+   WATCH HISTORY PAGE (/Student/WatchHistory)
+   ============================================================ */
+html.dark .watch-history-container {
+  background-color: var(--background) !important;
+}
+
+html.dark .wh-header h1 {
+  color: var(--foreground) !important;
+}
+
+html.dark .wh-header p {
+  color: var(--muted-text) !important;
+}
+
+html.dark .wh-search-wrap {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .wh-search-input {
+  background: transparent !important;
+  color: var(--input-text) !important;
+}
+
+html.dark .wh-search-input::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+html.dark .wh-stats-bar {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .wh-stat-label {
+  color: var(--muted-text) !important;
+}
+
+html.dark .wh-stat-value {
+  color: var(--card-text) !important;
+}
+
+html.dark .wh-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .wh-card:hover {
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1) !important;
+}
+
+html.dark .wh-title {
+  color: var(--card-text) !important;
+}
+
+html.dark .wh-meta,
+html.dark .wh-date {
+  color: var(--muted-text) !important;
+}
+
+html.dark .wh-category-badge {
+  background-color: var(--badge-bg) !important;
+  color: var(--badge-text) !important;
+}
+
+html.dark .wh-empty {
+  color: var(--muted-text) !important;
+}
+
+html.dark .wh-delete-btn {
+  color: var(--muted-text) !important;
+}
+
+html.dark .wh-delete-btn:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* ============================================================
+   MY PROGRESS PAGE (/Student/MyProgress)
+   ============================================================ */
+.student-progress-layout {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+html.dark .sp-back-link {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-back-link:hover {
+  color: #60a5fa !important;
+}
+
+html.dark .sp-page-title {
+  color: var(--foreground) !important;
+}
+
+html.dark .sp-page-subtitle {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-btn-secondary {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-btn-secondary:hover {
+  background-color: var(--input-bg) !important;
+}
+
+html.dark .sp-btn-emerald {
+  background-color: #052e16 !important;
+  border-color: #065f46 !important;
+  color: #34d399 !important;
+}
+
+html.dark .sp-hero-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-name-row h2 {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-roll-no {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-meta-item {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-hero-right {
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-info-label {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-info-colon {
+  color: var(--card-border) !important;
+}
+
+html.dark .sp-info-val {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-kpi-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-kpi-label {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-kpi-value {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-kpi-sub {
+  color: var(--muted-text) !important;
+}
+
+html.dark .icon-blue {
+  background: rgba(37, 99, 235, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+html.dark .icon-green {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+html.dark .icon-amber {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+html.dark .icon-purple {
+  background: rgba(139, 92, 246, 0.15) !important;
+  color: #a78bfa !important;
+}
+
+html.dark .icon-rose {
+  background: rgba(244, 63, 94, 0.15) !important;
+  color: #fb7185 !important;
+}
+
+html.dark .icon-emerald {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+html.dark .sp-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-card-title {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-card-subtitle {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-completion-bar-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-big-progress-track {
+  background-color: var(--progress-track) !important;
+}
+
+html.dark .sp-legend-item {
+  color: var(--muted-text) !important;
+}
+
+html.dark .dot-slate {
+  background: var(--card-border) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-bar-track {
+  background-color: var(--progress-track) !important;
+}
+
+html.dark .sp-bar-subject {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-bar-count {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-bar-percent {
+  filter: brightness(1.2);
+}
+
+html.dark .sp-empty-chart {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-empty-table {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-table-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark .sp-table {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-table th {
+  color: var(--muted-text) !important;
+  border-color: var(--card-border) !important;
+  background-color: var(--table-head-bg) !important;
+}
+
+html.dark .sp-table td {
+  border-color: var(--table-border) !important;
+}
+
+html.dark .sp-table tr:hover td {
+  background-color: var(--table-row-hover) !important;
+}
+
+html.dark .sp-vid-title {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-vid-sub {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-vid-thumb {
+  background: rgba(37, 99, 235, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+html.dark .sp-dur-text,
+html.dark .sp-date-text {
+  color: var(--muted-text) !important;
+}
+
+html.dark .sp-progress-text {
+  color: var(--card-text) !important;
+}
+
+html.dark .sp-mini-track {
+  background-color: var(--progress-track) !important;
+}
+
+html.dark .chip-green {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+html.dark .chip-amber {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+html.dark .sp-view-all-link {
+  color: #60a5fa !important;
+}
+
+html.dark .sp-view-all-link:hover {
+  color: #93c5fd !important;
+}
+
+html.dark .sp-start-link {
+  color: #60a5fa !important;
+}
+
+/* Recharts in dark mode */
+html.dark .recharts-cartesian-grid line {
+  stroke: #1e2d45 !important;
+}
+
+html.dark .recharts-text {
+  fill: var(--muted-text) !important;
+}
+
+html.dark .recharts-legend-item-text {
+  fill: var(--muted-text) !important;
+  color: var(--muted-text) !important;
+}
+
+html.dark .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #131929 !important;
+  border-color: #1e2d45 !important;
+  color: var(--card-text) !important;
+}
+
+/* Status badge dark mode specific (green active status) */
+html.dark .sp-status-badge {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+/* Year badge dark mode */
+html.dark .sp-year-badge {
+  background-color: rgba(37, 99, 235, 0.15) !important;
+  color: #60a5fa !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Chart tag dark mode */
+html.dark .sp-chart-tag {
+  background-color: rgba(37, 99, 235, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+/* Table hover row */
+html.dark .sp-table tr:hover td {
+  background-color: var(--table-row-hover) !important;
+}
+
+/* Dot slate color in dark */
+html.dark .dot-slate {
+  background: #1e2d45 !important;
+  border-color: #334155 !important;
+}
+
+/* KPI icon colors in dark */
+html.dark .sp-kpi-icon.icon-blue {
+  background: rgba(37, 99, 235, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+html.dark .sp-kpi-icon.icon-green {
+  background: rgba(22, 163, 74, 0.15) !important;
+  color: #34d399 !important;
+}
+
+html.dark .sp-kpi-icon.icon-amber {
+  background: rgba(217, 119, 6, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+html.dark .sp-kpi-icon.icon-purple {
+  background: rgba(124, 58, 237, 0.15) !important;
+  color: #a78bfa !important;
+}
+
+html.dark .sp-kpi-icon.icon-rose {
+  background: rgba(225, 29, 72, 0.15) !important;
+  color: #fb7185 !important;
+}
+
+html.dark .sp-kpi-icon.icon-emerald {
+  background: rgba(5, 150, 105, 0.15) !important;
+  color: #34d399 !important;
+}
+
+/* Emerald button in dark mode */
+html.dark .sp-btn-emerald {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  color: #34d399 !important;
+}
+
+
+/* ============================================================
+   STUDENT PORTAL — UNIFIED LIGHT-BLUE HOVER SYSTEM
+   ============================================================ */
+/* Buttons, chips, cards, pagination, and icon interactive elements */
+.sdb-quick-btn,
+.sdb-recent-watch-btn,
+.sdb-rec-card,
+.sdb-recent-card,
+.sdb-cat-hcard,
+.sdb-cw-side-item,
+.sdb-cw-featured,
+.sdb-bell-btn,
+.sdb-rec-next-btn,
+.sdb-recent-next-btn,
+.fav-cat-btn,
+.fav-card,
+.fav-watch-btn,
+.wl-card,
+.wl-watch-btn,
+.tag-btn,
+.watch-btn,
+.video-card,
+.action-row-btn,
+.sp-promo-btn,
+.view-progress-link,
+.edit-profile-btn {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Light blue hover state with subtle blue border, blue text/icon & slight lift effect */
+.sdb-quick-btn:hover,
+.sdb-recent-watch-btn:hover,
+.sdb-bell-btn:hover,
+.sdb-rec-next-btn:hover,
+.sdb-recent-next-btn:hover,
+.fav-cat-btn:not(.active):hover,
+.fav-watch-btn:hover,
+.wl-watch-btn:hover,
+.tag-btn:not(.active):hover,
+.watch-btn:hover,
+.action-row-btn:hover,
+.view-progress-link:hover {
+  background-color: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #2563eb !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* Ensure child icons inside hover buttons switch to blue */
+.sdb-quick-btn:hover svg,
+.sdb-recent-watch-btn:hover svg,
+.sdb-bell-btn:hover svg,
+.sdb-rec-next-btn:hover svg,
+.sdb-recent-next-btn:hover svg,
+.fav-cat-btn:not(.active):hover svg,
+.fav-watch-btn:hover svg,
+.wl-watch-btn:hover svg,
+.tag-btn:not(.active):hover svg,
+.watch-btn:hover svg,
+.action-row-btn:hover svg,
+.view-progress-link:hover svg {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+/* Dark mode specific light-blue tint hover adjustment */
+html.dark .sdb-quick-btn:hover,
+html.dark .sdb-recent-watch-btn:hover,
+html.dark .sdb-bell-btn:hover,
+html.dark .sdb-rec-next-btn:hover,
+html.dark .sdb-recent-next-btn:hover,
+html.dark .fav-cat-btn:not(.active):hover,
+html.dark .fav-watch-btn:hover,
+html.dark .wl-watch-btn:hover,
+html.dark .tag-btn:not(.active):hover,
+html.dark .watch-btn:hover,
+html.dark .action-row-btn:hover,
+html.dark .view-progress-link:hover {
+  background-color: rgba(37, 99, 235, 0.16) !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .sdb-quick-btn:hover svg,
+html.dark .sdb-recent-watch-btn:hover svg,
+html.dark .sdb-bell-btn:hover svg,
+html.dark .sdb-rec-next-btn:hover svg,
+html.dark .sdb-recent-next-btn:hover svg,
+html.dark .fav-cat-btn:not(.active):hover svg,
+html.dark .fav-watch-btn:hover svg,
+html.dark .wl-watch-btn:hover svg,
+html.dark .tag-btn:not(.active):hover svg,
+html.dark .watch-btn:hover svg,
+html.dark .action-row-btn:hover svg,
+html.dark .view-progress-link:hover svg {
+  color: #60a5fa !important;
+  stroke: #60a5fa !important;
+}
+
+/* Interactive Card lift & light-blue background hover effects */
+.sdb-rec-card:hover,
+.sdb-recent-card:hover,
+.sdb-cat-hcard:hover,
+.sdb-cw-side-item:hover,
+.sdb-cw-featured:hover,
+.fav-card:hover,
+.wl-card:hover,
+.video-card:hover {
+  background-color: #eff6ff !important;
+  transform: translateY(-3px) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.14) !important;
+}
+
+/* Ensure text inside cards changes to dark blue on light-blue background hover */
+.sdb-rec-card:hover h4,
+.sdb-recent-card:hover h4,
+.sdb-cat-hcard:hover h5,
+.sdb-cw-side-item:hover h5,
+.sdb-cw-featured:hover h4 {
+  color: #1e40af !important;
+}
+
+html.dark .sdb-rec-card:hover,
+html.dark .sdb-recent-card:hover,
+html.dark .sdb-cat-hcard:hover,
+html.dark .sdb-cw-side-item:hover,
+html.dark .sdb-cw-featured:hover,
+html.dark .fav-card:hover,
+html.dark .wl-card:hover,
+html.dark .video-card:hover {
+  background-color: rgba(37, 99, 235, 0.14) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .sdb-rec-card:hover h4,
+html.dark .sdb-recent-card:hover h4,
+html.dark .sdb-cat-hcard:hover h5,
+html.dark .sdb-cw-side-item:hover h5,
+html.dark .sdb-cw-featured:hover h4 {
+  color: #60a5fa !important;
 }

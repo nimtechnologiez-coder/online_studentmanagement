@@ -317,9 +317,12 @@ html.dark .sidebar-link-active {
   background-color: var(--p-sidebar-mobile-bg);
   padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--p-sidebar-mobile-border);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 45;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 60;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 

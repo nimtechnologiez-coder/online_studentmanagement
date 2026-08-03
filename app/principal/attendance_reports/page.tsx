@@ -16,6 +16,9 @@ import {
   CheckCircle2,
   RefreshCw
 } from "lucide-react";
+import "../dashboard/Principaldashboard.css";
+import "../video_report/VideoReports.css";
+import "../students/StudentsPage.css";
 
 /* ---------------------------------- FALLBACK DATA ---------------------------------- */
 const initialSummaryStats = [
@@ -111,91 +114,120 @@ export default function AttendanceReports() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 p-3 sm:p-6 md:p-8 font-sans text-slate-900">
-      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="dash-main">
+      <div className="dash-content">
         
-        {/* Header */}
-        <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <Link href="/principal/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors group">
-              <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+        {/* Banner Header */}
+        <div className="dash-welcome-banner mb-6">
+          <div className="banner-content">
+            <Link href="/principal/dashboard" className="banner-badge hover:underline">
+              <ChevronLeft size={13} />
               <span>Back to Dashboard</span>
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Attendance Reports</h1>
-            <p className="text-xs sm:text-sm text-slate-500">Monitor college-wide attendance trends & student warnings.</p>
+            <h2>Attendance Reports</h2>
+            <p>Monitor college-wide attendance trends & student warnings across all departments.</p>
           </div>
           
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => {
-                const csvHeader = "ID,Name,Department,Attendance,Status,Streak\n";
-                const csvRows = attendanceList.map(s => `"${s.id}","${s.name}","${s.dept}","${s.attendance}%","${s.status}","${s.streak}"`).join("\n");
-                const blob = new Blob([csvHeader + csvRows], { type: "text/csv" });
-                const url = window.URL.createObjectURL(blob);
+                const listToExport = filteredData.length > 0 ? filteredData : attendanceList;
+                if (listToExport.length === 0) return;
+
+                const headers = ["Student ID", "Full Name", "Department", "Attendance (%)", "Status", "Streak"];
+                const rowsHtml = listToExport
+                  .map(
+                    (s) => `
+                  <tr>
+                    <td>${s.id}</td>
+                    <td>${s.name || ""}</td>
+                    <td>${s.dept || ""}</td>
+                    <td>${s.attendance}%</td>
+                    <td>${s.status || ""}</td>
+                    <td>${s.streak || ""}</td>
+                  </tr>`
+                  )
+                  .join("");
+
+                const excelTemplate = `
+                  <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                  <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                    <!--[if gte mso 9]>
+                    <xml>
+                      <x:ExcelWorkbook>
+                        <x:ExcelWorksheets>
+                          <x:ExcelWorksheet>
+                            <x:Name>Attendance Report</x:Name>
+                            <x:WorksheetOptions>
+                              <x:DisplayGridlines/>
+                            </x:WorksheetOptions>
+                          </x:ExcelWorksheet>
+                        </x:ExcelWorksheets>
+                      </x:ExcelWorkbook>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                      th { background-color: #4f46e5; color: #ffffff; font-weight: bold; padding: 8px; text-align: left; }
+                      td { padding: 6px; border: 1px solid #cbd5e1; }
+                    </style>
+                  </head>
+                  <body>
+                    <table>
+                      <thead>
+                        <tr>
+                          ${headers.map((h) => `<th>${h}</th>`).join("")}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${rowsHtml}
+                      </tbody>
+                    </table>
+                  </body>
+                  </html>
+                `;
+
+                const blob = new Blob([excelTemplate], { type: "application/vnd.ms-excel;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `Attendance_Report_${new Date().toISOString().slice(0,10)}.csv`;
+                a.download = `Attendance_Report_${new Date().toISOString().slice(0, 10)}.xls`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
               }}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200/60 rounded-xl sm:rounded-lg transition-all active:scale-[0.98]"
+              className="dash-action-btn btn-export"
+              title="Download Attendance Excel File"
             >
-              <Download size={16} />
-              <span>Export Log</span>
-            </button>
-            <button className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2.5 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl sm:rounded-lg transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]">
-              <Calendar size={16} />
-              <span className="truncate">Manual Attendance</span>
+              <Download size={15} />
+              <span className="btn-text">Export Excel</span>
             </button>
           </div>
         </div>
 
-        {/* Summary Cards Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-          {summaryStats.map((stat, idx) => {
-            const StatIcon = iconMap[stat.iconName] || Users;
-            return (
-              <div key={idx} className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-all">
-                <div className="flex justify-between items-start mb-2 sm:mb-4">
-                  <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl ${stat.bg} ${stat.color}`}>
-                    <StatIcon size={18} className="sm:w-[22px] sm:h-[22px]" />
-                  </div>
-                  {stat.trendUp !== null && (
-                    <span className={`flex items-center gap-0.5 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full ${stat.trendUp ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
-                      {stat.trendUp ? <ArrowUpRight size={10} className="sm:w-3 sm:h-3" /> : <ArrowDownRight size={10} className="sm:w-3 sm:h-3" />}
-                      <span>{stat.trend}</span>
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <p className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider truncate">{stat.label}</p>
-                  <p className="text-lg sm:text-2xl font-black text-slate-800 mt-0.5">{stat.value}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+
 
         {/* Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Students List (Left 2/3) */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-              <div className="p-3.5 sm:p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between bg-slate-50/50">
-                <div className="relative w-full sm:w-72">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <div className="corp-card table-card-corp">
+              <div className="corp-card-header mb-4">
+                <div className="dash-search-container" style={{ maxWidth: 300 }}>
+                  <Search size={15} className="search-icon" />
                   <input 
                     type="text" 
                     placeholder="Search student ID or name..." 
-                    className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm border border-slate-200 rounded-xl sm:rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition-all shadow-sm"
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
                 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Filter size={15} className="text-slate-400 flex-shrink-0 ml-1" />
+                <div className="flex items-center gap-2">
+                  <Filter size={15} style={{ color: "var(--p-text-muted)" }} />
                   <select 
-                    className="w-full sm:w-auto px-3 py-2 text-xs sm:text-sm border border-slate-200 rounded-xl sm:rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white font-medium text-slate-700 cursor-pointer shadow-sm"
+                    className="corp-select"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
                   >
@@ -207,89 +239,55 @@ export default function AttendanceReports() {
                 </div>
               </div>
 
-              {/* Mobile Card List View (visible below sm) */}
-              <div className="block sm:hidden divide-y divide-slate-100">
-                {filteredData.map((item, idx) => (
-                  <div key={idx} className="p-3.5 space-y-2.5 hover:bg-slate-50/60 transition-colors">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="font-bold text-sm text-slate-800 truncate">{item.name}</p>
-                        <p className="text-[11px] text-slate-400 font-medium truncate">{item.id} • {item.dept}</p>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ${
-                        item.status === 'Safe' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                        item.status === 'At Risk' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                        'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}>
-                        {item.status}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-3 text-xs pt-2 border-t border-slate-100/60">
-                      <div className="flex items-center gap-2 flex-1">
-                        <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden flex-shrink-0">
-                          <div 
-                            className={`h-full rounded-full ${
-                              item.attendance >= 75 ? 'bg-emerald-500' : 
-                              item.attendance >= 70 ? 'bg-amber-500' : 'bg-rose-500'
-                            }`} 
-                            style={{ width: `${item.attendance}%` }}
-                          />
-                        </div>
-                        <span className="font-extrabold text-slate-800">{item.attendance}%</span>
-                      </div>
-                      <span className="text-slate-500 font-semibold text-[11px] bg-slate-100 px-2 py-0.5 rounded-md">Streak: {item.streak}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop & Tablet Table View (hidden on small screens) */}
-              <div className="hidden sm:block overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-slate-50/80 text-slate-400 text-[11px] uppercase font-bold tracking-wider">
-                    <tr className="border-b border-slate-100">
-                      <th className="px-4 md:px-6 py-3.5">Student</th>
-                      <th className="px-4 md:px-6 py-3.5">Department</th>
-                      <th className="px-4 md:px-6 py-3.5">Attendance %</th>
-                      <th className="px-4 md:px-6 py-3.5">Status</th>
-                      <th className="px-4 md:px-6 py-3.5">Streak</th>
+              {/* Desktop & Tablet Table View */}
+              <div className="corp-table-wrap">
+                <table className="corp-table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Department</th>
+                      <th>Attendance %</th>
+                      <th>Status</th>
+                      <th>Streak</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody>
                     {filteredData.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/60 transition-colors group">
-                        <td className="px-4 md:px-6 py-3.5">
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-slate-800 text-sm">{item.name}</span>
-                            <span className="text-xs text-slate-400 font-mono">{item.id}</span>
+                      <tr key={idx}>
+                        <td>
+                          <div className="student-cell-profile">
+                            <span className="font-semibold" style={{ color: "var(--p-text-primary)" }}>{item.name}</span>
+                            <code className="corp-code-badge" style={{ fontSize: 11 }}>{item.id}</code>
                           </div>
                         </td>
-                        <td className="px-4 md:px-6 py-3.5 text-xs md:text-sm text-slate-600 font-medium">{item.dept}</td>
-                        <td className="px-4 md:px-6 py-3.5">
+                        <td>
+                          <span className="table-dept-pill">{item.dept}</span>
+                        </td>
+                        <td>
                           <div className="flex items-center gap-2.5">
-                            <div className="w-16 md:w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="w-16 md:w-20 h-2 rounded-full overflow-hidden" style={{ background: "var(--p-border-table)" }}>
                               <div 
-                                className={`h-full rounded-full ${
-                                  item.attendance >= 75 ? 'bg-emerald-500' : 
-                                  item.attendance >= 70 ? 'bg-amber-500' : 'bg-rose-500'
-                                }`} 
-                                style={{ width: `${item.attendance}%` }}
+                                className="h-full rounded-full"
+                                style={{ 
+                                  width: `${item.attendance}%`,
+                                  background: item.attendance >= 75 ? "var(--p-emerald)" : item.attendance >= 70 ? "var(--p-amber)" : "var(--p-red)" 
+                                }} 
                               />
                             </div>
-                            <span className="text-xs md:text-sm font-bold text-slate-800">{item.attendance}%</span>
+                            <span className="font-bold">{item.attendance}%</span>
                           </div>
                         </td>
-                        <td className="px-4 md:px-6 py-3.5">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            item.status === 'Safe' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                            item.status === 'At Risk' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                            'bg-rose-50 text-rose-700 border border-rose-200'
+                        <td>
+                          <span className={`status-badge ${
+                            item.status === 'Safe' ? 'status-active' : 'status-inactive'
                           }`}>
+                            <span className="status-dot" />
                             {item.status}
                           </span>
                         </td>
-                        <td className="px-4 md:px-6 py-3.5 text-xs md:text-sm text-slate-600 font-medium">{item.streak}</td>
+                        <td>
+                          <span style={{ color: "var(--p-text-muted)", fontSize: 13 }}>{item.streak}</span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -299,23 +297,25 @@ export default function AttendanceReports() {
           </div>
 
           {/* Dept Analytics & Alert Sidebar (Right 1/3) */}
-          <div className="space-y-4 sm:space-y-6">
-            <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4 sm:mb-6 flex items-center gap-2 text-sm sm:text-base">
-                <Users size={18} className="text-blue-500" />
-                <span>Dept. Comparison</span>
-              </h3>
-              <div className="space-y-4 sm:space-y-5">
+          <div className="space-y-6">
+            <div className="corp-card">
+              <div className="corp-card-header">
+                <h3>
+                  <Users size={18} className="header-icon" style={{ color: "var(--p-indigo)" }} />
+                  <span>Dept. Comparison</span>
+                </h3>
+              </div>
+              <div className="space-y-4">
                 {deptList.map((dept, idx) => (
                   <div key={idx} className="space-y-1.5">
                     <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="font-semibold text-slate-700">{dept.name}</span>
-                      <span className="font-bold text-slate-800">{dept.rate}%</span>
+                      <span className="font-semibold" style={{ color: "var(--p-text-primary)" }}>{dept.name}</span>
+                      <span className="font-bold">{dept.rate}%</span>
                     </div>
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--p-border-table)" }}>
                       <div 
-                        className={`h-full rounded-full ${dept.color}`} 
-                        style={{ width: `${dept.rate}%` }}
+                        className="h-full rounded-full" 
+                        style={{ width: `${dept.rate}%`, background: "var(--p-indigo)" }}
                       />
                     </div>
                   </div>
@@ -324,20 +324,19 @@ export default function AttendanceReports() {
             </div>
 
             {/* Alert Card */}
-            <div className="bg-gradient-to-br from-rose-500 to-red-600 p-4 sm:p-6 rounded-xl sm:rounded-2xl text-white shadow-lg relative overflow-hidden">
-              <div className="relative z-10 space-y-2.5 sm:space-y-3">
+            <div className="corp-card" style={{ background: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)", color: "#ffffff" }}>
+              <div className="relative z-10 space-y-3">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={20} className="flex-shrink-0" />
-                  <h3 className="font-bold text-sm sm:text-base">Attendance Warning</h3>
+                  <h3 className="font-bold text-base text-white margin-0">Attendance Warning</h3>
                 </div>
                 <p className="text-rose-100 text-xs sm:text-sm leading-relaxed">
                   There are <span className="font-extrabold text-white underline decoration-rose-300">{warningCount} students</span> currently below the 75% mandatory threshold.
                 </p>
-                <button className="w-full py-2.5 bg-white text-rose-600 text-xs font-bold rounded-lg hover:bg-rose-50 transition-all shadow-sm active:scale-[0.98]">
+                <button className="dash-action-btn w-full justify-center" style={{ background: "#ffffff", color: "#e11d48", borderColor: "#ffffff" }}>
                   Send Bulk Warning Emails
                 </button>
               </div>
-              <UserX size={90} className="absolute -bottom-4 -right-4 text-white opacity-20 -rotate-12 pointer-events-none" />
             </div>
           </div>
 

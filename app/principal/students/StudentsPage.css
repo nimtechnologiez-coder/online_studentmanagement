@@ -514,11 +514,11 @@
 .corp-table-wrap {
   overflow-x: auto;
 }
-
 .corp-table {
   width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
-  font-size: 13.5px;
+  font-size: 13px;
 }
 
 .corp-table thead th {
@@ -531,15 +531,39 @@
   padding: 12px 14px;
   border-bottom: 1px solid var(--p-border-table);
   background: transparent;
+  white-space: nowrap;
 }
 
 .corp-table tbody td {
-  padding: 14px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--p-border-table-row);
   vertical-align: middle;
   color: var(--p-text-primary);
+  white-space: nowrap;
 }
 
+.action-btn-view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-indigo);
+  background: var(--p-indigo-soft);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.action-btn-view:hover {
+  background: var(--p-indigo);
+  color: #ffffff;
+  border-color: var(--p-indigo);
+}
 .corp-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -686,26 +710,6 @@
 
 .status-inactive { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
 .status-inactive .status-dot { background: #ef4444; }
-
-.action-btn-view {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--p-indigo);
-  background: var(--p-indigo-soft);
-  border: 1px solid rgba(79, 70, 229, 0.15);
-  padding: 6px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.action-btn-view:hover {
-  background: var(--p-indigo);
-  color: #ffffff;
-}
 
 .empty-table-cell {
   text-align: center;
@@ -1046,6 +1050,17 @@
 
 .modal-list-icon { color: var(--p-indigo); flex-shrink: 0; }
 
+.modal-video-date-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--p-text-muted);
+  background: var(--p-bg-elevated);
+  border: 1px solid var(--p-border-table);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
 .modal-timeline {
   list-style: none;
   padding: 0;
@@ -1203,8 +1218,8 @@
     font-size: 12px;
   }
 
-  .btn-text {
-    display: none;
+  .btn-export .btn-text {
+    display: inline !important;
   }
 
   .dash-corp-body {

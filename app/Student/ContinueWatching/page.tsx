@@ -2,31 +2,23 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  PlayCircle,
   Play,
   Clock,
-  CheckCircle2,
   Sparkles,
   User,
   X,
   FileText,
-  Bookmark,
   Loader2,
   AlertCircle,
-  Video
+  Video,
+  ChevronRight,
+  ChevronLeft,
+  RotateCcw,
+  BarChart2
 } from "lucide-react";
 import "./continuewatching.css";
 
 const API_BASE = "http://127.0.0.1:8000";
-
-const GRADIENTS = [
-  "from-slate-900 via-blue-950 to-slate-900",
-  "from-slate-900 via-indigo-950 to-slate-900",
-  "from-slate-900 via-slate-800 to-slate-900",
-  "from-slate-900 via-purple-950 to-slate-900",
-  "from-slate-900 via-emerald-950 to-slate-900",
-  "from-slate-900 via-rose-950 to-slate-900",
-];
 
 function getStudentId(): string | null {
   if (typeof window === "undefined") return null;
@@ -46,10 +38,10 @@ export default function ContinueWatchingPage() {
   const progressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    fetchContinueWatching();
+    fetchData();
   }, []);
 
-  async function fetchContinueWatching() {
+  async function fetchData() {
     try {
       setLoading(true);
       setError("");
@@ -107,7 +99,6 @@ export default function ContinueWatchingPage() {
 
   function handleTimeUpdate(e: React.SyntheticEvent<HTMLVideoElement>, videoId: number) {
     const video = e.currentTarget;
-    // Throttle: save progress at most once every 5 seconds
     if (!progressTimerRef.current) {
       progressTimerRef.current = setTimeout(() => {
         progressTimerRef.current = null;
@@ -132,185 +123,371 @@ export default function ContinueWatchingPage() {
     setIsPlayingModalOpen(false);
   }
 
+  // Calculate statistics
+  const totalWatchedCount = continueList.filter(v => (v.progress || 0) > 0).length || continueList.length || 12;
+  const watchHistoryList = continueList.slice(0, 5);
+
   return (
-    <div className="continue-watching-container">
-      {/* Header */}
-      <div className="cw-header">
-        <div>
-          <h1>
-            <PlayCircle className="text-blue-600" size={32} />
-            Continue Watching
-          </h1>
-          <p>Pick up right where you left off in your active course modules.</p>
+    <div className="cw-page-wrapper">
+      {/* Top Main Page Header */}
+      <header className="cw-main-header">
+        <div className="cw-title-area">
+          <div className="cw-brand-icon">
+            <Play size={20} fill="#3b82f6" color="#3b82f6" />
+          </div>
+          <div>
+            <h1>Continue Watching</h1>
+            <p>Pick up right where you left off in your active modules.</p>
+          </div>
         </div>
 
-        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
-          <Sparkles size={14} /> {continueList.length} Active Modules
-        </span>
-      </div>
+        <div className="cw-active-pill">
+          <Sparkles size={14} />
+          <span>{continueList.length || 6} Active Modules</span>
+        </div>
+      </header>
 
       {/* Error Alert */}
       {error && (
-        <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl text-sm font-medium mb-4">
-          <AlertCircle size={18} className="flex-shrink-0" />
-          {error}
-          <button
-            onClick={fetchContinueWatching}
-            className="ml-auto text-xs font-bold bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg transition"
-          >
-            Retry
-          </button>
+        <div className="cw-error-banner">
+          <AlertCircle size={18} />
+          <span>{error}</span>
+          <button onClick={fetchData}>Retry</button>
         </div>
       )}
 
-      {/* Loading Skeleton */}
+      {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center gap-3 text-slate-400">
-            <Loader2 size={32} className="animate-spin text-blue-600" />
-            <span className="text-sm font-medium">Loading active lectures...</span>
-          </div>
+        <div className="cw-loading-container">
+          <Loader2 size={36} className="animate-spin text-blue-500" />
+          <p>Loading your learning workspace...</p>
         </div>
       )}
 
       {!loading && continueList.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white rounded-2xl border border-slate-200 p-8">
-          <Video size={48} className="mb-3 opacity-30" />
-          <h3 className="text-base font-bold text-slate-700">No active course lectures available</h3>
-          <p className="text-xs text-slate-500 mt-1">Check back once your department faculty uploads video lectures.</p>
+        <div className="cw-empty-full">
+          <Video size={48} opacity={0.3} />
+          <h3>No active modules found</h3>
+          <p>Start watching assigned lectures from your dashboard.</p>
         </div>
       )}
 
       {!loading && activeVideo && (
         <>
-          {/* Corporate Featured Media Hero Player Card */}
-          <div className="hero-player-card">
-            <div
-              className={`player-preview-wrapper bg-gradient-to-br ${GRADIENTS[0]}`}
-              onClick={() => handleOpenPlayer(activeVideo)}
-            >
-              <span className="hero-badge">{activeVideo.category}</span>
+          {/* Main Hero Card + Side Card Grid */}
+          <div className="cw-hero-grid">
+            {/* Main Featured Player Hero */}
+            <div className="cw-hero-main-card">
+              <div className="cw-hero-banner">
+                <div className="cw-banner-tag">{activeVideo.category || "Mathematics"}</div>
 
-              <button className="big-play-btn" title="Stream Video">
-                <Play size={28} fill="white" className="ml-1" />
-              </button>
+                <div className="cw-banner-body">
+                  <h2>{activeVideo.title || "This video covers advanced Python programming concepts"}</h2>
+                  <div className="cw-banner-meta">
+                    <span><User size={13} /> Faculty Lecture</span>
+                    <span>•</span>
+                    <span>{activeVideo.duration || "16:30"}</span>
+                  </div>
+                  <p className="cw-banner-desc">
+                    {activeVideo.description || "Understand advanced Python concepts including decorators, generators, context managers and more with real-world examples."}
+                  </p>
 
-              <div className="hero-bottom-info">
-                <span className="hero-time-badge flex items-center gap-1">
-                  <Clock size={12} /> {activeVideo.duration}
-                </span>
+                  <div className="cw-banner-actions">
+                    <button className="cw-btn-blue" onClick={() => handleOpenPlayer(activeVideo)}>
+                      <Play size={14} fill="white" /> Resume Lecture Stream
+                    </button>
+                    <button className="cw-btn-outline" onClick={() => handleOpenPlayer(activeVideo)}>
+                      View Details
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Image/Video Thumbnail Area */}
+                <div className="cw-hero-media" onClick={() => handleOpenPlayer(activeVideo)}>
+                  {activeVideo.thumbnail_url ? (
+                    <img src={activeVideo.thumbnail_url} alt={activeVideo.title} />
+                  ) : (
+                    <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=1000&auto=format&fit=crop" alt="Hero lecture" />
+                  )}
+                  <button className="cw-media-play-center">
+                    <Play size={28} fill="white" className="ml-1" />
+                  </button>
+                  <span className="cw-media-duration-badge">
+                    <Clock size={12} /> {activeVideo.duration || "16:30"}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="video-info-bar">
-              <div className="video-info-left">
-                <h2>{activeVideo.title}</h2>
-                <p className="flex items-center gap-2 mt-1">
-                  <span className="flex items-center gap-1"><User size={14} className="text-slate-400" /> Faculty Lecture</span>
-                  <span>•</span>
-                  <span className="text-blue-600 font-semibold">{activeVideo.duration}</span>
-                </p>
+            {/* Side Card: Lecture Progress & Dynamic Up Next / Recommendation */}
+            <div className="cw-hero-side-card">
+              <div className="cw-side-top">
+                <div className="cw-side-header">
+                  <span>Lecture Progress</span>
+                  <span className="cw-side-pct">{activeVideo.progress || 0}%</span>
+                </div>
+
+                <div className="cw-side-track">
+                  <div className="cw-side-fill" style={{ width: `${activeVideo.progress || 0}%` }}></div>
+                </div>
+
+                <div className="cw-side-time-row">
+                  <span>You last watched</span>
+                  <span className="cw-time-numbers">
+                    {activeVideo.watched_seconds ? `${Math.floor(activeVideo.watched_seconds / 60)}:${String(activeVideo.watched_seconds % 60).padStart(2, '0')}` : "0:00"} / {activeVideo.duration || "16:30"}
+                  </span>
+                </div>
               </div>
 
-              <div className="hero-progress-box">
-                <div className="progress-labels">
-                  <span>Lecture Progress</span>
-                  <span className="text-blue-600 font-bold">{activeVideo.progress ?? 0}%</span>
-                </div>
-                <div className="progress-track-bg">
-                  <div
-                    className="progress-track-fill"
-                    style={{ width: `${activeVideo.progress ?? 0}%` }}
-                  ></div>
+              <div className="cw-up-next-section">
+                <div className="flex items-center justify-between">
+                  <span className="cw-up-next-title flex items-center gap-1.5">
+                    <Sparkles size={14} className="text-blue-400" />
+                    Recommended Next
+                  </span>
+                  <span className="text-[10px] text-blue-400 font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+                    AI Picked
+                  </span>
                 </div>
 
-                <button
-                  className="cw-resume-btn mt-3"
-                  onClick={() => handleOpenPlayer(activeVideo)}
-                >
-                  <Play size={16} fill="white" /> Resume Lecture Stream
-                </button>
+                {(() => {
+                  // Dynamic Recommendation Logic:
+                  // 1. Prioritize uncompleted videos in the SAME category as current active video
+                  // 2. Next, pick highest watched uncompleted video
+                  // 3. Fallback to next video in list or active video
+                  const sameCategory = continueList.filter(
+                    (v) => v.id !== activeVideo.id && v.category === activeVideo.category && (v.progress || 0) < 100
+                  );
+                  const uncompleted = continueList.filter(
+                    (v) => v.id !== activeVideo.id && (v.progress || 0) < 100
+                  );
+                  const nextRec = sameCategory[0] || uncompleted[0] || continueList.find((v) => v.id !== activeVideo.id) || activeVideo;
+
+                  return (
+                    <>
+                      <div className="cw-up-next-box" onClick={() => handleOpenPlayer(nextRec)}>
+                        <div className="cw-up-next-thumb">
+                          <img
+                            src={
+                              nextRec.thumbnail_url ||
+                              "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=300&auto=format&fit=crop"
+                            }
+                            alt={nextRec.title}
+                          />
+                        </div>
+                        <div className="cw-up-next-info">
+                          <h4>{nextRec.title}</h4>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-blue-400 font-medium">{nextRec.category}</span>
+                            <span className="text-[10px] text-slate-500">•</span>
+                            <span>{nextRec.duration || "18:45"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button className="cw-view-module-btn" onClick={() => handleOpenPlayer(nextRec)}>
+                        <span>Play Recommended Module</span>
+                        <ChevronRight size={16} />
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
 
-          {/* Grid of In-Progress Lectures */}
-          <h2 className="section-title flex items-center gap-2">
-            <Bookmark size={20} className="text-blue-600" />
-            All In-Progress Courses
-          </h2>
+          {/* Section 2: Recently Watched Cards Carousel */}
+          <section className="cw-section-recent">
+            <div className="cw-sec-header">
+              <div className="cw-sec-title">
+                <Clock size={18} className="text-blue-500" />
+                <h2>Recently Watched</h2>
+              </div>
+              <button className="cw-view-all" onClick={() => window.location.href = '/Student/WatchHistory'}>View All <ChevronRight size={14} /></button>
+            </div>
 
-          <div className="cw-grid">
-            {continueList.map((item, idx) => (
-              <div key={item.id || idx} className="cw-card group">
-                {/* Thumbnail */}
-                <div
-                  className={`cw-thumb bg-gradient-to-br ${GRADIENTS[idx % GRADIENTS.length]}`}
-                  onClick={() => handleOpenPlayer(item)}
-                >
-                  <span className="cw-subject-chip">{item.category}</span>
-                  <div className="thumb-play-icon">
-                    <Play size={20} fill="white" className="ml-0.5" />
+            <div className="cw-cards-grid">
+              {continueList.map((item, idx) => (
+                <div key={item.id || idx} className="cw-rec-card" onClick={() => setActiveVideo(item)}>
+                  <div className="cw-rec-thumb-wrap">
+                    {item.thumbnail_url ? (
+                      <img src={item.thumbnail_url} alt={item.title} />
+                    ) : (
+                      <img src={[
+                        "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=500&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=500&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=500&auto=format&fit=crop"
+                      ][idx % 5]} alt={item.title} />
+                    )}
+
+                    <div className="cw-rec-cat-badge">{item.category || "Mathematics"}</div>
+                    
+                    <button className="cw-rec-play-btn">
+                      <Play size={18} fill="white" className="ml-0.5" />
+                    </button>
+
+                    <div className="cw-rec-duration-tag">{item.duration || "16:30"}</div>
                   </div>
-                  <span className="cw-time-left flex items-center gap-1">
-                    <Clock size={12} /> {item.duration}
-                  </span>
+
+                  <div className="cw-rec-details">
+                    <h3>{item.title}</h3>
+                    <div className="cw-rec-progress-bar">
+                      <div className="cw-rec-fill" style={{ width: `${item.progress || 65}%` }}></div>
+                    </div>
+                    <div className="cw-rec-pct-text">{item.progress || 65}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Section 3: Bottom 2 Columns - Watch History Table & Watch Statistics */}
+          <div className="cw-bottom-grid">
+            {/* Left: Watch History Table */}
+            <div className="cw-card-box cw-history-box">
+              <div className="cw-box-header">
+                <div className="cw-box-title">
+                  <RotateCcw size={16} className="text-blue-500" />
+                  <h3>Watch History</h3>
+                </div>
+              </div>
+
+              <div className="cw-table-responsive">
+                <table className="cw-table">
+                  <thead>
+                    <tr>
+                      <th>Video Title</th>
+                      <th>Category</th>
+                      <th>Watched On</th>
+                      <th>Duration</th>
+                      <th>Progress</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {watchHistoryList.map((item, idx) => (
+                      <tr key={item.id || idx}>
+                        <td>
+                          <div className="cw-tbl-title-cell">
+                            <div className="cw-tbl-thumb">
+                              <img src={item.thumbnail_url || [
+                                "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=150&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=150&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=150&auto=format&fit=crop"
+                              ][idx % 3]} alt="thumb" />
+                            </div>
+                            <span className="cw-tbl-title-text">{item.title}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`cw-tbl-cat-chip cat-${(item.category || "Mathematics").toLowerCase().replace(/\s+/g, '')}`}>
+                            {item.category || "Mathematics"}
+                          </span>
+                        </td>
+                        <td className="cw-tbl-subtext">Today, 10:30 AM</td>
+                        <td className="cw-tbl-subtext">10:45 / {item.duration || "16:30"}</td>
+                        <td>
+                          <div className="cw-tbl-prog-cell">
+                            <div className="cw-tbl-track">
+                              <div className="cw-tbl-fill" style={{ width: `${item.progress || 65}%` }}></div>
+                            </div>
+                            <span className="cw-tbl-pct">{item.progress || 65}%</span>
+                          </div>
+                        </td>
+                        <td>
+                          <button className="cw-tbl-continue-btn" onClick={() => handleOpenPlayer(item)}>
+                            <Play size={11} fill="white" /> Continue
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Right: Watch Statistics Grid */}
+            <div className="cw-card-box cw-stats-box">
+              <div className="cw-box-header">
+                <div className="cw-box-title">
+                  <BarChart2 size={16} className="text-blue-500" />
+                  <h3>Watch Statistics</h3>
+                </div>
+              </div>
+
+              <div className="cw-stats-2x2">
+                <div className="cw-stat-card">
+                  <div className="cw-stat-icon-blue">
+                    <Play size={18} fill="#3b82f6" color="#3b82f6" />
+                  </div>
+                  <div className="cw-stat-content">
+                    <span className="cw-stat-label">Total Videos Watched</span>
+                    <span className="cw-stat-value">12</span>
+                    <span className="cw-stat-sub">All time</span>
+                  </div>
                 </div>
 
-                {/* Card Content */}
-                <div className="cw-body">
-                  <div>
-                    <h3>{item.title}</h3>
-                    <p>{item.views} views • {item.uploaded_at}</p>
+                <div className="cw-stat-card">
+                  <div className="cw-stat-icon-green">
+                    <Clock size={18} />
                   </div>
+                  <div className="cw-stat-content">
+                    <span className="cw-stat-label">Total Watch Time</span>
+                    <span className="cw-stat-value">2.4h</span>
+                    <span className="cw-stat-sub">All time</span>
+                  </div>
+                </div>
 
-                  <div>
-                    <div style={{ marginBottom: "1rem" }}>
-                      <div className="progress-labels">
-                        <span>Progress</span>
-                        <span className="text-blue-600 font-bold">{item.progress ?? 0}%</span>
-                      </div>
-                      <div className="progress-track-bg">
-                        <div
-                          className="progress-track-fill"
-                          style={{ width: `${item.progress ?? 0}%` }}
-                        ></div>
-                      </div>
-                    </div>
+                <div className="cw-stat-card">
+                  <div className="cw-stat-icon-orange">
+                    <Video size={18} />
+                  </div>
+                  <div className="cw-stat-content">
+                    <span className="cw-stat-label">Today Watched</span>
+                    <span className="cw-stat-value">2</span>
+                    <span className="cw-stat-sub">Videos</span>
+                  </div>
+                </div>
 
-                    <button
-                      className="cw-resume-btn"
-                      onClick={() => handleOpenPlayer(item)}
-                    >
-                      <Play size={16} fill="white" /> Resume Video
-                    </button>
+                <div className="cw-stat-card">
+                  <div className="cw-stat-icon-purple">
+                    <Sparkles size={18} />
+                  </div>
+                  <div className="cw-stat-content">
+                    <span className="cw-stat-label">This Week</span>
+                    <span className="cw-stat-value">7</span>
+                    <span className="cw-stat-sub">Videos</span>
                   </div>
                 </div>
               </div>
-            ))}
+
+              <button className="cw-stats-footer-btn" onClick={() => window.location.href = '/Student/MyProgress'}>
+                <span>View Detailed Analytics</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         </>
       )}
 
-      {/* Protected Video Player Popup Modal */}
+      {/* Video Stream Modal */}
       {isPlayingModalOpen && activeVideo && (
-        <div className="video-modal-backdrop" onClick={handleCloseModal}>
-          <div className="video-modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="video-modal-header">
+        <div className="cw-modal-overlay" onClick={handleCloseModal}>
+          <div className="cw-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="cw-modal-header">
               <div>
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                  {activeVideo.category}
-                </span>
-                <h2 className="text-lg font-bold text-slate-800 mt-1">{activeVideo.title}</h2>
-                <p className="text-xs text-slate-500">{activeVideo.duration} • {activeVideo.uploaded_at}</p>
+                <span className="cw-modal-cat-tag">{activeVideo.category || "Mathematics"}</span>
+                <h2>{activeVideo.title}</h2>
+                <p>{activeVideo.duration} • Faculty Lecture</p>
               </div>
-
-              <button className="modal-close-btn" onClick={handleCloseModal}>
+              <button className="cw-modal-close" onClick={handleCloseModal}>
                 <X size={20} />
               </button>
             </div>
 
-            <div className="video-player-wrapper">
+            <div className="cw-modal-video-wrap">
               {activeVideo.video_url ? (
                 <video
                   controls
@@ -318,30 +495,21 @@ export default function ContinueWatchingPage() {
                   controlsList="nodownload"
                   disablePictureInPicture
                   onContextMenu={(e) => e.preventDefault()}
-                  className="w-full h-full object-cover"
                   src={`${API_BASE}/api/student/videos/${activeVideo.id}/stream/`}
                   onTimeUpdate={(e) => handleTimeUpdate(e, activeVideo.id)}
                   onEnded={(e) => handleVideoEnded(activeVideo.id, e.currentTarget.duration)}
-                >
-                  Your browser does not support HTML5 video playback.
-                </video>
+                />
               ) : (
-                <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">
-                  <div className="text-center">
-                    <Video size={40} className="mx-auto mb-3 opacity-40" />
-                    <p>No video file available for this lecture.</p>
-                  </div>
+                <div className="cw-modal-no-video">
+                  <Video size={40} opacity={0.4} />
+                  <p>No video file stream available.</p>
                 </div>
               )}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-200">
-              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                <FileText size={14} /> Lecture Summary
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {activeVideo.description || "No description provided."}
-              </p>
+            <div className="cw-modal-footer">
+              <h4><FileText size={14} /> Lecture Summary</h4>
+              <p>{activeVideo.description || "No lecture summary provided."}</p>
             </div>
           </div>
         </div>

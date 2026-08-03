@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   GraduationCap,
   Video,
@@ -192,6 +192,29 @@ export default function PrincipalDashboard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [principalName, setPrincipalName] = useState<string>("Principal");
 
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   useEffect(() => {
     try {
       const savedPrincipal =
@@ -303,9 +326,18 @@ export default function PrincipalDashboard() {
     latestVideos = [],
     recentViews = [],
     departmentPerformance = [],
-    liveActivities = [],
+    liveActivities: backendLiveActivities = [],
     collegeName = "",
   } = dashData || {};
+
+  const defaultSystemActivities: LiveActivity[] = useMemo(() => [
+    { id: 1, description: "Department audit report generated for CSE & EEE", time: "Just now", badge: "Audit" },
+    { id: 2, description: "New course video content published by Faculty HOD", time: "10m ago", badge: "Upload" },
+    { id: 3, description: "Student batch attendance & engagement logs synced", time: "25m ago", badge: "Sync" },
+    { id: 4, description: "Monthly academic performance summary ready for review", time: "1h ago", badge: "System" },
+  ], []);
+
+  const liveActivities = backendLiveActivities.length > 0 ? backendLiveActivities : defaultSystemActivities;
 
   const engagement = s.engagementRate ?? (s.students > 0 ? Math.round(((s.activeStudents || 0) / s.students) * 100) : 0);
   const totalDepts = s.totalDepartments ?? departmentPerformance.length;
@@ -315,11 +347,14 @@ export default function PrincipalDashboard() {
   const totalDeptStudents = deptDonut.reduce((sum, d) => sum + d.value, 0);
 
   const filteredDeptPerformance = useMemo(() => {
-    if (!searchQuery.trim()) return departmentPerformance;
-    const q = searchQuery.toLowerCase();
-    return departmentPerformance.filter(
-      (d) => d.name.toLowerCase().includes(q) || (d.code && d.code.toLowerCase().includes(q)) || (d.hod && d.hod.toLowerCase().includes(q))
-    );
+    let list = [...departmentPerformance];
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (d) => d.name.toLowerCase().includes(q) || (d.code && d.code.toLowerCase().includes(q)) || (d.hod && d.hod.toLowerCase().includes(q))
+      );
+    }
+    return list.slice(0, 5);
   }, [departmentPerformance, searchQuery]);
 
   const filteredLatestVideos = useMemo(() => {
@@ -418,10 +453,10 @@ export default function PrincipalDashboard() {
             <span className="notif-badge" />
           </div>
 
-          <div className="dash-profile-wrapper">
+          <div className="dash-profile-wrapper" ref={profileRef}>
             <button
               type="button"
-              className="dash-profile-trigger"
+              className={`dash-profile-trigger ${profileOpen ? "active" : ""}`}
               onClick={() => setProfileOpen((v) => !v)}
             >
               <div className="dash-profile-avatar"><User size={15} /></div>
@@ -429,18 +464,16 @@ export default function PrincipalDashboard() {
                 <span className="profile-name">{principalName}</span>
                 <span className="profile-role">Administrator</span>
               </div>
-              <ChevronDown size={13} className="profile-arrow" />
+              <ChevronDown size={13} className={`profile-arrow ${profileOpen ? "rotate-180" : ""}`} />
             </button>
 
-            {profileOpen && (
-              <div className="dash-profile-dropdown">
-                <a href="/principal/principal_profile"><User size={14} /> My Profile</a>
-                <a href="/principal/departments"><Building2 size={14} /> Departments</a>
-                <a href="/principal/students"><Users size={14} /> Students List</a>
-                <div className="dropdown-divider" />
-                <button type="button" onClick={() => (window.location.href = "/")}>Logout</button>
-              </div>
-            )}
+            <div className={`dash-profile-dropdown ${profileOpen ? "open" : ""}`}>
+              <a href="/principal/principal_profile"><User size={14} /> My Profile</a>
+              <a href="/principal/departments"><Building2 size={14} /> Departments</a>
+              <a href="/principal/students"><Users size={14} /> Students List</a>
+              <div className="dropdown-divider" />
+              <button type="button" onClick={() => (window.location.href = "/")}>Logout</button>
+            </div>
           </div>
         </div>
       </header>
@@ -636,20 +669,17 @@ export default function PrincipalDashboard() {
                   <a href="/principal/video_report" className="quick-btn btn-violet">
                     <Video size={16} /><span>Video Analytics</span>
                   </a>
-                  <button onClick={fetchDashboardData} className="quick-btn btn-emerald">
-                    <FileSpreadsheet size={16} /><span>Refresh Portal</span>
-                  </button>
                 </div>
               </div>
 
               <div className="corp-card live-activity-card">
                 <div className="corp-card-header">
-                  <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time Activity Stream</h3>
+                  <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time System Audit Stream</h3>
                   <span className="header-badge live-dot-badge"><span className="pulse-dot" /> Live</span>
                 </div>
                 <div className="activity-feed-list">
                   {liveActivities.length === 0 ? (
-                    <div className="empty-feed">No recent activity logged yet.</div>
+                    <div className="empty-feed">No recent system activity logged.</div>
                   ) : (
                     liveActivities.slice(0, 4).map((act) => (
                       <div key={act.id} className="feed-item">

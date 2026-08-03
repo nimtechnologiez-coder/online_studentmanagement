@@ -218,6 +218,12 @@ html.dark {
   overflow-x: hidden;
 }
 
+@media (max-width: 1023px) {
+  .principal-layout-main {
+    padding-top: 60px;
+  }
+}
+
 @media (min-width: 1024px) {
   .principal-layout-root {
     flex-direction: row;
@@ -226,6 +232,7 @@ html.dark {
   .principal-layout-main {
     margin-left: 264px;
     width: calc(100% - 264px);
+    padding-top: 0;
   }
 }
 

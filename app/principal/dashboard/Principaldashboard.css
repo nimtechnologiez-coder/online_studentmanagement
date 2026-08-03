@@ -359,6 +359,11 @@ html.dark .hstat-amber {
 
 .profile-arrow {
   color: var(--p-text-light);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-arrow.rotate-180 {
+  transform: rotate(180deg);
 }
 
 .dash-profile-dropdown {
@@ -374,6 +379,21 @@ html.dark .hstat-amber {
   display: flex;
   flex-direction: column;
   z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.96);
+  transform-origin: top right;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.dash-profile-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .dash-profile-dropdown a,
@@ -392,6 +412,7 @@ html.dark .hstat-amber {
   width: 100%;
   text-align: left;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .dash-profile-dropdown a:hover,
@@ -821,10 +842,16 @@ html.dark .hstat-amber {
   gap: 20px;
 }
 
+.actions-card {
+  display: flex;
+  flex-direction: column;
+}
+
 .quick-actions-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
 .quick-btn {
@@ -885,10 +912,15 @@ html.dark .hstat-amber {
   color: #ffffff;
 }
 
+.live-activity-card {
+  display: flex;
+  flex-direction: column;
+}
+
 .activity-feed-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .empty-feed {
@@ -900,10 +932,18 @@ html.dark .hstat-amber {
 
 .feed-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--p-border-table-row);
+  padding: 10px 12px;
+  background: var(--p-bg-subtle);
+  border: 1px solid var(--p-border-table);
+  border-radius: var(--p-radius-md);
+  transition: all 0.15s ease;
+}
+
+.feed-item:hover {
+  background: var(--p-bg-elevated);
+  border-color: var(--p-indigo-soft);
 }
 
 .feed-item:last-child {
@@ -1128,7 +1168,7 @@ html.dark .hstat-amber {
 
 .dept-matrix-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   margin-top: 10px;
 }
@@ -1370,6 +1410,24 @@ html.dark .hstat-amber {
 
 /* ---------------------------------- RESPONSIVE BREAKPOINTS ---------------------------------- */
 
+@media (max-width: 1400px) {
+  .dept-matrix-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .dept-matrix-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .dept-matrix-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 1200px) {
   .dash-corp-body {
     padding: 20px 24px 36px;
@@ -1378,10 +1436,6 @@ html.dark .hstat-amber {
 
   .charts-grid-corp {
     grid-template-columns: 1fr;
-  }
-
-  .dept-matrix-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .kpi-cards-grid {
@@ -1629,6 +1683,12 @@ html.dark .hstat-amber {
   width: 100%;
 }
 
+@media (max-width: 1023px) {
+  .dash-tables-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .table-card-corp {
   padding: 24px 24px 12px;
   min-width: 0;
@@ -1658,7 +1718,7 @@ html.dark .hstat-amber {
 
 .corp-table {
   width: 100%;
-  min-width: 480px;
+  min-width: 520px;
   /* keeps columns readable, wrap scrolls horizontally instead of squashing */
   border-collapse: collapse;
   font-size: 13.5px;
@@ -1679,7 +1739,7 @@ html.dark .hstat-amber {
 }
 
 .corp-table tbody td {
-  padding: 14px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--p-border-table-row);
   vertical-align: middle;
   color: var(--p-text-primary);
@@ -1697,30 +1757,121 @@ html.dark .hstat-amber {
   background: var(--p-table-hover);
 }
 
-.recent-header-actions {
+/* Student & Media table cell styling */
+.student-cell-profile {
   display: flex;
   align-items: center;
   gap: 10px;
+  white-space: nowrap;
+}
+
+.avatar-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.table-dept-pill,
+.table-cat-badge,
+.table-dur-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table-dept-pill {
+  background: var(--p-indigo-soft);
+  color: var(--p-indigo);
+}
+
+.table-cat-badge {
+  background: var(--p-teal-soft);
+  color: var(--p-teal);
+}
+
+.table-dur-badge {
+  background: var(--p-bg-subtle);
+  color: var(--p-text-muted);
+  border: 1px solid var(--p-border);
+}
+
+.table-media-thumb {
+  width: 44px;
+  height: 30px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--p-bg-subtle);
+  border: 1px solid var(--p-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.table-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.table-media-fallback {
+  color: var(--p-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recent-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-indigo);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.card-header-link:hover {
+  text-decoration: underline;
 }
 
 .table-refresh-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  background: #fff;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--p-border);
+  border-radius: 8px;
+  background: var(--p-btn-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: .25s ease;
-  color: #4f46e5;
+  transition: all .2s ease;
+  color: var(--p-indigo);
 }
 
 .table-refresh-btn:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  transform: rotate(20deg);
+  background: var(--p-indigo-soft);
+  border-color: var(--p-indigo);
 }
 
 .table-refresh-btn:disabled {
@@ -1728,6 +1879,16 @@ html.dark .hstat-amber {
   cursor: not-allowed;
 }
 
-.table-refresh-btn svg {
-  transition: .4s;
+/* Header responsive adjustments for table cards */
+@media (max-width: 640px) {
+  .corp-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .recent-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

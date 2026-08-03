@@ -1,61 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
   Video,
-  FileText,
   BarChart3,
+  CalendarDays,
+  User,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  Sparkles,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
-
 import "./sidebar.css";
 
-const menu = [
+const menuGroups = [
   {
-    title: "Main",
+    label: "OVERVIEW",
     items: [
-      {
-        name: "Dashboard",
-        href: "/hod/dashboard",
-        icon: LayoutDashboard,
-      },
-      {
-        name: "Students",
-        href: "/hod/students",
-        icon: Users,
-      },
-    ],
-  },
-  {
-    title: "Academic",
-    items: [
-      {
-        name: "Videos",
-        href: "/hod/videos",
-        icon: Video,
-      },
+      { title: "Dashboard", href: "/hod/dashboard", icon: LayoutDashboard },
+      { title: "Students", href: "/hod/students", icon: Users },
 
     ],
   },
   {
-    title: "Analytics",
+    label: "ACADEMICS & ANALYTICS",
     items: [
-      {
-        name: "Performance",
-        href: "/hod/performance",
-        icon: BarChart3,
-      },
+      { title: "Video Analytics", href: "/hod/videos", icon: Video },
+      { title: "Performance", href: "/hod/performance", icon: BarChart3 },
+      // { title: "Attendance", href: "/hod/attendance", icon: CalendarDays },
+      { title: "Profile", href: "/hod/hod_profile", icon: User },
     ],
   },
 ];
@@ -63,9 +44,41 @@ const menu = [
 export default function HODSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [hodName, setHodName] = useState("Dr. Alan Turing");
+  const [departmentName, setDepartmentName] = useState("Computer Science & Eng.");
+  const [hodEmail, setHodEmail] = useState("");
+
+  useEffect(() => {
+    try {
+      const saved =
+        typeof window !== "undefined"
+          ? localStorage.getItem("hod") || sessionStorage.getItem("hod") || localStorage.getItem("user")
+          : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const name =
+          parsed?.hod_name ||
+          parsed?.name ||
+          parsed?.full_name ||
+          parsed?.username ||
+          "Dr. Alan Turing";
+        const dept =
+          parsed?.department ||
+          parsed?.dept ||
+          parsed?.department_name ||
+          "Computer Science & Eng.";
+        const email = parsed?.email || parsed?.hod_email || "";
+
+        setHodName(name);
+        setDepartmentName(dept);
+        setHodEmail(email);
+      }
+    } catch (e) {
+      console.error("Error reading HOD info:", e);
+    }
+  }, []);
 
   const handleLogout = () => {
     router.push("/");
@@ -77,17 +90,21 @@ export default function HODSidebar() {
 
   return (
     <>
-      {/* Mobile Header Toggle */}
-      <div className="mobile-header-bar">
-        <div className="mobile-brand">
-          <div className="logo-circle text-sm">H</div>
-          <span className="mobile-brand-title">HOD Portal</span>
+      {/* Mobile Top Header (Visible on screens < 1024px) */}
+      <div className="principal-mobile-header">
+        <div className="mobile-brand flex items-center gap-2">
+          <div className="sidebar-logo-icon">
+            <Sparkles size={18} />
+          </div>
+          <div>
+            <span className="font-bold text-base block leading-tight">HOD Portal</span>
+            <span className="text-xs text-slate-400">Department Dashboard</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Mobile Theme Toggle */}
           <button
-            className="mobile-toggle-btn text-slate-300 hover:text-white"
+            className="mobile-theme-btn-principal"
             onClick={toggleTheme}
             aria-label="Toggle theme"
           >
@@ -95,7 +112,7 @@ export default function HODSidebar() {
           </button>
 
           <button
-            className="mobile-toggle-btn"
+            className="mobile-menu-btn-principal"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -104,102 +121,95 @@ export default function HODSidebar() {
         </div>
       </div>
 
-      {/* Backdrop overlay for mobile screens */}
+      {/* Backdrop overlay for mobile drawer */}
       {mobileOpen && (
         <div
-          className="sidebar-backdrop"
+          className="principal-sidebar-backdrop"
           onClick={closeMobileSidebar}
         />
       )}
 
-      <aside className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
-        {/* Mobile close icon inside sidebar header */}
-        <div className="sidebar-mobile-close">
-          <button onClick={closeMobileSidebar} aria-label="Close sidebar">
-            <X size={20} />
+      {/* Main Sidebar Drawer */}
+      <aside className={`sidebar ${mobileOpen ? "mobile-open" : ""}`}>
+        {/* Header with Sparkles Logo */}
+        <div className="sidebar-header">
+          <div className="sidebar-brand-wrapper">
+            <div className="sidebar-logo-icon">
+              <Sparkles size={20} className="text-white" />
+            </div>
+            <div className="sidebar-brand-text">
+              <h1 className="sidebar-logo">HOD Portal</h1>
+              <p className="sidebar-subtitle">Department Dashboard</p>
+            </div>
+          </div>
+          <button className="sidebar-menu-toggle-btn" title="Toggle layout">
+            <SlidersHorizontal size={16} />
           </button>
         </div>
 
-        {/* Logo */}
-        <div className="sidebar-logo">
-          <div className="logo-circle">H</div>
-          {(!collapsed || mobileOpen) && (
-            <div className="logo-text">
-              <h2>HOD Portal</h2>
-              <p>Management System</p>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation Menu */}
-        <div className="sidebar-menu">
-          {menu.map((group) => (
-            <div key={group.title} className="menu-group">
-              {(!collapsed || mobileOpen) && (
-                <span className="menu-title">{group.title}</span>
-              )}
-
-              {group.items.map((item) => {
-                const Icon = item.icon;
-                const active = pathname === item.href;
+        {/* Menu Groups */}
+        <nav className="sidebar-nav">
+          {menuGroups.map((group) => (
+            <div className="sidebar-group" key={group.label}>
+              <span className="sidebar-group-label">{group.label}</span>
+              {group.items.map((menu) => {
+                const Icon = menu.icon;
+                const active = pathname === menu.href;
 
                 return (
                   <Link
-                    key={item.name}
-                    href={item.href}
+                    key={menu.title}
+                    href={menu.href}
                     onClick={closeMobileSidebar}
-                    className={`menu-item ${active ? "active" : ""}`}
-                    title={collapsed && !mobileOpen ? item.name : undefined}
+                    className={`sidebar-link ${active ? "sidebar-link-active" : ""}`}
                   >
-                    <Icon size={20} className="menu-item-icon" />
-                    {(!collapsed || mobileOpen) && <span>{item.name}</span>}
+                    <span className="sidebar-icon-wrap">
+                      <Icon size={18} strokeWidth={2} className="sidebar-icon" />
+                    </span>
+                    <span className="sidebar-link-text">{menu.title}</span>
                   </Link>
                 );
               })}
             </div>
           ))}
-        </div>
+        </nav>
 
-        {/* User Card */}
-        <div className="sidebar-user">
-          <img
-            src="https://api.dicebear.com/7.x/initials/svg?seed=HOD"
-            alt="User Avatar"
-          />
-          {(!collapsed || mobileOpen) && (
-            <div className="user-details">
-              <h4>Dr. Alan Turing</h4>
-              <p>Computer Science</p>
+        {/* Footer */}
+        <div className="sidebar-footer">
+          {/* Theme Toggle Pill Switch */}
+          <div className="theme-toggle-row" onClick={toggleTheme}>
+            <div className="theme-toggle-label">
+              <Sun size={16} className="theme-icon" />
+              <span>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
             </div>
-          )}
+            <div className={`theme-switch-track ${theme === "dark" ? "switch-dark" : "switch-light"}`}>
+              <div className="theme-switch-thumb" />
+            </div>
+          </div>
+
+          {/* Profile Card */}
+          <div className="sidebar-profile-card cursor-pointer hover:opacity-90 transition-opacity" onClick={() => router.push("/hod/hod_profile")}>
+            <div className="profile-avatar-box">
+              <User size={20} />
+            </div>
+            <div className="sidebar-profile-text">
+              <span className="sidebar-profile-name">{hodName}</span>
+              <p className="sidebar-profile-role">Head of Department</p>
+              {hodEmail && (
+                <p className="sidebar-profile-email" style={{ fontSize: "11px", opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {hodEmail}
+                </p>
+              )}
+              <p className="sidebar-profile-college">{departmentName}</p>
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <button type="button" className="sidebar-logout-btn" onClick={handleLogout}>
+            <LogOut size={16} strokeWidth={2} />
+            <span>Logout</span>
+          </button>
         </div>
-
-        {/* Theme Toggle Button */}
-        <button
-          className="theme-toggle-btn-sidebar"
-          onClick={toggleTheme}
-          title={collapsed && !mobileOpen ? "Toggle Theme" : undefined}
-        >
-          {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
-          {(!collapsed || mobileOpen) && (
-            <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
-          )}
-        </button>
-
-        {/* Logout */}
-        <button className="logout-btn mt-2" onClick={handleLogout}>
-          <LogOut size={18} />
-          {(!collapsed || mobileOpen) && <span>Logout</span>}
-        </button>
-
-        {/* Desktop Collapse Toggle */}
-        <button
-          className="collapse-btn"
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label="Collapse sidebar"
-        >
-          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-        </button>
       </aside>
     </>
   );

@@ -17,6 +17,8 @@ import {
   Loader2,
   AlertCircle,
   Eye,
+  Heart,
+  Bookmark,
 } from "lucide-react";
 import "./myvideos.css";
 
@@ -47,13 +49,102 @@ export default function MyVideosPage() {
   const [activeModalVideo, setActiveModalVideo] = useState<any>(null);
   const [videos, setVideos] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>(["All"]);
+  const [favoritesMap, setFavoritesMap] = useState<Record<number, boolean>>({});
+  const [watchLaterMap, setWatchLaterMap] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const progressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetchVideos();
+    loadMaps();
   }, []);
+
+  function loadMaps() {
+    try {
+      const savedFavs = localStorage.getItem("student_favorites");
+      if (savedFavs) {
+        const list = JSON.parse(savedFavs);
+        const map: Record<number, boolean> = {};
+        list.forEach((item: any) => {
+          if (item.id) map[item.id] = true;
+        });
+        setFavoritesMap(map);
+      }
+
+      const savedWL = localStorage.getItem("student_watch_later");
+      if (savedWL) {
+        const list = JSON.parse(savedWL);
+        const map: Record<number, boolean> = {};
+        list.forEach((item: any) => {
+          if (item.id) map[item.id] = true;
+        });
+        setWatchLaterMap(map);
+      }
+    } catch (e) {}
+  }
+
+  function toggleFavorite(video: any, e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      const saved = localStorage.getItem("student_favorites");
+      let list: any[] = saved ? JSON.parse(saved) : [];
+      const isFav = favoritesMap[video.id];
+
+      if (isFav) {
+        list = list.filter((item: any) => item.id !== video.id);
+      } else {
+        const newItem = {
+          id: video.id,
+          title: video.title,
+          category: video.category || "General",
+          duration: video.duration || "15:00",
+          rating: "4.8",
+          views: `${video.views || 0} views`,
+          date: video.uploaded_at || "Recently",
+          thumbnail: video.thumbnail_url || "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=500&auto=format&fit=crop",
+          video_url: video.video_url || "",
+        };
+        list.push(newItem);
+      }
+
+      localStorage.setItem("student_favorites", JSON.stringify(list));
+      setFavoritesMap((prev) => ({ ...prev, [video.id]: !isFav }));
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
+  }
+
+  function toggleWatchLater(video: any, e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      const saved = localStorage.getItem("student_watch_later");
+      let list: any[] = saved ? JSON.parse(saved) : [];
+      const isWL = watchLaterMap[video.id];
+
+      if (isWL) {
+        list = list.filter((item: any) => item.id !== video.id);
+      } else {
+        const newItem = {
+          id: video.id,
+          title: video.title,
+          category: video.category || "General",
+          duration: video.duration || "15:00",
+          rating: "4.8",
+          views: `${video.views || 0} views`,
+          date: video.uploaded_at || "Recently",
+          thumbnail: video.thumbnail_url || "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=500&auto=format&fit=crop",
+          video_url: video.video_url || "",
+        };
+        list.push(newItem);
+      }
+
+      localStorage.setItem("student_watch_later", JSON.stringify(list));
+      setWatchLaterMap((prev) => ({ ...prev, [video.id]: !isWL }));
+    } catch (err) {
+      console.error("Failed to toggle Watch Later:", err);
+    }
+  }
 
   async function fetchVideos(searchQ = "", cat = "") {
     try {
@@ -236,11 +327,33 @@ export default function MyVideosPage() {
                   className={`thumbnail-wrapper bg-gradient-to-br ${GRADIENTS[idx % GRADIENTS.length]}`}
                   onClick={() => handlePlayVideo(video)}
                 >
-                  <span className="subject-badge">{video.category}</span>
-                  <div className="play-overlay">
+                  {video.thumbnail_url ? (
+                    <img src={video.thumbnail_url} alt={video.title} className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-300" />
+                  ) : null}
+                  <span className="subject-badge relative z-10">{video.category}</span>
+
+                  <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                    <button
+                      className="w-8 h-8 rounded-full bg-slate-950/70 border border-slate-700/50 flex items-center justify-center text-amber-500 hover:scale-110 transition-transform"
+                      title={watchLaterMap[video.id] ? "Remove from Watch Later" : "Add to Watch Later"}
+                      onClick={(e) => toggleWatchLater(video, e)}
+                    >
+                      <Bookmark size={15} fill={watchLaterMap[video.id] ? "#f59e0b" : "none"} color="#f59e0b" />
+                    </button>
+
+                    <button
+                      className="w-8 h-8 rounded-full bg-slate-950/70 border border-slate-700/50 flex items-center justify-center text-pink-500 hover:scale-110 transition-transform"
+                      title={favoritesMap[video.id] ? "Remove from Favorites" : "Add to Favorites"}
+                      onClick={(e) => toggleFavorite(video, e)}
+                    >
+                      <Heart size={15} fill={favoritesMap[video.id] ? "#ec4899" : "none"} color="#ec4899" />
+                    </button>
+                  </div>
+
+                  <div className="play-overlay relative z-10">
                     <Play size={22} fill="white" className="ml-0.5" />
                   </div>
-                  <span className="duration-badge flex items-center gap-1">
+                  <span className="duration-badge relative z-10 flex items-center gap-1">
                     <Clock size={12} /> {video.duration}
                   </span>
                 </div>

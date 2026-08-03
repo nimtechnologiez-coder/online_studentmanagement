@@ -14,14 +14,14 @@ export default function StudentLayout({
   const isLoginPage = pathname === "/Student/login";
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-slate-100">{children}</div>;
+    return <div style={{ minHeight: "100vh", backgroundColor: "var(--background)" }}>{children}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
+    <div style={{ minHeight: "100vh", backgroundColor: "var(--background)", display: "flex", flexDirection: "column" }} className="lg:flex-row">
       <StudentSidebar />
 
-      <main className="flex-1 ml-0 lg:ml-[270px] min-w-0 transition-all duration-300">
+      <main className="flex-1 min-w-0 transition-all duration-300 pl-0 lg:pl-[250px]" style={{ backgroundColor: "var(--background)", overflowX: "hidden" }}>
         {children}
       </main>
     </div>

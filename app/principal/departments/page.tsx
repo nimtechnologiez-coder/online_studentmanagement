@@ -83,6 +83,7 @@ interface DepartmentData {
   email?: string;
   students: number;
   videos: number;
+  views?: number;
   completionRate: number;
   performance: string;
   trend: string;
@@ -205,10 +206,10 @@ export default function DepartmentOverview() {
                   </div>
                 </div>
                 <div className="metric-item">
-                  <div className="metric-icon"><Video size={16} /></div>
+                  <div className="metric-icon"><TrendingUp size={16} /></div>
                   <div className="metric-data">
-                    <span className="value">{dept.videos}</span>
-                    <span className="label">Videos</span>
+                    <span className="value">{(dept as any).views ?? dept.videos ?? 0}</span>
+                    <span className="label">Views</span>
                   </div>
                 </div>
               </div>

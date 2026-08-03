@@ -231,13 +231,13 @@ video::-webkit-media-controls-enclosure {
   position: absolute;
   top: 0.85rem;
   left: 0.85rem;
-  background: rgba(255, 255, 255, 0.95);
-  color: #2563eb;
+  background: rgba(37, 99, 235, 0.9);
+  color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.3rem 0.7rem;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
 }
 
@@ -273,14 +273,14 @@ video::-webkit-media-controls-enclosure {
   justify-content: space-between;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--muted-text, #64748b);
   margin-bottom: 0.4rem;
 }
 
 .progress-track {
   width: 100%;
   height: 6px;
-  background-color: #f1f5f9;
+  background-color: var(--progress-track, #f1f5f9);
   border-radius: 9999px;
   overflow: hidden;
 }

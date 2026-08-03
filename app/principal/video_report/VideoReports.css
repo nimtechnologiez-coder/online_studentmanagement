@@ -1,54 +1,51 @@
-/* ==========================================================================
-   Dashboard Stylesheet
-   Shared by StudentsPage.tsx and VideosPage.tsx
-   ========================================================================== */
+@import "../principal-theme.css";
 
 :root {
-  --ink: var(--card-text, #1c2130);
-  --ink-soft: var(--muted-text, #5b6472);
-  --ink-faint: var(--muted-text, #9399a6);
+  --ink: var(--p-text-primary);
+  --ink-soft: var(--p-text-muted);
+  --ink-faint: var(--p-text-light);
 
-  --surface: var(--background, #f6f7fb);
-  --surface-card: var(--card-bg, #ffffff);
-  --surface-muted: var(--background, #eef0f6);
-  --surface-hover: var(--background, #f9fafc);
+  --surface: var(--p-bg-main);
+  --surface-card: var(--p-bg-card);
+  --surface-muted: var(--p-bg-subtle);
+  --surface-hover: var(--p-table-hover);
 
-  --border: var(--card-border, #e6e8f0);
-  --border-strong: var(--card-border, #d7dae4);
+  --border: var(--p-border);
+  --border-strong: var(--p-border-strong);
 
-  --brand: #3d4bf5;
-  --brand-soft: rgba(61, 75, 245, 0.15);
-  --brand-ink: #3d4bf5;
+  --brand: var(--p-indigo);
+  --brand-soft: var(--p-indigo-soft);
+  --brand-ink: var(--p-indigo);
 
-  --tone-indigo-bg: rgba(74, 79, 224, 0.15);
-  --tone-indigo-ink: #6366f1;
+  --tone-indigo-bg: var(--p-indigo-soft);
+  --tone-indigo-ink: var(--p-indigo);
 
-  --tone-emerald-bg: rgba(23, 167, 104, 0.15);
-  --tone-emerald-ink: #10b981;
+  --tone-emerald-bg: var(--p-emerald-soft);
+  --tone-emerald-ink: var(--p-emerald);
 
-  --tone-teal-bg: rgba(15, 157, 146, 0.15);
-  --tone-teal-ink: #14b8a6;
+  --tone-teal-bg: var(--p-teal-soft);
+  --tone-teal-ink: var(--p-teal);
 
-  --tone-amber-bg: rgba(217, 138, 26, 0.15);
-  --tone-amber-ink: #f59e0b;
+  --tone-amber-bg: var(--p-amber-soft);
+  --tone-amber-ink: var(--p-amber);
 
-  --success-bg: rgba(23, 167, 104, 0.15);
-  --success-ink: #10b981;
-  --success-dot: #22c07a;
+  --success-bg: var(--p-emerald-soft);
+  --success-ink: var(--p-emerald);
+  --success-dot: #10b981;
 
-  --inactive-bg: rgba(125, 122, 224, 0.15);
-  --inactive-ink: #818cf8;
-  --inactive-dot: #9b98ea;
+  --inactive-bg: var(--p-indigo-soft);
+  --inactive-ink: var(--p-indigo);
+  --inactive-dot: #6366f1;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-sm: var(--p-radius-sm);
+  --radius-md: var(--p-radius-md);
+  --radius-lg: var(--p-radius-lg);
   --radius-pill: 999px;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.15);
-  --shadow-modal: 0 24px 60px -20px rgba(0, 0, 0, 0.45);
+  --shadow-card: var(--p-shadow-card);
+  --shadow-modal: var(--p-shadow-modal);
 
-  font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
 }
 
 * {

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/hod/Sidebar";
+import "../hod/hod-theme.css";
 
 export default function HODLayout({
   children,
@@ -12,14 +13,17 @@ export default function HODLayout({
 
   // Don't show sidebar on login page
   if (pathname === "/hod/login") {
-    return <>{children}</>;
+    return (
+      <div className="principal-themed min-h-screen" style={{ background: "var(--p-bg-main)" }}>
+        {children}
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
+    <div className="principal-themed principal-layout-root">
       <Sidebar />
-
-      <main className="flex-1 overflow-y-auto bg-slate-50 min-w-0">
+      <main className="principal-layout-main">
         {children}
       </main>
     </div>

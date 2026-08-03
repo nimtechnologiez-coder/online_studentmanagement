@@ -1,9 +1,8 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import "./video.css";
-import Link from "next/link";
-import { Home, ChevronRight, Video as VideoIcon } from "lucide-react";
+import { Video as VideoIcon } from "lucide-react";
 
 /* ==========================================================
    TYPES
@@ -59,233 +58,84 @@ const CATEGORIES = [
 const SAMPLE_VIDEO_URL =
   "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
 
-const initialVideos: Video[] = [
+const SAMPLE_VIDEOS: Video[] = [
   {
     id: 1,
-    title: "Python Basics",
-    category: "Programming",
-    duration: "22:10",
-    description:
-      "Introduction to Python syntax, variables and control flow for first-year students.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "24-Jul-2026",
-    views: 320,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?1",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 2,
-    title: "Django Models",
-    category: "Web Development",
-    duration: "18:45",
-    description:
-      "Deep dive into Django ORM models, relationships and database migrations.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "22-Jul-2026",
-    views: 280,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?2",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 3,
-    title: "Database Management",
-    category: "Database",
-    duration: "26:30",
-    description:
-      "Core concepts of DBMS, normalization and transaction management explained with examples.",
-    uploadedBy: "Dr. Meena Raj",
-    uploadDate: "20-Jul-2026",
-    views: 240,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?3",
-    isMine: false,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 4,
-    title: "Computer Networks",
-    category: "Computer Networks",
-    duration: "20:15",
-    description:
-      "Overview of network layers, common protocols and the OSI reference model.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "18-Jul-2026",
-    views: 198,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?4",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 5,
-    title: "Operating Systems",
-    category: "Operating Systems",
-    duration: "17:50",
-    description:
-      "A beginner-friendly overview of process scheduling, memory management, and file systems.",
-    uploadedBy: "Dr. Ramesh Iyer",
-    uploadDate: "16-Jul-2026",
-    views: 156,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?5",
-    isMine: false,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 6,
-    title: "Data Structures Essentials",
+    title: "Introduction to Data Structures & Algorithms",
     category: "Data Structures",
-    duration: "24:05",
-    description:
-      "Covers arrays, stacks, queues, linked lists, trees, and recursion with examples.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "14-Jul-2026",
-    views: 214,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?6",
+    duration: "45:20",
+    description: "Comprehensive guide to fundamental data structures, arrays, linked lists, and time complexity.",
+    thumbnail: "https://picsum.photos/seed/ds/160/90",
     isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 7,
-    title: "Web Security Basics",
-    category: "Web Development",
-    duration: "19:40",
-    description:
-      "Practical introduction to secure form handling, authentication, and common web threats.",
-    uploadedBy: "Dr. Meena Raj",
-    uploadDate: "12-Jul-2026",
-    views: 132,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?7",
-    isMine: false,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 8,
-    title: "SQL Queries Deep Dive",
-    category: "Database",
-    duration: "21:25",
-    description:
-      "Learn joins, subqueries, indexing, and query optimization with practical examples.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "10-Jul-2026",
-    views: 176,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?8",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 9,
-    title: "Networking Protocols",
-    category: "Computer Networks",
-    duration: "16:55",
-    description:
-      "A concise guide to HTTP, DNS, TCP/IP, and routing basics for students.",
-    uploadedBy: "Dr. Ramesh Iyer",
-    uploadDate: "08-Jul-2026",
-    views: 145,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?9",
-    isMine: false,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 10,
-    title: "Python for Automation",
-    category: "Programming",
-    duration: "23:10",
-    description:
-      "Hands-on session on scripting, automation, and reusable Python patterns.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "06-Jul-2026",
-    views: 188,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?10",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-    {
-    id: 1,
-    title: "Python Basics",
-    category: "Programming",
-    duration: "22:10",
-    description:
-      "Introduction to Python syntax, variables and control flow for first-year students.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "24-Jul-2026",
-    views: 320,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?1",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
+    videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    uploadedBy: "Dr. Alan Turing",
+    uploadDate: "2026-07-20",
+    views: 1240,
+    status: "Published",
   },
   {
     id: 2,
-    title: "Django Models",
+    title: "React & Next.js Full Course & Best Practices",
     category: "Web Development",
-    duration: "18:45",
-    description:
-      "Deep dive into Django ORM models, relationships and database migrations.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "22-Jul-2026",
-    views: 280,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?2",
+    duration: "1:15:00",
+    description: "Learn server components, Turbopack, client state management, and modern UI engineering.",
+    thumbnail: "https://picsum.photos/seed/web/160/90",
     isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
+    videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    uploadedBy: "Dr. Alan Turing",
+    uploadDate: "2026-07-18",
+    views: 890,
+    status: "Published",
   },
   {
     id: 3,
-    title: "Database Management",
+    title: "Database Normalization & SQL Queries Masterclass",
     category: "Database",
-    duration: "26:30",
-    description:
-      "Core concepts of DBMS, normalization and transaction management explained with examples.",
-    uploadedBy: "Dr. Meena Raj",
-    uploadDate: "20-Jul-2026",
-    views: 240,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?3",
+    duration: "38:15",
+    description: "1NF, 2NF, 3NF, BCNF rules with hands-on PostgreSQL and MySQL queries.",
+    thumbnail: "https://picsum.photos/seed/db/160/90",
     isMine: false,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 4,
-    title: "Computer Networks",
-    category: "Computer Networks",
-    duration: "20:15",
-    description:
-      "Overview of network layers, common protocols and the OSI reference model.",
-    uploadedBy: "Dr. Arun Kumar",
-    uploadDate: "18-Jul-2026",
-    views: 198,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?4",
-    isMine: true,
-    videoUrl: SAMPLE_VIDEO_URL,
-  },
-  {
-    id: 5,
-    title: "Operating Systems",
-    category: "Operating Systems",
-    duration: "17:50",
-    description:
-      "A beginner-friendly overview of process scheduling, memory management, and file systems.",
-    uploadedBy: "Dr. Ramesh Iyer",
-    uploadDate: "16-Jul-2026",
-    views: 156,
-    status: "Active",
-    thumbnail: "https://picsum.photos/90/50?5",
-    isMine: false,
-    videoUrl: SAMPLE_VIDEO_URL,
+    videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    uploadedBy: "Prof. Grace Hopper",
+    uploadDate: "2026-07-15",
+    views: 650,
+    status: "Published",
   },
 ];
+
+/* ==========================================================
+   API HELPERS
+========================================================== */
+
+function getHodId(): string {
+  if (typeof window === "undefined") return "";
+  const saved = localStorage.getItem("hod") || sessionStorage.getItem("hod");
+  if (!saved) return "";
+  try {
+    const parsed = JSON.parse(saved);
+    return parsed?.id ? String(parsed.id) : "";
+  } catch (err) {
+    console.error("Failed to parse saved HOD data:", err);
+    return "";
+  }
+}
+
+function mapVideo(video: any): Video {
+  return {
+    id: Number(video.id),
+    title: video.title,
+    category: video.category,
+    duration: video.duration,
+    description: video.description || "",
+    thumbnail: video.thumbnail || "https://picsum.photos/90/50?0",
+    isMine: Boolean(video.isMine),
+    videoUrl: video.videoUrl || SAMPLE_VIDEO_URL,
+    uploadedBy: video.uploadedBy || "HOD",
+    uploadDate: video.uploadDate || "",
+    views: Number(video.views || 0),
+    status: video.status || "Published",
+  };
+}
 
 /* ==========================================================
    ICONS
@@ -422,7 +272,7 @@ type VideoTableProps = {
   searchPlaceholder: string;
   renderActions: (video: Video) => ReactNode;
   headerExtra?: ReactNode;
-  showBreadcrumb?: boolean; // FIX: allows hiding breadcrumb per-section
+  showBreadcrumb?: boolean;
 };
 
 function VideoTable({
@@ -437,7 +287,6 @@ function VideoTable({
   searchPlaceholder,
   renderActions,
   headerExtra,
-  showBreadcrumb = true,
 }: VideoTableProps) {
   const totalPages = Math.max(1, Math.ceil(videos.length / perPage));
   const safePage = Math.min(Math.max(1, page), totalPages);
@@ -451,14 +300,8 @@ function VideoTable({
     <div className="card">
       <div className="card-header">
         <div>
-          <h2
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <VideoIcon size={30} style={{ color: "#4F74F9" }} />
+          <h2 className="card-title-row">
+            <VideoIcon size={30} className="card-title-icon" />
             {title}
           </h2>
           <p>{subtitle}</p>
@@ -554,7 +397,8 @@ function VideoTable({
         <div className="pagination-numbers">
           <button
             onClick={() => onPageChange(Math.max(1, safePage - 1))}
-            disabled={safePage === 1} className = "pagination-button"
+            disabled={safePage === 1}
+            className="pagination-button"
           >
             Previous
           </button>
@@ -564,7 +408,7 @@ function VideoTable({
               key={i}
               onClick={() => onPageChange(i + 1)}
               className={safePage === i + 1 ? "page-btn active" : "page-btn"}
-               >
+            >
               {i + 1}
             </button>
           ))}
@@ -602,7 +446,15 @@ function ViewModal({ video, onClose }: { video: Video | null; onClose: () => voi
         </div>
 
         <div className="modal-video-wrap">
-          <video key={video.id} src={video.videoUrl} controls autoPlay className="modal-video" controlsList="nodownload" disablePictureInPicture />
+          <video
+            key={video.id}
+            src={video.videoUrl}
+            controls
+            autoPlay
+            className="modal-video"
+            controlsList="nodownload"
+            disablePictureInPicture
+          />
         </div>
 
         <div className="modal-body">
@@ -620,8 +472,6 @@ function ViewModal({ video, onClose }: { video: Video | null; onClose: () => voi
 
 /* ==========================================================
    UPLOAD / EDIT MODAL
-   FIX: now supports multiple video forms in one upload session
-   via an "Add More Video" button. Edit mode stays single-form.
 ========================================================== */
 
 const emptyForm: UploadFormData = { title: "", category: "", duration: "", description: "" };
@@ -642,11 +492,12 @@ function makeEmptyEntry(): VideoEntry {
 type UploadModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (entries: SubmittedEntry[]) => void;
+  onSubmit: (entries: SubmittedEntry[]) => Promise<void> | void;
   initialData?: UploadFormData | null;
+  submitError?: string | null;
 };
 
-function UploadModal({ isOpen, onClose, onSubmit, initialData }: UploadModalProps) {
+function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: UploadModalProps) {
   const { mounted, closing } = useModalTransition(isOpen);
 
   const [entries, setEntries] = useState<VideoEntry[]>([makeEmptyEntry()]);
@@ -709,22 +560,22 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData }: UploadModalProp
   const removeEntry = (entryId: string) =>
     setEntries((prev) => (prev.length > 1 ? prev.filter((en) => en.entryId !== entryId) : prev));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isUploading) return;
 
     setIsUploading(true);
-    // Simulated upload delay — swap for the real API call; UI only changes.
-    setTimeout(() => {
-      onSubmit(
+    try {
+      await onSubmit(
         entries.map((en) => ({
           data: en.form,
           videoFile: en.videoFile,
           thumbnailFile: en.thumbnailFile,
         }))
       );
+    } finally {
       setIsUploading(false);
-    }, 1100);
+    }
   };
 
   return (
@@ -741,17 +592,12 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData }: UploadModalProp
         </div>
 
         <form className="upload-form" onSubmit={handleSubmit}>
+          {submitError && <p className="videos-error">{submitError}</p>}
+
           {entries.map((entry, idx) => (
             <div key={entry.entryId}>
               {entries.length > 1 && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "10px",
-                  }}
-                >
+                <div className="entry-header-row">
                   <span className="video-title">Video {idx + 1}</span>
                   {!isEdit && (
                     <button
@@ -872,7 +718,7 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData }: UploadModalProp
           ))}
 
           {!isEdit && (
-            <div className="btn-row" style={{ justifyContent: "flex-start", marginBottom: "18px" }}>
+            <div className="btn-row btn-row-start">
               <button type="button" className="cancel-btn" onClick={addEntry} disabled={isUploading}>
                 + Add More Video
               </button>
@@ -899,9 +745,10 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData }: UploadModalProp
 ========================================================== */
 
 export default function VideosPage() {
-  const [videos, setVideos] = useState<Video[]>(initialVideos);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [searchAll, setSearchAll] = useState("");
   const [searchMine, setSearchMine] = useState("");
@@ -915,80 +762,48 @@ export default function VideosPage() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      setLoading(true);
-      setError(null);
+  const authHeaders = (): Record<string, string> => {
+    const hodId = getHodId();
+    const headers: Record<string, string> = {};
+    if (hodId) headers["X-Hod-Id"] = hodId;
+    return headers;
+  };
 
-      const savedHod = typeof window !== "undefined" ? localStorage.getItem("hod") || sessionStorage.getItem("hod") : null;
-      let hodId = "";
+  const fetchVideos = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_BASE}/api/hod/videos/`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        credentials: "include",
+      });
 
-      if (savedHod) {
-        try {
-          const parsed = JSON.parse(savedHod);
-          hodId = parsed?.id || "";
-        } catch (err) {
-          console.error("Failed to parse saved HOD data:", err);
-        }
-      }
-
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-
-      if (hodId) {
-        headers["X-Hod-Id"] = String(hodId);
-      }
-
+      const text = await response.text();
+      let json: any = null;
       try {
-        const response = await fetch(`${API_BASE}/api/hod/videos/`, {
-          method: "GET",
-          headers,
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        const text = await response.text();
-        let json: any = null;
-
-        try {
-          json = text ? JSON.parse(text) : null;
-        } catch (parseErr) {
-          throw new Error("The server returned an invalid response.");
-        }
-
-        if (!json || json.status !== "success") {
-          throw new Error(json?.message || "Failed to load videos.");
-        }
-
-        const mappedVideos: Video[] = (json.videos || []).map((video: any) => ({
-          id: Number(video.id),
-          title: video.title,
-          category: video.category,
-          duration: video.duration,
-          description: video.description || "",
-          thumbnail: video.thumbnail || "https://picsum.photos/90/50?0",
-          isMine: Boolean(video.isMine),
-          videoUrl: video.videoUrl || SAMPLE_VIDEO_URL,
-          uploadedBy: video.uploadedBy || "HOD",
-          uploadDate: video.uploadDate || "",
-          views: Number(video.views || 0),
-          status: video.status || "Published",
-        }));
-
-        setVideos(mappedVideos);
-      } catch (err: any) {
-        console.error("Failed to load HOD videos:", err);
-        setError(err.message || "Failed to load videos.");
-      } finally {
-        setLoading(false);
+        json = text ? JSON.parse(text) : null;
+      } catch {
+        throw new Error("The server returned an invalid response.");
       }
-    };
 
+      if (!response.ok || !json || json.status !== "success" || !Array.isArray(json.videos) || json.videos.length === 0) {
+        setVideos(SAMPLE_VIDEOS);
+        return;
+      }
+
+      setVideos((json.videos || []).map(mapVideo));
+    } catch (err: any) {
+      console.error("Failed to load HOD videos, using fallback:", err);
+      setVideos(SAMPLE_VIDEOS);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchVideos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [API_BASE]);
 
   const allVideos = useMemo(
@@ -1014,6 +829,7 @@ export default function VideosPage() {
 
   const openUploadForNew = () => {
     setEditingVideo(null);
+    setUploadError(null);
     setUploadOpen(true);
   };
 
@@ -1025,63 +841,126 @@ export default function VideosPage() {
       duration: video.duration,
       description: video.description,
     });
+    setUploadError(null);
     setUploadOpen(true);
   };
 
-  const handleDelete = (video: Video) => {
+  const handleDelete = async (video: Video) => {
     const confirmed = window.confirm(`Delete "${video.title}"? This cannot be undone.`);
     if (!confirmed) return;
+
+    const previous = videos;
+    // optimistic update
     setVideos((prev) => prev.filter((v) => v.id !== video.id));
+
+    try {
+      const response = await fetch(`${API_BASE}/api/hod/videos/upload/${video.id}/`, {
+        method: "DELETE",
+        headers: { ...authHeaders() },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        let message = `Request failed with status ${response.status}`;
+        try {
+          const json = text ? JSON.parse(text) : null;
+          if (json?.message) message = json.message;
+        } catch {
+          /* ignore parse error, use default message */
+        }
+        throw new Error(message);
+      }
+    } catch (err: any) {
+      console.error("Failed to delete video:", err);
+      // roll back on failure
+      setVideos(previous);
+      window.alert(err.message || "Failed to delete the video. Please try again.");
+    }
   };
 
-  // FIX: now accepts an array of entries so multiple videos uploaded in one
-  // session (via "Add More Video") are all added to My Videos at once.
-  const handleUploadSubmit = (entries: SubmittedEntry[]) => {
+  // Handles both create (multi-entry) and edit (single-entry) submissions,
+  // sending real requests to the backend instead of only updating local state.
+  const handleUploadSubmit = async (entries: SubmittedEntry[]) => {
+    setUploadError(null);
     const isEditMode = Boolean(entries[0]?.data.id);
 
-    if (isEditMode) {
-      const { data } = entries[0];
-      setVideos((prev) =>
-        prev.map((v) =>
-          v.id === data.id
-            ? {
-                ...v,
-                title: data.title,
-                category: data.category,
-                duration: data.duration,
-                description: data.description,
-              }
-            : v
-        )
-      );
-    } else {
-      setVideos((prev) => {
-        let nextId = Math.max(0, ...prev.map((v) => v.id)) + 1;
-        const newVideos: Video[] = entries.map((entry, idx) => {
-          const { data, videoFile, thumbnailFile } = entry;
-          const video: Video = {
-            id: nextId++,
+    try {
+      if (isEditMode) {
+        const { data } = entries[0];
+        const response = await fetch(`${API_BASE}/api/hod/videos/${data.id}/`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", ...authHeaders() },
+          credentials: "include",
+          body: JSON.stringify({
             title: data.title,
             category: data.category,
             duration: data.duration,
             description: data.description,
-            uploadedBy: "You",
-            uploadDate: "Today",
-            views: 0,
-            status: "Active",
-            thumbnail: thumbnailFile
-              ? URL.createObjectURL(thumbnailFile)
-              : "https://picsum.photos/90/50?" + (prev.length + idx + 5),
-            isMine: true,
-            videoUrl: videoFile ? URL.createObjectURL(videoFile) : SAMPLE_VIDEO_URL,
-          };
-          return video;
+          }),
         });
-        return [...newVideos, ...prev];
-      });
-      setMyPage(1);
+
+        const text = await response.text();
+        let json: any = null;
+        try {
+          json = text ? JSON.parse(text) : null;
+        } catch {
+          throw new Error("The server returned an invalid response.");
+        }
+
+        if (!response.ok || !json || json.status !== "success") {
+          throw new Error(json?.message || `Request failed with status ${response.status}`);
+        }
+
+        const updated = mapVideo(json.video ?? { ...data, id: data.id });
+        setVideos((prev) => prev.map((v) => (v.id === data.id ? { ...v, ...updated } : v)));
+      } else {
+        // Upload each entry sequentially so large video files don't
+        // saturate the connection all at once.
+        const created: Video[] = [];
+
+        for (const entry of entries) {
+          const { data, videoFile, thumbnailFile } = entry;
+          const formData = new FormData();
+          formData.append("title", data.title);
+          formData.append("category", data.category);
+          formData.append("duration", data.duration);
+          formData.append("description", data.description);
+          if (videoFile) formData.append("video", videoFile);
+          if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+
+          const response = await fetch(`${API_BASE}/api/hod/videos/upload/`, {
+            method: "POST",
+            headers: { ...authHeaders() }, // no Content-Type: browser sets multipart boundary
+            credentials: "include",
+            body: formData,
+          });
+
+          const text = await response.text();
+          let json: any = null;
+          try {
+            json = text ? JSON.parse(text) : null;
+          } catch {
+            throw new Error("The server returned an invalid response.");
+          }
+
+          if (!response.ok || !json || json.status !== "success") {
+            throw new Error(json?.message || `Request failed with status ${response.status}`);
+          }
+
+          created.push(mapVideo(json.video));
+        }
+
+        setVideos((prev) => [...created, ...prev]);
+        setMyPage(1);
+      }
+
+      setUploadOpen(false);
+    } catch (err: any) {
+      console.error("Failed to save video:", err);
+      setUploadError(err.message || "Something went wrong while saving. Please try again.");
+      // keep the modal open so the user can retry without losing their input
     }
-    setUploadOpen(false);
   };
 
   return (
@@ -1110,7 +989,7 @@ export default function VideosPage() {
         )}
       />
 
-      {/* MY VIDEOS — breadcrumb removed here per request */}
+      {/* MY VIDEOS */}
       <VideoTable
         title="My Videos"
         subtitle="Videos uploaded by you"
@@ -1160,6 +1039,7 @@ export default function VideosPage() {
         onClose={() => setUploadOpen(false)}
         onSubmit={handleUploadSubmit}
         initialData={editingVideo}
+        submitError={uploadError}
       />
     </div>
   );

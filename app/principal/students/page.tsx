@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import {
   GraduationCap,
   Search,
@@ -14,6 +14,8 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Building2,
   RefreshCw,
   AlertCircle,
   Users,
@@ -24,7 +26,6 @@ import {
   Lock,
   Copy,
   Check,
-  Building2,
   Award,
 } from "lucide-react";
 import "./StudentsPage.css";
@@ -257,12 +258,19 @@ function StudentReportModal({
             </h4>
             {student.recentVideos && student.recentVideos.length > 0 ? (
               <ul className="modal-list">
-                {student.recentVideos.map((title) => (
-                  <li key={title}>
-                    <PlayCircle size={13} className="modal-list-icon" />
-                    <span>{title}</span>
-                  </li>
-                ))}
+                {student.recentVideos.slice(0, 4).map((item, idx) => {
+                  const title = typeof item === "object" && item !== null && (item as any).title ? (item as any).title : String(item);
+                  const dateStr = typeof item === "object" && item !== null && (item as any).date ? (item as any).date : (student.lastLogin && student.lastLogin !== "No recent login" ? student.lastLogin : "1 day ago");
+                  return (
+                    <li key={`${title}-${idx}`} style={{ justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <PlayCircle size={13} className="modal-list-icon" />
+                        <span>{title}</span>
+                      </div>
+                      <span className="modal-video-date-badge">{dateStr}</span>
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <p className="modal-empty">No video watch records available yet.</p>
@@ -304,6 +312,30 @@ function StudentReportModal({
 /* --------------------------------- MAIN COMPONENT -------------------------------- */
 
 export default function StudentsPage() {
+  const [profileOpen, setProfileOpen] = useState<boolean>(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -461,9 +493,11 @@ export default function StudentsPage() {
     return [ALL_DEPTS, ...depts];
   }, [students]);
 
-  // CSV Export feature
-  const exportToCSV = () => {
-    if (students.length === 0) return;
+  // Native Excel (.xls) Data Download
+  const exportToExcel = () => {
+    const listToExport = filteredStudents.length > 0 ? filteredStudents : students;
+    if (listToExport.length === 0) return;
+
     const headers = [
       "Student ID",
       "Full Name",
@@ -471,34 +505,76 @@ export default function StudentsPage() {
       "Email",
       "Username",
       "Viewed Videos",
-      "Total Views",
       "Progress (%)",
       "Status",
     ];
 
-    const rows = filteredStudents.map((s) => [
-      s.id,
-      `"${s.name}"`,
-      `"${s.department}"`,
-      `"${s.email}"`,
-      `"${s.username}"`,
-      s.viewedVideos,
-      s.totalViews,
-      s.progress,
-      s.status,
-    ]);
+    const rowsHtml = listToExport
+      .map(
+        (s) => `
+      <tr>
+        <td>${s.id}</td>
+        <td>${s.name || ""}</td>
+        <td>${s.department || ""}</td>
+        <td>${s.email || ""}</td>
+        <td>${s.username || ""}</td>
+        <td>${s.viewedVideos || 0}</td>
+        <td>${s.progress || 0}%</td>
+        <td>${s.status || "Active"}</td>
+      </tr>`
+      )
+      .join("");
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const excelTemplate = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>Student Performance</x:Name>
+                <x:WorksheetOptions>
+                  <x:DisplayGridlines/>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          th { background-color: #4f46e5; color: #ffffff; font-weight: bold; padding: 8px; text-align: left; }
+          td { padding: 6px; border: 1px solid #cbd5e1; }
+        </style>
+      </head>
+      <body>
+        <table>
+          <thead>
+            <tr>
+              ${headers.map((h) => `<th>${h}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([excelTemplate], { type: "application/vnd.ms-excel;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `student_performance_report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `Student_Records_Report_${new Date().toISOString().slice(0, 10)}.xls`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Stats computation
@@ -609,17 +685,30 @@ export default function StudentsPage() {
             <span className="btn-text">Sync</span>
           </button>
 
-          <button type="button" className="dash-action-btn btn-export" onClick={exportToCSV}>
+          <button type="button" className="dash-action-btn btn-export" onClick={exportToExcel} title="Download Excel Spreadsheet">
             <Download size={16} />
-            <span className="btn-text">Export CSV</span>
+            <span className="btn-text">Export Excel</span>
           </button>
 
-          <div className="dash-profile-wrapper">
-            <div className="dash-profile-trigger">
+          <div className="dash-profile-wrapper" ref={profileRef}>
+            <button
+              type="button"
+              className={`dash-profile-trigger ${profileOpen ? "active" : ""}`}
+              onClick={() => setProfileOpen((v) => !v)}
+            >
               <div className="dash-profile-avatar">
-                <User size={16} />
+                <User size={15} />
               </div>
               <span className="profile-name">Principal</span>
+              <ChevronDown size={13} className={`profile-arrow ${profileOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            <div className={`dash-profile-dropdown ${profileOpen ? "open" : ""}`}>
+              <a href="/principal/principal_profile"><User size={14} /> My Profile</a>
+              <a href="/principal/departments"><Building2 size={14} /> Departments</a>
+              <a href="/principal/students"><Users size={14} /> Students List</a>
+              <div className="dropdown-divider" />
+              <button type="button" onClick={() => (window.location.href = "/")}>Logout</button>
             </div>
           </div>
         </div>
@@ -699,42 +788,6 @@ export default function StudentsPage() {
                   <span className="summary-card-label">Active Departments</span>
                 </div>
               </div>
-
-              {/* Card 5: Total Watch Hours */}
-              <div className="corp-card summary-card-corp card-highlight-watch">
-                <div className="card-top-row">
-                  <div className="summary-icon-box tone-violet">
-                    <Clock size={20} />
-                  </div>
-                  <span className="card-trend-pill trend-up">Learning Time</span>
-                </div>
-                <div className="card-bottom-row">
-                  <span className="summary-card-value">
-                    {totalWatchHours}
-                    <span className="summary-card-unit">hrs</span>
-                  </span>
-                  <span className="summary-card-label">Total Watch Hours</span>
-                  <span className="summary-card-sub">Aggregate learning duration across {totalWatchViews} session{totalWatchViews !== 1 ? 's' : ''}</span>
-                </div>
-              </div>
-
-              {/* Card 6: Active Engagement Rate */}
-              <div className="corp-card summary-card-corp card-highlight-engage">
-                <div className="card-top-row">
-                  <div className="summary-icon-box tone-rose">
-                    <Activity size={20} />
-                  </div>
-                  <span className="card-trend-pill trend-up">Participation</span>
-                </div>
-                <div className="card-bottom-row">
-                  <span className="summary-card-value">
-                    {engagementRate}
-                    <span className="summary-card-unit">%</span>
-                  </span>
-                  <span className="summary-card-label">Active Student Engagement</span>
-                  <span className="summary-card-sub">{engagedStudents} of {totalStudents} students actively learning</span>
-                </div>
-              </div>
             </section>
 
             {/* Advanced Filters Toolbar */}
@@ -792,7 +845,6 @@ export default function StudentsPage() {
                       <th>Username</th>
                       <th>Password</th>
                       <th style={{ textAlign: "center" }}>Viewed Videos</th>
-                      <th style={{ textAlign: "center" }}>Total Views</th>
                       <th>Progress</th>
                       <th>Status</th>
                       <th style={{ textAlign: "right" }}>Actions</th>
@@ -801,7 +853,7 @@ export default function StudentsPage() {
                   <tbody>
                     {paginatedStudents.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="empty-table-cell">
+                        <td colSpan={9} className="empty-table-cell">
                           {students.length === 0
                             ? "No students found in the database."
                             : "No students match the selected filter criteria."}
@@ -827,7 +879,6 @@ export default function StudentsPage() {
                             <PasswordCell password={student.password} />
                           </td>
                           <td style={{ textAlign: "center", fontWeight: 600 }}>{student.viewedVideos}</td>
-                          <td style={{ textAlign: "center", fontWeight: 600 }}>{student.totalViews}</td>
                           <td>
                             <ProgressBar value={student.progress} />
                           </td>
@@ -856,18 +907,6 @@ export default function StudentsPage() {
               {/* Polished Pagination Controls */}
               <div className="pagination-bar-corp">
                 <div className="pagination-size-selector">
-                  <span>Show per page:</span>
-                  <select
-                    className="corp-select size-select"
-                    value={pageSize}
-                    onChange={(e) => setPageSize(Number(e.target.value))}
-                  >
-                    {PAGE_SIZE_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
                   <span className="range-summary">
                     Showing {rangeStart}–{rangeEnd} of {filteredStudents.length}
                   </span>

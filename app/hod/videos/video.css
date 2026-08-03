@@ -1,32 +1,592 @@
-/* ============================================================
-   Add these rules to your existing video.css
-   They replace the inline style={{...}} props removed from the TSX
-============================================================ */
+@import "../hod-theme.css";
 
-/* was: style={{ display: "flex", alignItems: "center", gap: "8px" }} on the <h2> */
+/* ==========================================================
+   HOD VIDEO ANALYTICS & MANAGEMENT — Complete CSS
+========================================================== */
+
+:root {
+  --primary-color: var(--p-indigo);
+  --primary-hover: var(--p-indigo-dark);
+  --bg-color: var(--p-bg-main);
+  --card-bg: var(--p-bg-card);
+  --text-main: var(--p-text-primary);
+  --text-muted: var(--p-text-muted);
+  --border-color: var(--p-border);
+  --danger-color: var(--p-rose);
+  --danger-hover: #be123c;
+  --success-color: var(--p-emerald);
+  --shadow-sm: var(--p-shadow-card);
+  --shadow-md: var(--p-shadow-card-hover);
+  --radius: var(--p-radius-lg);
+}
+
+.videos-page {
+  padding: 24px 28px 48px;
+  max-width: 1600px;
+  margin: 0 auto;
+  background-color: var(--p-bg-main);
+  min-height: 100vh;
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.videos-page h1, .videos-page h2, .videos-page h3, .videos-page h4 {
+  font-family: var(--font-heading);
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+.videos-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.videos-page-header h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--p-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.videos-page-header p {
+  font-size: 13.5px;
+  color: var(--p-text-muted);
+  margin: 4px 0 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, var(--p-indigo) 0%, var(--p-indigo-dark) 100%);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  transition: all 0.15s ease;
+}
+
+.upload-btn:hover {
+  opacity: 0.94;
+  transform: translateY(-1px);
+}
+
+/* Banners & Messages */
+.videos-banner {
+  padding: 14px 18px;
+  border-radius: var(--p-radius-md);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.videos-banner-error {
+  background: var(--p-rose-soft);
+  color: var(--p-rose);
+  border: 1px solid var(--p-border);
+}
+
+.videos-error {
+  color: var(--p-rose);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ==========================================================
+   CARDS & TABLES
+========================================================== */
+.card {
+  background: var(--p-bg-card);
+  backdrop-filter: blur(12px);
+  border-radius: var(--p-radius-lg);
+  border: 1px solid var(--p-border);
+  box-shadow: var(--p-shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--p-shadow-card-hover);
+}
+
+.card-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--p-border);
+}
+
 .card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--p-text-primary);
+  margin: 0;
+}
+
+.card-title-icon {
+  color: var(--p-indigo);
+}
+
+.card-header p {
+  margin: 4px 0 0 0;
+  color: var(--p-text-muted);
+  font-size: 13px;
+}
+
+/* Search Row */
+.search-row {
+  padding: 16px 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 38px;
+  color: var(--p-text-light);
+  pointer-events: none;
+}
+
+.search-row input {
+  width: 100%;
+  padding: 10px 16px 10px 42px;
+  border: 1px solid var(--p-btn-border);
+  border-radius: 999px;
+  font-size: 13.5px;
+  background: var(--p-bg-input);
+  color: var(--p-text-primary);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-row input:focus {
+  background: var(--p-bg-card);
+  border-color: var(--p-indigo);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Video Table */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.video-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13.5px;
+}
+
+.video-table th {
+  padding: 14px 20px;
+  background: var(--p-bg-subtle);
+  border-bottom: 1px solid var(--p-border-table);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--p-text-muted);
+}
+
+.video-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--p-border-table-row);
+  color: var(--p-text-primary);
+  vertical-align: middle;
+}
+
+.video-table tbody tr:hover {
+  background: var(--p-table-hover);
+}
+
+.col-sno {
+  width: 60px;
+  font-weight: 600;
+  color: var(--p-text-muted);
+}
+
+.thumb {
+  width: 80px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--p-border);
+}
+
+.video-title {
+  font-weight: 700;
+  color: var(--p-text-primary);
+}
+
+.category-pill {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--p-indigo-soft);
+  color: var(--p-indigo);
+}
+
+.duration-badge {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--p-bg-input);
+  color: var(--p-text-muted);
+  border: 1px solid var(--p-border);
+}
+
+.desc-cell {
+  max-width: 220px;
+}
+
+.desc-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12.5px;
+  color: var(--p-text-muted);
+}
+
+.uploadDate {
+  font-size: 12.5px;
+  color: var(--p-text-muted);
+}
+
+.col-action {
+  width: 140px;
+}
+
+.action-group {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* was: style={{ color: "#4F74F9" }} on <VideoIcon> */
-.card-title-icon {
-  color: #4f74f9;
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--p-btn-border);
+  background: var(--p-btn-bg);
+  color: var(--p-btn-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-/* was: style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}
-   on the "Video N" row inside the multi-upload form */
-.entry-header-row {
+.action-btn:hover {
+  background: var(--p-btn-hover);
+  border-color: var(--p-border-strong);
+}
+
+.view-btn:hover {
+  color: var(--p-indigo);
+  background: var(--p-indigo-soft);
+  border-color: var(--p-indigo);
+}
+
+.edit-btn:hover {
+  color: var(--p-amber);
+  background: var(--p-amber-soft);
+  border-color: var(--p-amber);
+}
+
+.delete-btn:hover {
+  color: var(--p-rose);
+  background: var(--p-rose-soft);
+  border-color: var(--p-rose);
+}
+
+.empty-row {
+  padding: 40px;
+  text-align: center;
+  color: var(--p-text-muted);
+}
+
+/* Footer & Pagination */
+.table-footer {
+  padding: 16px 24px;
+  background: var(--p-bg-subtle);
+  border-top: 1px solid var(--p-border-table);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--p-text-muted);
+  font-weight: 600;
 }
 
-/* was: style={{ justifyContent: "flex-start", marginBottom: "18px" }}
-   modifier on .btn-row, used only for the "+ Add More Video" row */
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-button, .pagination-numbers button {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--p-radius-md);
+  border: 1px solid var(--p-btn-border);
+  background: var(--p-btn-bg);
+  color: var(--p-btn-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pagination-numbers button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-numbers button:hover:not(:disabled) {
+  background: var(--p-btn-hover);
+}
+
+.page-btn.active {
+  background: var(--p-indigo) !important;
+  color: #ffffff !important;
+  border-color: var(--p-indigo) !important;
+}
+
+/* ==========================================================
+   MODALS
+========================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.modal-box {
+  background: var(--p-modal-panel-bg);
+  border: 1px solid var(--p-border-strong);
+  border-radius: var(--p-radius-xl);
+  box-shadow: var(--p-shadow-modal);
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  background: var(--p-modal-header-bg);
+  border-bottom: 1px solid var(--p-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--p-text-primary);
+  margin: 0;
+}
+
+.modal-close {
+  background: var(--p-btn-bg);
+  border: 1px solid var(--p-btn-border);
+  color: var(--p-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modal-video-wrap {
+  width: 100%;
+  background: #000;
+  aspect-ratio: 16/9;
+}
+
+.modal-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.modal-body {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Upload Modal Form */
+.upload-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group-full {
+  grid-column: span 2;
+}
+
+.form-group label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--p-text-muted);
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  padding: 10px 14px;
+  border-radius: var(--p-radius-md);
+  border: 1px solid var(--p-border-strong);
+  background: var(--p-bg-input);
+  color: var(--p-text-primary);
+  font-size: 13.5px;
+  outline: none;
+  font-family: inherit;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--p-indigo);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.dropzone-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.dropzone {
+  border: 2px dashed var(--p-border-strong);
+  border-radius: var(--p-radius-md);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--p-bg-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--p-text-muted);
+  transition: all 0.2s ease;
+}
+
+.dropzone:hover, .dropzone.has-file {
+  border-color: var(--p-indigo);
+  background: var(--p-indigo-soft);
+  color: var(--p-indigo);
+}
+
+.dropzone-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dropzone-hint {
+  font-size: 11.5px;
+  opacity: 0.8;
+}
+
+.thumb-preview-img {
+  width: 100%;
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
 .btn-row-start {
   justify-content: flex-start;
-  margin-bottom: 18px;
+}
+
+.cancel-btn {
+  padding: 10px 18px;
+  border-radius: var(--p-radius-md);
+  border: 1px solid var(--p-btn-border);
+  background: var(--p-btn-bg);
+  color: var(--p-btn-text);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, var(--p-indigo) 0%, var(--p-indigo-dark) 100%);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
