@@ -332,7 +332,8 @@ function VideoTable({
               <th>Video Category</th>
               <th>Duration</th>
               <th>Description</th>
-              <th>upload date</th>
+              <th>Upload Date</th>
+              <th>Status</th>
               <th className="col-action">Action</th>
             </tr>
           </thead>
@@ -366,6 +367,24 @@ function VideoTable({
 
                 <td data-label="date" className="desc-cel">
                   <span className="uploadDate">{video.uploadDate}</span>
+                </td>
+
+                <td data-label="Status">
+                  {video.status === "Pending" && (
+                    <span style={{ background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                      Pending Approval
+                    </span>
+                  )}
+                  {video.status === "Published" && (
+                    <span style={{ background: "rgba(34, 197, 94, 0.15)", color: "#4ade80", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                      Published
+                    </span>
+                  )}
+                  {video.status === "Rejected" && (
+                    <span style={{ background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                      Rejected
+                    </span>
+                  )}
                 </td>
 
                 <td data-label="Action" className="col-action">
@@ -787,15 +806,15 @@ export default function VideosPage() {
         throw new Error("The server returned an invalid response.");
       }
 
-      if (!response.ok || !json || json.status !== "success" || !Array.isArray(json.videos) || json.videos.length === 0) {
-        setVideos(SAMPLE_VIDEOS);
+      if (!response.ok || !json || json.status !== "success" || !Array.isArray(json.videos)) {
+        setVideos([]);
         return;
       }
 
       setVideos((json.videos || []).map(mapVideo));
     } catch (err: any) {
-      console.error("Failed to load HOD videos, using fallback:", err);
-      setVideos(SAMPLE_VIDEOS);
+      console.error("Failed to load HOD videos:", err);
+      setVideos([]);
     } finally {
       setLoading(false);
     }

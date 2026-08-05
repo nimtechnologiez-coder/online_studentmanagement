@@ -437,22 +437,6 @@ export default function PrincipalDashboard() {
 
         {/* Right actions */}
         <div className="dash-header-actions">
-          <button
-            type="button"
-            className="dash-action-btn"
-            onClick={fetchDashboardData}
-            disabled={loading}
-            title="Refresh Dashboard"
-          >
-            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
-            <span className="btn-text">Sync</span>
-          </button>
-
-          <div className="dash-notif-btn">
-            <Bell size={17} />
-            <span className="notif-badge" />
-          </div>
-
           <div className="dash-profile-wrapper" ref={profileRef}>
             <button
               type="button"
@@ -789,7 +773,7 @@ export default function PrincipalDashboard() {
                               </div>
                             </td>
                             <td><span className="table-dept-pill">{row.department}</span></td>
-                            <td style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
+                            <td className="table-activity-cell" style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
                             <td style={{ color: "var(--p-text-muted)", fontSize: 12.5 }}>{row.lastViewed}</td>
                           </tr>
                         ))

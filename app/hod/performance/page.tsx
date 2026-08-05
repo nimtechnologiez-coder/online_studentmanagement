@@ -36,9 +36,6 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import "../dashboard/Hoddashboard.css";
-import "../../principal/dashboard/Principaldashboard.css";
-import "../../principal/students/StudentsPage.css";
 import "./performance.css";
 
 /* ═══════════════════════════ Types ═══════════════════════════ */

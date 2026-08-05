@@ -111,74 +111,74 @@ body.student-sidebar-collapsed main {
    GLOBAL TAILWIND CLASS OVERRIDES (dark mode)
    These ensure inline Tailwind classes used in page.tsx get dark-themed
    ============================================================ */
-html.dark .bg-white {
+html.dark:not(.light-page) .bg-white {
   background-color: var(--card-bg) !important;
 }
 
-html.dark .bg-slate-50 {
+html.dark:not(.light-page) .bg-slate-50 {
   background-color: var(--background) !important;
 }
 
-html.dark .bg-slate-100 {
+html.dark:not(.light-page) .bg-slate-100 {
   background-color: #111827 !important;
 }
 
-html.dark .bg-slate-200 {
+html.dark:not(.light-page) .bg-slate-200 {
   background-color: #1a2540 !important;
 }
 
-html.dark .bg-slate-900 {
+html.dark:not(.light-page) .bg-slate-900 {
   background-color: #060c17 !important;
 }
 
-html.dark .text-slate-800,
-html.dark .text-slate-900 {
+html.dark:not(.light-page) .text-slate-800,
+html.dark:not(.light-page) .text-slate-900 {
   color: var(--card-text) !important;
 }
 
-html.dark .text-slate-700 {
+html.dark:not(.light-page) .text-slate-700 {
   color: #c5d2e8 !important;
 }
 
-html.dark .text-slate-600 {
+html.dark:not(.light-page) .text-slate-600 {
   color: #9aaac5 !important;
 }
 
-html.dark .text-slate-500 {
+html.dark:not(.light-page) .text-slate-500 {
   color: var(--muted-text) !important;
 }
 
-html.dark .text-slate-400 {
+html.dark:not(.light-page) .text-slate-400 {
   color: #4f6080 !important;
 }
 
-html.dark .border-slate-200,
-html.dark .border-slate-100,
-html.dark .border-slate-300 {
+html.dark:not(.light-page) .border-slate-200,
+html.dark:not(.light-page) .border-slate-100,
+html.dark:not(.light-page) .border-slate-300 {
   border-color: var(--card-border) !important;
 }
 
-html.dark .divide-slate-200>*+* {
+html.dark:not(.light-page) .divide-slate-200>*+* {
   border-color: var(--card-border) !important;
 }
 
-html.dark .shadow-sm {
+html.dark:not(.light-page) .shadow-sm {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Inputs */
-html.dark input[type="text"],
-html.dark input[type="search"],
-html.dark input[type="email"],
-html.dark select,
-html.dark textarea {
+/* Inputs styling for dark mode (except pages with custom explicit styling) */
+html.dark:not(.light-page) input[type="text"],
+html.dark:not(.light-page) input[type="search"],
+html.dark:not(.light-page) input[type="email"],
+html.dark:not(.light-page) select,
+html.dark:not(.light-page) textarea {
   background-color: var(--input-bg) !important;
   border-color: var(--input-border) !important;
   color: var(--input-text) !important;
 }
 
-html.dark input::placeholder,
-html.dark textarea::placeholder {
+html.dark:not(.light-page) input::placeholder,
+html.dark:not(.light-page) textarea::placeholder {
   color: var(--input-placeholder) !important;
 }
 

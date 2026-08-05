@@ -1707,35 +1707,56 @@ html.dark .hstat-amber {
   white-space: nowrap;
 }
 
-.corp-table-wrap {
-  overflow-x: auto;
-  margin-top: 10px;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  -webkit-overflow-scrolling: touch;
-}
-
-.corp-table {
-  width: 100%;
-  min-width: 520px;
-  /* keeps columns readable, wrap scrolls horizontally instead of squashing */
-  border-collapse: collapse;
-  font-size: 13.5px;
-  table-layout: auto;
-}
-
-.corp-table thead th {
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--p-text-muted);
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--p-border-table);
-  background: transparent;
+.table-dept-pill {
+  background: var(--p-indigo-soft);
+  color: var(--p-indigo);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  display: inline-block;
+}
+
+.table-activity-cell {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.corp-table th,
+.corp-table td {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .corp-table-wrap {
+    margin-top: 6px;
+    overflow-x: auto;
+  }
+  
+  .corp-table {
+    min-width: 520px;
+    table-layout: auto;
+    font-size: 12px;
+  }
+
+  .corp-table thead th {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+
+  .corp-table tbody td {
+    padding: 10px 10px;
+  }
+
+  .student-cell-profile {
+    gap: 8px;
+  }
+
+  .table-activity-cell {
+    max-width: 150px;
+  }
 }
 
 .corp-table tbody td {
@@ -1879,8 +1900,64 @@ html.dark .hstat-amber {
   cursor: not-allowed;
 }
 
-/* Header responsive adjustments for table cards */
+/* Header responsive adjustments for table cards & KPI Grid */
+@media (max-width: 1024px) {
+  .kpi-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
 @media (max-width: 640px) {
+  .kpi-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .kpi-card {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .kpi-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .kpi-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  .kpi-icon-box svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .kpi-trend-pill {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .kpi-card-value {
+    font-size: 1.35rem;
+  }
+
+  .kpi-card-title {
+    font-size: 0.76rem;
+  }
+
+  .kpi-card-sub {
+    font-size: 0.68rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .corp-card-header {
     flex-direction: column;
     align-items: flex-start;

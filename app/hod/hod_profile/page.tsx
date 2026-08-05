@@ -16,9 +16,6 @@ import {
   BookOpen,
   X
 } from "lucide-react";
-import "../dashboard/Hoddashboard.css";
-import "../../principal/dashboard/Principaldashboard.css";
-import "../../principal/students/StudentsPage.css";
 import "../performance/performance.css";
 
 interface HodProfileData {
@@ -288,105 +285,88 @@ export default function HodProfilePage() {
               </button>
             </div>
 
-            {/* Action Tabs */}
-            <div className="flex border-b border-slate-100 mt-8" style={{ borderColor: "var(--p-border-table)" }}>
-              <button className="px-6 py-3 text-sm font-bold border-b-2" style={{ borderColor: "var(--p-indigo)", color: "var(--p-indigo)" }}>Overview</button>
-              <button className="px-6 py-3 text-sm font-medium" style={{ color: "var(--p-text-muted)" }}>Department Bio</button>
-              <button className="px-6 py-3 text-sm font-medium" style={{ color: "var(--p-text-muted)" }}>Courses</button>
-              <button className="px-6 py-3 text-sm font-medium" style={{ color: "var(--p-text-muted)" }}>Security</button>
-            </div>
           </div>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           
-          {/* Left Column: Details & Bio */}
-          <div className="lg:col-span-2 space-y-8">
-            
-            {/* Quick Contact Section */}
-            <div className="corp-card grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
-                <div className="p-2 rounded-lg text-indigo-600 shadow-sm" style={{ background: "var(--p-indigo-soft)" }}><Mail size={18} /></div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Email</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{email}</span>
-                </div>
+          {/* Quick Contact Section */}
+          <div className="corp-card flex flex-col justify-center gap-4">
+            <h3 className="font-bold flex items-center gap-2 mb-2" style={{ color: "var(--p-text-primary)" }}>
+              <Mail size={18} style={{ color: "var(--p-indigo)" }} />
+              Quick Contact
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Email</span>
+                <span className="text-sm font-semibold text-right truncate" style={{ color: "var(--p-text-primary)" }}>{email}</span>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
-                <div className="p-2 rounded-lg text-emerald-600 shadow-sm" style={{ background: "var(--p-emerald-soft)" }}><Phone size={18} /></div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Phone</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{phone}</span>
-                </div>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Phone</span>
+                <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{phone}</span>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
-                <div className="p-2 rounded-lg text-amber-600 shadow-sm" style={{ background: "var(--p-amber-soft)" }}><Calendar size={18} /></div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Joined</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{joined}</span>
-                </div>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Joined</span>
+                <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{joined}</span>
               </div>
-            </div>
-
-            {/* Department Biography */}
-            <div className="corp-card">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold flex items-center gap-2" style={{ color: "var(--p-text-primary)" }}>
-                  <GraduationCap style={{ color: "var(--p-indigo)" }} /> Department Leadership Biography
-                </h3>
-                <button 
-                  type="button" 
-                  onClick={() => {
-                    setEditEmail(email);
-                    setEditPhone(phone);
-                    setEditBio(profile?.bio || "");
-                    setIsEditModalOpen(true);
-                  }} 
-                  className="dash-action-btn"
-                  style={{ fontSize: 12, padding: "4px 10px" }}
-                >
-                  <Edit3 size={13} />
-                  <span>Edit Bio</span>
-                </button>
-              </div>
-              <p className="leading-relaxed" style={{ color: "var(--p-text-muted)" }}>
-                {profile?.bio}
-              </p>
             </div>
           </div>
 
-          {/* Right Column: Settings & Security */}
-          <div className="space-y-8">
+          {/* Account Details */}
+          <div className="corp-card flex flex-col justify-center gap-4">
+            <h3 className="font-bold flex items-center gap-2 mb-2" style={{ color: "var(--p-text-primary)" }}>
+              <ShieldCheck size={18} style={{ color: "var(--p-indigo)" }} />
+              Account Details
+            </h3>
             
-            {/* Account Details */}
-            <div className="corp-card">
-              <h3 className="font-bold mb-6 flex items-center gap-2" style={{ color: "var(--p-text-primary)" }}>
-                <ShieldCheck size={20} style={{ color: "var(--p-indigo)" }} />
-                Account Details
-              </h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Username</span>
+                <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{profile?.username || "hod_admin"}</span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Department</span>
+                <span className="text-sm font-semibold text-right leading-snug" style={{ color: "var(--p-text-primary)", maxWidth: "60%" }}>{department}</span>
+              </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
-                  <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Username</span>
-                  <span className="text-sm font-semibold">{profile?.username || "hod_admin"}</span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
-                  <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Department</span>
-                  <span className="text-sm font-semibold">{department}</span>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
-                  <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Status</span>
-                  <span className="status-badge status-active">
-                    <span className="status-dot" />
-                    {profile?.status || "Active"}
-                  </span>
-                </div>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Status</span>
+                <span className="status-badge status-active">
+                  <span className="status-dot" />
+                  {profile?.status || "Active"}
+                </span>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Academic Biography Section */}
+        <div className="corp-card">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold flex items-center gap-2" style={{ color: "var(--p-text-primary)" }}>
+              <GraduationCap size={18} style={{ color: "var(--p-indigo)" }} />
+              Academic Biography
+            </h3>
+            <button
+              type="button"
+              onClick={() => {
+                setEditEmail(email);
+                setEditPhone(phone);
+                setEditBio(profile?.bio || "");
+                setIsEditModalOpen(true);
+              }}
+              className="dash-action-btn"
+              style={{ fontSize: 12, padding: "4px 10px" }}
+            >
+              <Edit3 size={13} />
+              <span>Edit Bio</span>
+            </button>
+          </div>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--p-text-muted)" }}>
+            {profile?.bio || `${name} is the Head of Department for ${department} at ${college}.`}
+          </p>
         </div>
       </div>
 
@@ -497,20 +477,22 @@ export default function HodProfilePage() {
                 />
               </div>
 
-              {/* Department Biography - Editable */}
+              {/* Academic Biography - Editable */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Department Biography
+                  Academic Biography
                 </label>
                 <textarea
                   rows={4}
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
-                  placeholder="Write department leadership biography..."
+                  placeholder="Write academic biography..."
                   className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none resize-none"
                   style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
                 />
               </div>
+
+
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t" style={{ borderColor: "var(--p-border-table)" }}>
                 <button

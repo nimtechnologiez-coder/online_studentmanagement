@@ -255,10 +255,10 @@ export default function WatchHistoryPage() {
               </div>
             ))
           ) : (
-            <div style={{ textAlign: "center", padding: "4rem", color: "#94a3b8", backgroundColor: "#ffffff", borderRadius: "0.875rem", border: "1px solid #e2e8f0" }}>
-              <Video size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
-              <p>No watch history records found.</p>
-              <p style={{ fontSize: "0.75rem", marginTop: "0.5rem" }}>Start watching videos to track your progress!</p>
+            <div className="wh-empty-box">
+              <Video size={48} className="wh-empty-icon" />
+              <p className="wh-empty-title">No watch history records found.</p>
+              <p className="wh-empty-sub">Start watching videos to track your progress!</p>
             </div>
           )}
         </div>

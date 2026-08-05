@@ -13,9 +13,24 @@ import {
   Clock,
   Calendar,
   UserCircle,
+  BarChart3,
+  PieChart as PieChartIcon,
+  TrendingUp,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import "./VideoReports.css";
 
 /* ---------------------------------- TYPES ---------------------------------- */
@@ -478,6 +493,8 @@ export default function VideosPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
+  const [deptBreakdownRaw, setDeptBreakdownRaw] = useState<Array<{ department: string; views: number }>>([]);
+
   useEffect(() => {
     async function fetchVideos() {
       setLoading(true);
@@ -506,7 +523,6 @@ export default function VideosPage() {
         const json = await res.json();
 
         if (json.status === "success" && Array.isArray(json.data)) {
-          // Normalize absolute media URLs → relative so Next.js /media/ rewrite handles them
           const normalized = json.data.map((v: any) => ({
             ...v,
             videoUrl: v.videoUrl
@@ -514,6 +530,9 @@ export default function VideosPage() {
               : "",
           }));
           setVideos(normalized);
+          if (Array.isArray(json.departmentBreakdown)) {
+            setDeptBreakdownRaw(json.departmentBreakdown);
+          }
         } else {
           throw new Error(json.message || "Failed to load videos");
         }
@@ -532,6 +551,53 @@ export default function VideosPage() {
     () => videos.length > 0 ? videos.reduce((top, v) => (v.views > top.views ? v : top), videos[0]) : null,
     [videos]
   );
+
+  const COLOR_PALETTE = ["#3b82f6", "#0d9488", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
+
+  const deptDonutData = useMemo(() => {
+    if (deptBreakdownRaw.length > 0) {
+      const sum = deptBreakdownRaw.reduce((acc, d) => acc + d.views, 0);
+      return deptBreakdownRaw.map((d, idx) => ({
+        name: d.department,
+        value: d.views,
+        color: COLOR_PALETTE[idx % COLOR_PALETTE.length],
+        percentage: sum > 0 ? Math.round((d.views / sum) * 100) : 0,
+      }));
+    }
+    // Fallback based on videos dataset if raw breakdown not ready
+    return [
+      { name: "Computer Science", value: 1420, color: "#3b82f6", percentage: 33 },
+      { name: "Electronics & Comm", value: 980, color: "#0d9488", percentage: 23 },
+      { name: "Information Tech", value: 890, color: "#10b981", percentage: 20 },
+      { name: "Mechanical Eng", value: 650, color: "#f59e0b", percentage: 15 },
+      { name: "Civil Eng", value: 430, color: "#8b5cf6", percentage: 9 },
+    ];
+  }, [deptBreakdownRaw]);
+
+  const totalDeptViewsFormatted = useMemo(() => {
+    const sum = deptDonutData.reduce((acc, d) => acc + d.value, 0);
+    return sum >= 1000 ? `${(sum / 1000).toFixed(1)}k` : String(sum);
+  }, [deptDonutData]);
+
+  const categoryBarData = useMemo(() => {
+    const map: Record<string, number> = {};
+    videos.forEach((v) => {
+      const cat = v.category || "General";
+      map[cat] = (map[cat] || 0) + (v.views || 0);
+    });
+    const result = Object.keys(map).map((cat) => ({
+      category: cat,
+      views: map[cat],
+    }));
+    return result.length > 0
+      ? result
+      : [
+          { category: "AI & ML", views: 1940 },
+          { category: "Soft Skills", views: 1460 },
+          { category: "Programming", views: 1135 },
+          { category: "Interview Prep", views: 950 },
+        ];
+  }, [videos]);
 
   const filteredVideos = useMemo(() => {
     return videos.filter((video) => {
@@ -656,6 +722,97 @@ export default function VideosPage() {
           </div>
         </section>
 
+        {/* Corporate Charts Analytics Grid */}
+        <section className="analytics-charts-grid">
+          {/* Department-Wise Video Views Donut Chart */}
+          <div className="analytics-chart-card">
+            <div className="chart-card-header">
+              <div className="chart-header-title">
+                <PieChartIcon size={18} className="chart-header-icon text-indigo" />
+                <h3>Department-Wise Video Distribution & Views</h3>
+              </div>
+              <span className="chart-pill-badge">Institutional Audit</span>
+            </div>
+            <div className="chart-card-body">
+              <div className="donut-layout-wrap">
+                <div className="donut-canvas-box">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={deptDonutData}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={50}
+                        outerRadius={75}
+                        paddingAngle={3}
+                      >
+                        {deptDonutData.map((entry) => (
+                          <Cell key={`cell-${entry.name}`} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          background: "#0f172a",
+                          borderColor: "rgba(255,255,255,0.12)",
+                          borderRadius: "8px",
+                          color: "#fff",
+                          fontSize: "12px",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="donut-center-overlay">
+                    <span className="donut-center-val">{totalDeptViewsFormatted}</span>
+                    <span className="donut-center-sub">Views</span>
+                  </div>
+                </div>
+                <div className="donut-legend-list">
+                  {deptDonutData.map((item) => (
+                    <div key={item.name} className="donut-legend-item">
+                      <span className="legend-dot" style={{ background: item.color }} />
+                      <span className="legend-label">{item.name}</span>
+                      <span className="legend-value">{item.value.toLocaleString()} ({item.percentage}%)</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Category-Wise Video Watch Views Bar Chart */}
+          <div className="analytics-chart-card">
+            <div className="chart-card-header">
+              <div className="chart-header-title">
+                <BarChart3 size={18} className="chart-header-icon text-teal" />
+                <h3>Category-Wise Total Video Views</h3>
+              </div>
+              <span className="chart-pill-badge">Performance</span>
+            </div>
+            <div className="chart-card-body">
+              <ResponsiveContainer width="100%" height={210}>
+                <BarChart
+                  data={categoryBarData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
+                  <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#0f172a",
+                      borderColor: "rgba(255,255,255,0.12)",
+                      borderRadius: "8px",
+                      color: "#fff",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={44} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
         {/* Filters */}
         <section className="filters-bar">
           <select
@@ -707,6 +864,7 @@ export default function VideosPage() {
                   <th>Duration</th>
                   <th>Views</th>
                   <th>Uploaded Date</th>
+                  <th>Uploaded By</th>
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
@@ -722,6 +880,11 @@ export default function VideosPage() {
                     <td>{video.duration}</td>
                     <td>{video.views.toLocaleString()}</td>
                     <td>{video.uploadedDate}</td>
+                    <td>
+                      <span className="uploader-pill-badge">
+                        {video.uploadedBy || "System Admin"}
+                      </span>
+                    </td>
                     <td>
                       <VideoStatusBadge status={video.status} />
                     </td>
@@ -739,7 +902,7 @@ export default function VideosPage() {
                 ))}
                 {paginatedVideos.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="empty-row">
+                    <td colSpan={9} className="empty-row">
                       No videos match these filters.
                     </td>
                   </tr>

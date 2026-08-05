@@ -81,7 +81,11 @@ export default function HODSidebar() {
   }, []);
 
   const handleLogout = () => {
-    router.push("/");
+    localStorage.removeItem("hod");
+    sessionStorage.removeItem("hod");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    window.location.href = "/hod/login";
   };
 
   const closeMobileSidebar = () => {

@@ -44,7 +44,7 @@
   inset: 0;
   background-color: rgba(6, 9, 19, 0.7);
   backdrop-filter: blur(4px);
-  z-index: 45;
+  z-index: 9990;
   transition: opacity 0.3s ease;
 }
 
@@ -62,7 +62,7 @@
   top: 0;
   border-right: 1px solid var(--sidebar-border, #162032);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 50;
+  z-index: 9999;
   flex-shrink: 0;
 }
 

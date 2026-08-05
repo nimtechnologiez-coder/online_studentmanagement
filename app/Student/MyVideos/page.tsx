@@ -327,8 +327,8 @@ export default function MyVideosPage() {
                   className={`thumbnail-wrapper bg-gradient-to-br ${GRADIENTS[idx % GRADIENTS.length]}`}
                   onClick={() => handlePlayVideo(video)}
                 >
-                  {video.thumbnail_url ? (
-                    <img src={video.thumbnail_url} alt={video.title} className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-300" />
+                  {(video.thumbnail_url || video.thumbnail) ? (
+                    <img src={video.thumbnail_url || video.thumbnail} alt={video.title} className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-300" />
                   ) : null}
                   <span className="subject-badge relative z-10">{video.category}</span>
 
@@ -434,28 +434,23 @@ export default function MyVideosPage() {
 
             {/* HTML5 Video Player */}
             <div className="video-player-wrapper">
-              {activeModalVideo.video_url ? (
-                <video
-                  controls
-                  autoPlay
-                  controlsList="nodownload"
-                  disablePictureInPicture
-                  onContextMenu={(e) => e.preventDefault()}
-                  className="w-full h-full object-cover"
-                  src={`${API_BASE}/api/student/videos/${activeModalVideo.id}/stream/`}
-                  onTimeUpdate={(e) => handleTimeUpdate(e, activeModalVideo.id)}
-                  onEnded={(e) => handleVideoEnded(activeModalVideo.id, e.currentTarget.duration)}
-                >
-                  Your browser does not support HTML5 video playback.
-                </video>
-              ) : (
-                <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">
-                  <div className="text-center">
-                    <Video size={40} className="mx-auto mb-3 opacity-40" />
-                    <p>No video file available for this lecture.</p>
-                  </div>
-                </div>
-              )}
+              <video
+                controls
+                autoPlay
+                controlsList="nodownload"
+                disablePictureInPicture
+                onContextMenu={(e) => e.preventDefault()}
+                className="w-full h-full object-cover"
+                src={
+                  activeModalVideo.video_url && activeModalVideo.video_url.startsWith("http") && !activeModalVideo.video_url.includes("127.0.0.1")
+                    ? activeModalVideo.video_url
+                    : `${API_BASE}/api/student/videos/${activeModalVideo.id}/stream/`
+                }
+                onTimeUpdate={(e) => handleTimeUpdate(e, activeModalVideo.id)}
+                onEnded={(e) => handleVideoEnded(activeModalVideo.id, e.currentTarget.duration)}
+              >
+                Your browser does not support HTML5 video playback.
+              </video>
             </div>
 
             <div className="p-4 bg-slate-50 border-t border-slate-200">

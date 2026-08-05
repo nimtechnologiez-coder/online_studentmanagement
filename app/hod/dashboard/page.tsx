@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   GraduationCap,
   Video,
@@ -87,11 +88,19 @@ interface LiveActivity {
   badge: string;
 }
 
+interface YearDistItem {
+  label: string;
+  count: number;
+  percent: number;
+  color: string;
+}
+
 interface HodDashboardData {
   summaryCards: {
     students: number;
     videos: number;
     totalViews: number;
+    monthViews?: number;
     watchTime: string;
     activeStudents?: number;
     engagementRate?: number;
@@ -102,6 +111,7 @@ interface HodDashboardData {
   recentViews: RecentView[];
   studentPerformance?: StudentPerformance[];
   liveActivities?: LiveActivity[];
+  yearDistribution?: YearDistItem[];
   departmentName?: string;
   collegeName?: string;
   hodName?: string;
@@ -153,6 +163,21 @@ function CategoryTooltip(props: any) {
   );
 }
 
+function DonutTooltip(props: any) {
+  const { active, payload } = props;
+  if (!active || !payload || !payload.length) return null;
+  const item = payload[0];
+  return (
+    <div className="chart-tooltip-glass">
+      <p className="chart-tooltip-title">{item.name}</p>
+      <p className="chart-tooltip-row">
+        <span className="chart-tooltip-dot" style={{ background: item.payload?.color }} />
+        {item.name}: <strong>{Number(item.value).toLocaleString()} students</strong>
+      </p>
+    </div>
+  );
+}
+
 function buildWeeklyData(dailyViews: DailyView[] = []) {
   if (!dailyViews || !dailyViews.length) return [];
   const weeks: { week: string; views: number }[] = [];
@@ -169,7 +194,15 @@ function buildWeeklyData(dailyViews: DailyView[] = []) {
   return weeks;
 }
 
-function buildStudentDonut(students: StudentPerformance[] = []) {
+function buildStudentDonut(yearDist: YearDistItem[] = [], students: StudentPerformance[] = []) {
+  if (yearDist && yearDist.length > 0) {
+    return yearDist.map((y) => ({
+      name: y.label,
+      fullName: y.label,
+      value: y.count,
+      color: y.color || "#4f6cf7",
+    }));
+  }
   if (!students || !students.length) return [];
   const palette = ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#94a3b8"];
   const yearGroups: Record<string, number> = {};
@@ -188,127 +221,86 @@ function buildStudentDonut(students: StudentPerformance[] = []) {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
-const FALLBACK_DASHBOARD_DATA: HodDashboardData = {
+const INITIAL_DASHBOARD_DATA: HodDashboardData = {
   summaryCards: {
-    students: 140,
-    videos: 42,
-    totalViews: 3840,
-    watchTime: "185 Hours",
-    activeStudents: 118,
-    engagementRate: 84,
+    students: 0,
+    videos: 0,
+    totalViews: 0,
+    monthViews: 0,
+    watchTime: "0 Mins",
+    activeStudents: 0,
+    engagementRate: 0,
   },
-  dailyViews: [
-    { day: "Mon", views: 420 },
-    { day: "Tue", views: 680 },
-    { day: "Wed", views: 890 },
-    { day: "Thu", views: 740 },
-    { day: "Fri", views: 950 },
-    { day: "Sat", views: 520 },
-    { day: "Sun", views: 380 },
-  ],
-  topCategories: [
-    { name: "Data Structures", value: 420, color: "#3b82f6" },
-    { name: "Web Development", value: 310, color: "#22c55e" },
-    { name: "Database", value: 240, color: "#f59e0b" },
-    { name: "Operating Systems", value: 230, color: "#8b5cf6" },
-  ],
-  latestVideos: [
-    { title: "Introduction to Data Structures & Algorithms", category: "Data Structures", duration: "45:20", views: 420, uploadDate: "2026-07-20" },
-    { title: "React & Next.js Full Course & Best Practices", category: "Web Development", duration: "1:15:00", views: 310, uploadDate: "2026-07-18" },
-    { title: "Database Normalization & SQL Queries Masterclass", category: "Database", duration: "38:15", views: 240, uploadDate: "2026-07-15" },
-  ],
-  recentViews: [
-    { student: "Arun Kumar", department: "Computer Science & Eng.", video: "Data Structures & Algorithms", watchTime: "45 min", lastViewed: "10 mins ago" },
-    { student: "Priya Dharshini", department: "Computer Science & Eng.", video: "React & Next.js Masterclass", watchTime: "30 min", lastViewed: "25 mins ago" },
-    { student: "Sanjay Kumar", department: "Computer Science & Eng.", video: "Database Normalization & SQL Queries", watchTime: "20 min", lastViewed: "1 hour ago" },
-  ],
-  studentPerformance: [
-    { name: "Arun Kumar", year: "III", score: 98, views: 41 },
-    { name: "Priya Dharshini", year: "II", score: 96, views: 40 },
-    { name: "Sanjay Kumar", year: "IV", score: 94, views: 39 },
-    { name: "Kavya Sri", year: "I", score: 92, views: 38 },
-  ],
-  liveActivities: [
-    { id: "1", type: "play", title: "Arun Kumar", description: "Arun Kumar watched Data Structures & Algorithms", time: "10 mins ago", badge: "Watched" },
-    { id: "2", type: "check", title: "Priya Dharshini", description: "Priya Dharshini completed React & Next.js Masterclass", time: "25 mins ago", badge: "Completed" },
-  ],
-  departmentName: "Computer Science & Eng.",
-  collegeName: "Institutional Portal",
-  hodName: "Dr. Alan Turing",
+  dailyViews: [],
+  topCategories: [],
+  latestVideos: [],
+  recentViews: [],
+  studentPerformance: [],
+  liveActivities: [],
+  yearDistribution: [],
+  departmentName: "",
+  collegeName: "",
+  hodName: "",
 };
 
 /* --------------------------------- COMPONENT -------------------------------- */
 
-export default function HodDashboard() {
-  const [profileOpen, setProfileOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+export default function HodDashboardPage() {
+  const router = useRouter();
+  const [dashData, setDashData] = useState<HodDashboardData>(INITIAL_DASHBOARD_DATA);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [hodDisplayName, setHodDisplayName] = useState<string>("HOD");
-
-  useEffect(() => {
-    try {
-      const savedHod =
-        typeof window !== "undefined"
-          ? localStorage.getItem("hod") || sessionStorage.getItem("hod")
-          : null;
-      if (savedHod) {
-        const parsed = JSON.parse(savedHod);
-        if (parsed?.name || parsed?.hod_name) {
-          setHodDisplayName(parsed.name || parsed.hod_name);
-        }
-      }
-    } catch (e) {
-      console.error("Error reading HOD name:", e);
-    }
-  }, []);
-
-  const [dashData, setDashData] = useState<HodDashboardData>(FALLBACK_DASHBOARD_DATA);
-
-  const getHodHeaders = () => {
-    const savedHod =
-      typeof window !== "undefined"
-        ? localStorage.getItem("hod") || sessionStorage.getItem("hod")
-        : null;
-    let hodId = "";
-    if (savedHod) {
-      try { hodId = JSON.parse(savedHod)?.id || ""; } catch { }
-    }
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (hodId) headers["X-Hod-Id"] = String(hodId);
-    return headers;
-  };
+  const [hodDisplayName, setHodDisplayName] = useState("HOD");
 
   const fetchDashboardData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const response = await fetch(`${API_BASE}/api/hod/dashboard/?period=week`, {
+      setLoading(true);
+      setError(null);
+
+      const savedHod = typeof window !== "undefined"
+        ? localStorage.getItem("hod") || sessionStorage.getItem("hod")
+        : null;
+
+      let hodId = "";
+      if (savedHod) {
+        try {
+          const parsed = JSON.parse(savedHod);
+          hodId = parsed?.id || "";
+          if (parsed?.name) setHodDisplayName(parsed.name);
+        } catch (e) {}
+      }
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (hodId) headers["X-Hod-Id"] = String(hodId);
+
+      const response = await fetch(`${API_BASE}/api/hod/dashboard/`, {
         method: "GET",
-        headers: getHodHeaders(),
+        headers,
         credentials: "include",
       });
 
-      const text = await response.text();
-      let json: any = null;
-      try {
-        json = text ? JSON.parse(text) : null;
-      } catch {
-        json = null;
+      const json = await response.json();
+
+      if (response.status === 401) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("hod");
+          sessionStorage.removeItem("hod");
+        }
+        router.push("/hod/login");
+        return;
       }
 
       if (response.ok && json && json.status === "success") {
-        const eng = Array.isArray(json.engagementData)
-          ? json.engagementData
-          : Array.isArray(json.dailyEngagement)
-            ? json.dailyEngagement
-            : [];
+        const eng = Array.isArray(json.engagementData) ? json.engagementData : [];
         const vids = Array.isArray(json.recentVideos) ? json.recentVideos : [];
         const acts = Array.isArray(json.recentActivities) ? json.recentActivities : [];
         const topSt = Array.isArray(json.topStudents) ? json.topStudents : [];
 
         const dailyViews: DailyView[] = eng.map((e: any) => ({ day: e.day, views: e.value ?? 0 }));
+        
         const recentViews: RecentView[] = acts.map((a: any) => ({
           student: a.name || "",
           department: json.hod?.department || "",
@@ -344,36 +336,37 @@ export default function HodDashboard() {
 
         setDashData({
           summaryCards: {
-            students: json.stats?.totalStudents ?? FALLBACK_DASHBOARD_DATA.summaryCards.students,
-            videos: json.stats?.totalVideos ?? FALLBACK_DASHBOARD_DATA.summaryCards.videos,
-            totalViews: FALLBACK_DASHBOARD_DATA.summaryCards.totalViews,
-            watchTime: FALLBACK_DASHBOARD_DATA.summaryCards.watchTime,
-            activeStudents: json.stats?.activeStudents ?? FALLBACK_DASHBOARD_DATA.summaryCards.activeStudents,
-            engagementRate: FALLBACK_DASHBOARD_DATA.summaryCards.engagementRate,
+            students: json.stats?.totalStudents ?? 0,
+            videos: json.stats?.totalVideos ?? 0,
+            totalViews: json.stats?.totalViews ?? 0,
+            monthViews: json.stats?.monthViews ?? 0,
+            watchTime: `${json.stats?.totalViews ? json.stats.totalViews * 10 : 0} Mins`,
+            activeStudents: json.stats?.activeStudents ?? 0,
+            engagementRate: json.stats?.totalStudents ? Math.round(((json.stats?.activeStudents || 0) / json.stats.totalStudents) * 100) : 0,
           },
-          dailyViews: dailyViews.length > 0 ? dailyViews : FALLBACK_DASHBOARD_DATA.dailyViews,
-          topCategories: FALLBACK_DASHBOARD_DATA.topCategories,
-          latestVideos: latestVideos.length > 0 ? latestVideos : FALLBACK_DASHBOARD_DATA.latestVideos,
-          recentViews: recentViews.length > 0 ? recentViews : FALLBACK_DASHBOARD_DATA.recentViews,
-          studentPerformance: studentPerformance.length > 0 ? studentPerformance : FALLBACK_DASHBOARD_DATA.studentPerformance,
-          liveActivities: liveActivities.length > 0 ? liveActivities : FALLBACK_DASHBOARD_DATA.liveActivities,
-          departmentName: json.hod?.department || FALLBACK_DASHBOARD_DATA.departmentName,
-          collegeName: json.hod?.college || FALLBACK_DASHBOARD_DATA.collegeName,
-          hodName: json.hod?.name || hodDisplayName || FALLBACK_DASHBOARD_DATA.hodName,
+          dailyViews,
+          topCategories: [],
+          latestVideos,
+          recentViews,
+          studentPerformance,
+          liveActivities,
+          yearDistribution: Array.isArray(json.yearDistribution) ? json.yearDistribution : [],
+          departmentName: json.hod?.department || "",
+          collegeName: json.hod?.college || "",
+          hodName: json.hod?.name || hodDisplayName || "",
         });
 
         if (json.hod?.name) setHodDisplayName(json.hod.name);
         setLastUpdated(new Date());
       } else {
-        setDashData(FALLBACK_DASHBOARD_DATA);
+        setError(json?.message || "Failed to load department analytics.");
       }
     } catch (err: any) {
-      console.warn("HOD Dashboard using fallback data (backend offline)");
-      setDashData(FALLBACK_DASHBOARD_DATA);
+      setError("Unable to connect to backend server.");
     } finally {
       setLoading(false);
     }
-  }, [hodDisplayName]);
+  }, [hodDisplayName, router]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -389,6 +382,7 @@ export default function HodDashboard() {
     recentViews = [],
     studentPerformance = [],
     liveActivities = [],
+    yearDistribution = [],
     departmentName = "",
     collegeName = "",
   } = dashData || {};
@@ -396,7 +390,7 @@ export default function HodDashboard() {
   const engagement = s.engagementRate ?? (s.students > 0 ? Math.round(((s.activeStudents || 0) / s.students) * 100) : 0);
 
   const weeklyViews = useMemo(() => buildWeeklyData(dailyViews), [dailyViews]);
-  const studentDonut = useMemo(() => buildStudentDonut(studentPerformance ?? []), [studentPerformance]);
+  const studentDonut = useMemo(() => buildStudentDonut(yearDistribution ?? [], studentPerformance ?? []), [yearDistribution, studentPerformance]);
   const totalDonutStudents = studentDonut.reduce((sum, d) => sum + d.value, 0);
 
   const filteredStudentPerformance = useMemo(() => {
@@ -447,10 +441,10 @@ export default function HodDashboard() {
       trend: "",
     },
     {
-      label: "Engagement Rate",
-      value: `${engagement}%`,
-      subtext: "Active participation rate",
-      icon: TrendingUp,
+      label: "Video Views (This Month)",
+      value: (s.monthViews ?? s.totalViews ?? 0).toLocaleString(),
+      subtext: `${(s.totalViews ?? 0).toLocaleString()} total watch sessions`,
+      icon: Eye,
       tone: "amber",
       trend: "",
     },
@@ -521,7 +515,18 @@ export default function HodDashboard() {
                 <a href="/hod/students"><Users size={14} /> My Students</a>
                 <a href="/hod/videos"><Video size={14} /> Videos</a>
                 <div className="dropdown-divider" />
-                <button type="button" onClick={() => (window.location.href = "/")}>Logout</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem("hod");
+                    sessionStorage.removeItem("hod");
+                    localStorage.removeItem("user");
+                    sessionStorage.removeItem("user");
+                    window.location.href = "/hod/login";
+                  }}
+                >
+                  Logout
+                </button>
               </div>
             )}
           </div>
@@ -678,11 +683,13 @@ export default function HodDashboard() {
 
               {/* Video Views Bar Chart (Weekly) */}
               <div className="corp-card chart-card">
-                <div className="corp-card-header">
+                <div className="corp-card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
                   <div>
-                    <h3><BarChart3 size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Video Views (This Month)</h3>
+                    <h3 style={{ fontSize: "15px", fontWeight: "700", display: "flex", alignItems: "center", gap: "8px", margin: 0, whiteSpace: "nowrap" }}>
+                      <BarChart3 size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Monthly Video Views
+                    </h3>
                   </div>
-                  <span className="chart-badge">This Month</span>
+                  <span className="chart-badge" style={{ whiteSpace: "nowrap", flexShrink: 0, padding: "4px 12px" }}>This Month</span>
                 </div>
                 <div className="chart-container">
                   {weeklyViews.length === 0 ? (
@@ -719,9 +726,9 @@ export default function HodDashboard() {
                   <a href="/hod/performance" className="quick-btn btn-violet">
                     <Award size={16} /><span>Performance</span>
                   </a>
-                  <button onClick={fetchDashboardData} className="quick-btn btn-emerald">
-                    <FileSpreadsheet size={16} /><span>Refresh Portal</span>
-                  </button>
+                  <a href="/hod/hod_profile" className="quick-btn btn-amber">
+                    <User size={16} /><span>HOD Profile</span>
+                  </a>
                 </div>
               </div>
 

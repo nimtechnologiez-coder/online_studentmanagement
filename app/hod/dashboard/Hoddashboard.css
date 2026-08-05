@@ -633,6 +633,8 @@
 .quick-btn.btn-violet:hover  { background: var(--p-violet); color: #fff; }
 .quick-btn.btn-emerald { background: rgba(16,185,129,0.08); color: var(--p-emerald);border-color: rgba(16,185,129,0.2); }
 .quick-btn.btn-emerald:hover { background: var(--p-emerald);color: #fff; }
+.quick-btn.btn-amber   { background: rgba(245,158,11,0.08); color: #f59e0b; border-color: rgba(245,158,11,0.2); }
+.quick-btn.btn-amber:hover   { background: #f59e0b; color: #fff; }
 
 .activity-feed-list {
   display: flex;
@@ -705,8 +707,13 @@
   font-weight: 600;
   background: var(--p-indigo-soft);
   color: var(--p-indigo);
-  padding: 3px 9px;
+  padding: 4px 12px;
   border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chart-container {
@@ -813,7 +820,7 @@
 
 .dept-matrix-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
   margin-top: 10px;
 }
@@ -1089,7 +1096,10 @@
 }
 
 @media (max-width: 580px) {
-  .kpi-cards-grid { grid-template-columns: 1fr; gap: 12px; }
+  .kpi-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .kpi-card { padding: 12px 14px; border-radius: 12px; }
+  .kpi-card-top { margin-bottom: 8px; gap: 6px; }
+  .kpi-card-sub { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
 @media (max-width: 640px) {

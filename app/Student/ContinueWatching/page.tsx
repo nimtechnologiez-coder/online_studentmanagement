@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import {
   Play,
   Clock,
@@ -14,7 +15,8 @@ import {
   ChevronRight,
   ChevronLeft,
   RotateCcw,
-  BarChart2
+  BarChart2,
+  CheckCircle2
 } from "lucide-react";
 import "./continuewatching.css";
 
@@ -31,6 +33,13 @@ function getStudentId(): string | null {
 
 export default function ContinueWatchingPage() {
   const [continueList, setContinueList] = useState<any[]>([]);
+  const [watchStats, setWatchStats] = useState<any>({
+    totalVideos: 0,
+    completed: 0,
+    pending: 0,
+    watchHours: 0,
+  });
+  const [recentHistory, setRecentHistory] = useState<any[]>([]);
   const [activeVideo, setActiveVideo] = useState<any>(null);
   const [isPlayingModalOpen, setIsPlayingModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -46,18 +55,36 @@ export default function ContinueWatchingPage() {
       setLoading(true);
       setError("");
       const studentId = getStudentId();
-      const res = await fetch(`${API_BASE}/api/student/videos/`, {
+      
+      // 1. Fetch watched videos & active sessions
+      const vRes = await fetch(`${API_BASE}/api/student/videos/`, {
         headers: studentId ? { "X-Student-Id": studentId } : {},
       });
-      const data = await res.json();
-      if (data.status === "success") {
-        const vList = data.videos || [];
-        setContinueList(vList);
-        if (vList.length > 0) {
-          setActiveVideo(vList[0]);
-        }
-      } else {
-        setError(data.message || "Failed to load active video lectures.");
+      const vData = await vRes.json();
+      
+      let vList: any[] = [];
+      if (vData.status === "success") {
+        vList = vData.videos || [];
+      }
+
+      // Filter for videos that have actual watch progress (> 0%)
+      const inProgressVideos = vList.filter((v: any) => (v.progress || 0) > 0);
+      setContinueList(inProgressVideos);
+
+      if (inProgressVideos.length > 0) {
+        setActiveVideo(inProgressVideos[0]);
+      } else if (vList.length > 0) {
+        setActiveVideo(vList[0]);
+      }
+
+      // 2. Fetch live student watch statistics
+      const pRes = await fetch(`${API_BASE}/api/student/progress/`, {
+        headers: studentId ? { "X-Student-Id": studentId } : {},
+      });
+      const pData = await pRes.json();
+      if (pData.status === "success") {
+        if (pData.stats) setWatchStats(pData.stats);
+        if (pData.recentVideos) setRecentHistory(pData.recentVideos);
       }
     } catch (err) {
       setError("Could not connect to server.");
@@ -123,9 +150,7 @@ export default function ContinueWatchingPage() {
     setIsPlayingModalOpen(false);
   }
 
-  // Calculate statistics
-  const totalWatchedCount = continueList.filter(v => (v.progress || 0) > 0).length || continueList.length || 12;
-  const watchHistoryList = continueList.slice(0, 5);
+  const hasWatchHistory = recentHistory.length > 0 || continueList.length > 0;
 
   return (
     <div className="cw-page-wrapper">
@@ -143,7 +168,7 @@ export default function ContinueWatchingPage() {
 
         <div className="cw-active-pill">
           <Sparkles size={14} />
-          <span>{continueList.length || 6} Active Modules</span>
+          <span>{continueList.length} Active Modules</span>
         </div>
       </header>
 
@@ -164,40 +189,48 @@ export default function ContinueWatchingPage() {
         </div>
       )}
 
-      {!loading && continueList.length === 0 && (
-        <div className="cw-empty-full">
-          <Video size={48} opacity={0.3} />
-          <h3>No active modules found</h3>
-          <p>Start watching assigned lectures from your dashboard.</p>
+      {!loading && !hasWatchHistory && (
+        <div className="cw-empty-full flex flex-col items-center justify-center py-20 px-4 text-center bg-slate-900/40 rounded-3xl border border-slate-800 my-6">
+          <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4 text-blue-400">
+            <Video size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">No video activity found</h3>
+          <p className="text-slate-400 text-sm max-w-md mb-6">
+            You haven't watched any video lectures yet. Start watching your first video to track your progress and pick up where you left off.
+          </p>
+          <Link
+            href="/Student/MyVideos"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/20"
+          >
+            <Play size={16} fill="white" />
+            <span>Browse Video Lectures</span>
+          </Link>
         </div>
       )}
 
-      {!loading && activeVideo && (
+      {!loading && hasWatchHistory && activeVideo && (
         <>
           {/* Main Hero Card + Side Card Grid */}
           <div className="cw-hero-grid">
             {/* Main Featured Player Hero */}
             <div className="cw-hero-main-card">
               <div className="cw-hero-banner">
-                <div className="cw-banner-tag">{activeVideo.category || "Mathematics"}</div>
+                <div className="cw-banner-tag">{activeVideo.category || "Course Module"}</div>
 
                 <div className="cw-banner-body">
-                  <h2>{activeVideo.title || "This video covers advanced Python programming concepts"}</h2>
+                  <h2>{activeVideo.title}</h2>
                   <div className="cw-banner-meta">
                     <span><User size={13} /> Faculty Lecture</span>
                     <span>•</span>
-                    <span>{activeVideo.duration || "16:30"}</span>
+                    <span>{activeVideo.duration || "15:00"}</span>
                   </div>
                   <p className="cw-banner-desc">
-                    {activeVideo.description || "Understand advanced Python concepts including decorators, generators, context managers and more with real-world examples."}
+                    {activeVideo.description || "Pick up where you left off in your active module."}
                   </p>
 
                   <div className="cw-banner-actions">
                     <button className="cw-btn-blue" onClick={() => handleOpenPlayer(activeVideo)}>
                       <Play size={14} fill="white" /> Resume Lecture Stream
-                    </button>
-                    <button className="cw-btn-outline" onClick={() => handleOpenPlayer(activeVideo)}>
-                      View Details
                     </button>
                   </div>
                 </div>
@@ -213,13 +246,13 @@ export default function ContinueWatchingPage() {
                     <Play size={28} fill="white" className="ml-1" />
                   </button>
                   <span className="cw-media-duration-badge">
-                    <Clock size={12} /> {activeVideo.duration || "16:30"}
+                    <Clock size={12} /> {activeVideo.duration || "15:00"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Side Card: Lecture Progress & Dynamic Up Next / Recommendation */}
+            {/* Side Card: Lecture Progress */}
             <div className="cw-hero-side-card">
               <div className="cw-side-top">
                 <div className="cw-side-header">
@@ -234,114 +267,47 @@ export default function ContinueWatchingPage() {
                 <div className="cw-side-time-row">
                   <span>You last watched</span>
                   <span className="cw-time-numbers">
-                    {activeVideo.watched_seconds ? `${Math.floor(activeVideo.watched_seconds / 60)}:${String(activeVideo.watched_seconds % 60).padStart(2, '0')}` : "0:00"} / {activeVideo.duration || "16:30"}
+                    {activeVideo.watched_seconds ? `${Math.floor(activeVideo.watched_seconds / 60)}:${String(activeVideo.watched_seconds % 60).padStart(2, '0')}` : "0:00"} / {activeVideo.duration || "15:00"}
                   </span>
                 </div>
-              </div>
-
-              <div className="cw-up-next-section">
-                <div className="flex items-center justify-between">
-                  <span className="cw-up-next-title flex items-center gap-1.5">
-                    <Sparkles size={14} className="text-blue-400" />
-                    Recommended Next
-                  </span>
-                  <span className="text-[10px] text-blue-400 font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
-                    AI Picked
-                  </span>
-                </div>
-
-                {(() => {
-                  // Dynamic Recommendation Logic:
-                  // 1. Prioritize uncompleted videos in the SAME category as current active video
-                  // 2. Next, pick highest watched uncompleted video
-                  // 3. Fallback to next video in list or active video
-                  const sameCategory = continueList.filter(
-                    (v) => v.id !== activeVideo.id && v.category === activeVideo.category && (v.progress || 0) < 100
-                  );
-                  const uncompleted = continueList.filter(
-                    (v) => v.id !== activeVideo.id && (v.progress || 0) < 100
-                  );
-                  const nextRec = sameCategory[0] || uncompleted[0] || continueList.find((v) => v.id !== activeVideo.id) || activeVideo;
-
-                  return (
-                    <>
-                      <div className="cw-up-next-box" onClick={() => handleOpenPlayer(nextRec)}>
-                        <div className="cw-up-next-thumb">
-                          <img
-                            src={
-                              nextRec.thumbnail_url ||
-                              "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=300&auto=format&fit=crop"
-                            }
-                            alt={nextRec.title}
-                          />
-                        </div>
-                        <div className="cw-up-next-info">
-                          <h4>{nextRec.title}</h4>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-blue-400 font-medium">{nextRec.category}</span>
-                            <span className="text-[10px] text-slate-500">•</span>
-                            <span>{nextRec.duration || "18:45"}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <button className="cw-view-module-btn" onClick={() => handleOpenPlayer(nextRec)}>
-                        <span>Play Recommended Module</span>
-                        <ChevronRight size={16} />
-                      </button>
-                    </>
-                  );
-                })()}
               </div>
             </div>
           </div>
 
-          {/* Section 2: Recently Watched Cards Carousel */}
-          <section className="cw-section-recent">
-            <div className="cw-sec-header">
-              <div className="cw-sec-title">
-                <Clock size={18} className="text-blue-500" />
-                <h2>Recently Watched</h2>
-              </div>
-              <button className="cw-view-all" onClick={() => window.location.href = '/Student/WatchHistory'}>View All <ChevronRight size={14} /></button>
-            </div>
-
-            <div className="cw-cards-grid">
-              {continueList.map((item, idx) => (
-                <div key={item.id || idx} className="cw-rec-card" onClick={() => setActiveVideo(item)}>
-                  <div className="cw-rec-thumb-wrap">
-                    {item.thumbnail_url ? (
-                      <img src={item.thumbnail_url} alt={item.title} />
-                    ) : (
-                      <img src={[
-                        "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=500&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=500&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=500&auto=format&fit=crop"
-                      ][idx % 5]} alt={item.title} />
-                    )}
-
-                    <div className="cw-rec-cat-badge">{item.category || "Mathematics"}</div>
-                    
-                    <button className="cw-rec-play-btn">
-                      <Play size={18} fill="white" className="ml-0.5" />
-                    </button>
-
-                    <div className="cw-rec-duration-tag">{item.duration || "16:30"}</div>
-                  </div>
-
-                  <div className="cw-rec-details">
-                    <h3>{item.title}</h3>
-                    <div className="cw-rec-progress-bar">
-                      <div className="cw-rec-fill" style={{ width: `${item.progress || 65}%` }}></div>
-                    </div>
-                    <div className="cw-rec-pct-text">{item.progress || 65}%</div>
-                  </div>
+          {/* Section 2: Recently Watched Cards */}
+          {continueList.length > 0 && (
+            <section className="cw-section-recent">
+              <div className="cw-sec-header">
+                <div className="cw-sec-title">
+                  <Clock size={18} className="text-blue-500" />
+                  <h2>In Progress Lectures</h2>
                 </div>
-              ))}
-            </div>
-          </section>
+              </div>
+
+              <div className="cw-cards-grid">
+                {continueList.map((item, idx) => (
+                  <div key={item.id || idx} className="cw-rec-card" onClick={() => setActiveVideo(item)}>
+                    <div className="cw-rec-thumb-wrap">
+                      <img src={item.thumbnail_url || "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=500&auto=format&fit=crop"} alt={item.title} />
+                      <div className="cw-rec-cat-badge">{item.category || "General"}</div>
+                      <button className="cw-rec-play-btn">
+                        <Play size={18} fill="white" className="ml-0.5" />
+                      </button>
+                      <div className="cw-rec-duration-tag">{item.duration || "15:00"}</div>
+                    </div>
+
+                    <div className="cw-rec-details">
+                      <h3>{item.title}</h3>
+                      <div className="cw-rec-progress-bar">
+                        <div className="cw-rec-fill" style={{ width: `${item.progress || 0}%` }}></div>
+                      </div>
+                      <div className="cw-rec-pct-text">{item.progress || 0}%</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Section 3: Bottom 2 Columns - Watch History Table & Watch Statistics */}
           <div className="cw-bottom-grid">
@@ -367,38 +333,31 @@ export default function ContinueWatchingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {watchHistoryList.map((item, idx) => (
+                    {recentHistory.map((item, idx) => (
                       <tr key={item.id || idx}>
                         <td>
                           <div className="cw-tbl-title-cell">
-                            <div className="cw-tbl-thumb">
-                              <img src={item.thumbnail_url || [
-                                "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=150&auto=format&fit=crop",
-                                "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=150&auto=format&fit=crop",
-                                "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=150&auto=format&fit=crop"
-                              ][idx % 3]} alt="thumb" />
-                            </div>
                             <span className="cw-tbl-title-text">{item.title}</span>
                           </div>
                         </td>
                         <td>
-                          <span className={`cw-tbl-cat-chip cat-${(item.category || "Mathematics").toLowerCase().replace(/\s+/g, '')}`}>
-                            {item.category || "Mathematics"}
+                          <span className="cw-tbl-cat-chip">
+                            {item.category || item.subtitle || "Lecture"}
                           </span>
                         </td>
-                        <td className="cw-tbl-subtext">Today, 10:30 AM</td>
-                        <td className="cw-tbl-subtext">10:45 / {item.duration || "16:30"}</td>
+                        <td className="cw-tbl-subtext">{item.date || "Recent"}</td>
+                        <td className="cw-tbl-subtext">{item.duration || "15:00"}</td>
                         <td>
                           <div className="cw-tbl-prog-cell">
                             <div className="cw-tbl-track">
-                              <div className="cw-tbl-fill" style={{ width: `${item.progress || 65}%` }}></div>
+                              <div className="cw-tbl-fill" style={{ width: `${item.progress || 0}%` }}></div>
                             </div>
-                            <span className="cw-tbl-pct">{item.progress || 65}%</span>
+                            <span className="cw-tbl-pct">{item.progress || 0}%</span>
                           </div>
                         </td>
                         <td>
                           <button className="cw-tbl-continue-btn" onClick={() => handleOpenPlayer(item)}>
-                            <Play size={11} fill="white" /> Continue
+                            <Play size={11} fill="white" /> Play
                           </button>
                         </td>
                       </tr>
@@ -423,50 +382,50 @@ export default function ContinueWatchingPage() {
                     <Play size={18} fill="#3b82f6" color="#3b82f6" />
                   </div>
                   <div className="cw-stat-content">
-                    <span className="cw-stat-label">Total Videos Watched</span>
-                    <span className="cw-stat-value">12</span>
-                    <span className="cw-stat-sub">All time</span>
+                    <span className="cw-stat-label">Total Videos</span>
+                    <span className="cw-stat-value">{watchStats.totalVideos ?? 0}</span>
+                    <span className="cw-stat-sub">Assigned lectures</span>
                   </div>
                 </div>
 
                 <div className="cw-stat-card">
                   <div className="cw-stat-icon-green">
-                    <Clock size={18} />
+                    <CheckCircle2 size={18} />
                   </div>
                   <div className="cw-stat-content">
-                    <span className="cw-stat-label">Total Watch Time</span>
-                    <span className="cw-stat-value">2.4h</span>
-                    <span className="cw-stat-sub">All time</span>
+                    <span className="cw-stat-label">Completed</span>
+                    <span className="cw-stat-value">{watchStats.completed ?? 0}</span>
+                    <span className="cw-stat-sub">Finished videos</span>
                   </div>
                 </div>
 
                 <div className="cw-stat-card">
                   <div className="cw-stat-icon-orange">
-                    <Video size={18} />
+                    <Clock size={18} />
                   </div>
                   <div className="cw-stat-content">
-                    <span className="cw-stat-label">Today Watched</span>
-                    <span className="cw-stat-value">2</span>
-                    <span className="cw-stat-sub">Videos</span>
+                    <span className="cw-stat-label">Pending</span>
+                    <span className="cw-stat-value">{watchStats.pending ?? 0}</span>
+                    <span className="cw-stat-sub">To be watched</span>
                   </div>
                 </div>
 
                 <div className="cw-stat-card">
                   <div className="cw-stat-icon-purple">
-                    <Sparkles size={18} />
+                    <Clock size={18} />
                   </div>
                   <div className="cw-stat-content">
-                    <span className="cw-stat-label">This Week</span>
-                    <span className="cw-stat-value">7</span>
-                    <span className="cw-stat-sub">Videos</span>
+                    <span className="cw-stat-label">Watch Hours</span>
+                    <span className="cw-stat-value">{watchStats.watchHours ?? 0}h</span>
+                    <span className="cw-stat-sub">Total time invested</span>
                   </div>
                 </div>
               </div>
 
-              <button className="cw-stats-footer-btn" onClick={() => window.location.href = '/Student/MyProgress'}>
+              <Link href="/Student/MyProgress" className="cw-analytics-btn">
                 <span>View Detailed Analytics</span>
                 <ChevronRight size={16} />
-              </button>
+              </Link>
             </div>
           </div>
         </>

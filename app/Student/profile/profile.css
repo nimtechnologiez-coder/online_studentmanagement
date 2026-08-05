@@ -116,154 +116,153 @@
 
 /* Hero Profile Card */
 .profile-hero-card {
-    background: linear-gradient(135deg, #070d24 0%, #0d173a 50%, #08102b 100%);
-    border: 1px solid #1e2942;
-    border-radius: 16px;
-    padding: 24px;
+    background: linear-gradient(135deg, #091230 0%, #111c47 50%, #0b1436 100%);
+    border: 1px solid #1e294e;
+    border-radius: 20px;
+    padding: 28px;
     display: flex;
     justify-content: space-between;
-    gap: 24px;
+    align-items: flex-start;
+    gap: 32px;
     position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
 }
 
 .hero-left {
     display: flex;
-    gap: 20px;
+    align-items: flex-start;
+    gap: 24px;
     flex: 1;
+    min-width: 0;
 }
 
 .avatar-wrapper {
     position: relative;
+    width: 84px;
+    height: 84px;
     flex-shrink: 0;
 }
 
 .avatar-large {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 84px;
+    height: 84px;
+    border-radius: 24px;
     background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
     color: #ffffff;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 3px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
-}
-
-.camera-btn {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background-color: #2563eb;
-    color: #ffffff;
-    border: 2px solid #060a17;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.camera-btn:hover {
-    transform: scale(1.1);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
 }
 
 .hero-main-info {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
 }
 
 .name-status-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .name-status-row h2 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     color: #ffffff;
     margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .status-chip {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 12px;
+    letter-spacing: 0.04em;
 }
 
 .chip-active {
-    background-color: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.4);
+    background-color: rgba(16, 185, 129, 0.18);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.35);
 }
 
 .username-text {
-    font-size: 12px;
-    color: #3b82f6;
+    font-size: 13px;
+    color: #60a5fa;
     font-weight: 600;
+    word-break: break-all;
 }
 
 .contact-meta-list {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-top: 6px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
 }
 
 .meta-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
+    gap: 8px;
+    font-size: 13px;
     color: #94a3b8;
+    word-break: break-all;
 }
 
 .hero-right {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 16px;
+    gap: 12px;
+    background: rgba(6, 10, 23, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 18px 22px;
+    border-radius: 16px;
+    min-width: 280px;
 }
 
 .academic-grid {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
 }
 
 .academic-row {
     display: flex;
-    align-items: center;
-    font-size: 12px;
+    align-items: flex-start;
+    font-size: 13px;
 }
 
 .acad-label {
-    width: 140px;
+    width: 110px;
+    flex-shrink: 0;
     color: #94a3b8;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    font-size: 12px;
 }
 
 .colon {
-    color: #64748b;
+    color: #475569;
     margin-right: 8px;
+    flex-shrink: 0;
 }
 
 .acad-val {
-    color: #ffffff;
+    color: #f1f5f9;
     font-weight: 600;
+    font-size: 12px;
+    flex: 1;
+    word-break: break-word;
 }
 
 .edit-profile-btn {
@@ -335,8 +334,8 @@
 /* Learning Stats Grid */
 .stats-2x2-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px;
 }
 
 .stat-box {
@@ -546,31 +545,122 @@
     color: var(--muted-text, #64748b);
 }
 
+/* 3-Column Grid Layout */
+.grid-three-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
 /* Responsive Media Queries */
 @media (max-width: 1024px) {
     .profile-hero-card {
         flex-direction: column;
+        gap: 16px;
     }
 
     .hero-right {
         align-items: flex-start;
+        width: 100%;
     }
 
-    .grid-two-columns {
+    .grid-two-columns,
+    .grid-three-columns {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 640px) {
     .profile-container {
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .header-user-section {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .profile-hero-card {
         padding: 16px;
     }
 
     .hero-left {
         flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .avatar-wrapper {
+        width: 64px;
+        height: 64px;
+    }
+
+    .avatar-large {
+        width: 64px;
+        height: 64px;
+        font-size: 22px;
+    }
+
+    .contact-meta-list {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .academic-row {
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .acad-label {
+        width: 120px;
+        font-size: 11px;
+    }
+
+    .acad-val {
+        font-size: 11px;
+        word-break: break-word;
     }
 
     .stats-2x2-grid {
         grid-template-columns: 1fr;
+    }
+
+    .stat-box {
+        padding: 10px;
+    }
+
+    .info-pair {
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .info-label {
+        width: 100px;
+        font-size: 11px;
+    }
+
+    .info-value {
+        font-size: 11px;
+        word-break: break-all;
+    }
+
+    .action-row-btn {
+        padding: 10px;
+    }
+
+    .action-title {
+        font-size: 11px;
+    }
+
+    .action-sub {
+        font-size: 9px;
     }
 }

@@ -329,9 +329,9 @@ video::-webkit-media-controls-enclosure {
 .video-modal-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(6px);
-  z-index: 60;
+  background-color: rgba(6, 9, 19, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -339,14 +339,14 @@ video::-webkit-media-controls-enclosure {
 }
 
 .video-modal-container {
-  background-color: var(--card-bg);
-  border-radius: 1rem;
+  background-color: var(--card-bg, #0b1120);
+  border-radius: 1.25rem;
   width: 100%;
-  max-width: 840px;
+  max-width: 960px;
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--card-border);
-  color: var(--card-text);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--card-border, #1e293b);
+  color: var(--card-text, #ffffff);
 }
 
 .video-modal-header {
@@ -354,32 +354,33 @@ video::-webkit-media-controls-enclosure {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border, #1e293b);
 }
 
 .modal-close-btn {
-  background: transparent;
-  border: none;
-  color: var(--muted-text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted-text, #94a3b8);
   cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.375rem;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
   transition: color 0.2s, background-color 0.2s;
 }
 
 .modal-close-btn:hover {
-  color: var(--foreground);
-  background-color: var(--background);
+  color: #ffffff;
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .video-player-wrapper {
   width: 100%;
-  height: 240px;
+  height: 260px;
   background-color: #000000;
 }
 
 @media (min-width: 640px) {
   .video-player-wrapper {
-    height: 380px;
+    height: 460px;
   }
 }

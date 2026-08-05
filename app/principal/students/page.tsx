@@ -47,6 +47,7 @@ interface Student {
   progress: number;
   status: StudentStatus;
   lastLogin: string;
+  lastViewed?: string;
   recentVideos: string[];
   recentActivity: string[];
   college?: string;
@@ -343,6 +344,8 @@ export default function StudentsPage() {
   const [department, setDepartment] = useState<string>(ALL_DEPTS);
   const [status, setStatus] = useState<string>(ALL_STATUS);
   const [perfTier, setPerfTier] = useState<string>(ALL_PERF);
+  const [monthFilter, setMonthFilter] = useState<string>("ALL");
+  const [specificDate, setSpecificDate] = useState<string>("");
   const [query, setQuery] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -419,6 +422,7 @@ export default function StudentsPage() {
             ? ((s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase()) as StudentStatus)
             : "Active",
           lastLogin: s.lastLogin || "Recently",
+          lastViewed: s.lastViewed || s.last_viewed || s.join_date || s.joinDate || "",
           recentVideos: s.recentVideos || [],
           recentActivity: s.recentActivity || [],
         }));
@@ -606,6 +610,16 @@ export default function StudentsPage() {
         matchesPerf = student.progress < 25;
       }
 
+      // Date filtering on lastViewed
+      let matchesDate = true;
+      const lv = student.lastViewed || "";
+
+      if (specificDate) {
+        matchesDate = lv.startsWith(specificDate);
+      } else if (monthFilter !== "ALL") {
+        matchesDate = lv.includes(`-${monthFilter.padStart(2, "0")}-`) || lv.startsWith(`2026-${monthFilter.padStart(2, "0")}`);
+      }
+
       const q = query.trim().toLowerCase();
       const matchesQuery =
         !q ||
@@ -614,18 +628,16 @@ export default function StudentsPage() {
         student.username.toLowerCase().includes(q) ||
         student.department.toLowerCase().includes(q);
 
-      return matchesDept && matchesStatus && matchesPerf && matchesQuery;
+      return matchesDept && matchesStatus && matchesPerf && matchesDate && matchesQuery;
     });
-  }, [students, department, status, perfTier, query]);
+  }, [students, department, status, perfTier, monthFilter, specificDate, query]);
 
   const totalPages = Math.max(1, Math.ceil(filteredStudents.length / pageSize));
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [department, status, perfTier, query, pageSize]);
-
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
   }, [totalPages, currentPage]);
 
   const paginatedStudents = useMemo(() => {
@@ -826,6 +838,41 @@ export default function StudentsPage() {
                   <option value="Moderate (25-75%)">Moderate (25-75%)</option>
                   <option value="Needs Support (<25%)">Needs Support (&lt;25%)</option>
                 </select>
+
+                <select
+                  className="corp-select"
+                  value={monthFilter}
+                  onChange={(e) => {
+                    setMonthFilter(e.target.value);
+                    setSpecificDate("");
+                  }}
+                >
+                  <option value="ALL">All Months</option>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+
+                <input
+                  type="date"
+                  className="corp-select"
+                  style={{ minWidth: "140px" }}
+                  value={specificDate}
+                  onChange={(e) => {
+                    setSpecificDate(e.target.value);
+                    setMonthFilter("ALL");
+                  }}
+                  title="Filter by Specific Last View Date"
+                />
               </div>
 
               <div className="results-count">
@@ -846,6 +893,7 @@ export default function StudentsPage() {
                       <th>Password</th>
                       <th style={{ textAlign: "center" }}>Viewed Videos</th>
                       <th>Progress</th>
+                      <th>Last View</th>
                       <th>Status</th>
                       <th style={{ textAlign: "right" }}>Actions</th>
                     </tr>
@@ -853,7 +901,7 @@ export default function StudentsPage() {
                   <tbody>
                     {paginatedStudents.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="empty-table-cell">
+                        <td colSpan={10} className="empty-table-cell">
                           {students.length === 0
                             ? "No students found in the database."
                             : "No students match the selected filter criteria."}
@@ -881,6 +929,11 @@ export default function StudentsPage() {
                           <td style={{ textAlign: "center", fontWeight: 600 }}>{student.viewedVideos}</td>
                           <td>
                             <ProgressBar value={student.progress} />
+                          </td>
+                          <td>
+                            <span className="text-slate-600 font-medium text-xs">
+                              {student.lastViewed ? student.lastViewed : "No views yet"}
+                            </span>
                           </td>
                           <td>
                             <StatusBadge status={student.status} />

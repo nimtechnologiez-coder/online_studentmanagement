@@ -10,10 +10,31 @@ export default function StudentLayout({
 }) {
   const pathname = usePathname();
 
-  // Hide sidebar on Student login page
-  const isLoginPage = pathname === "/Student/login";
+  const isAuthPage =
+    pathname === "/Student/login" ||
+    pathname === "/Student/signup" ||
+    pathname === "/Student/forgot-password";
 
-  if (isLoginPage) {
+  // Check authentication on route change
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("student") || sessionStorage.getItem("student");
+    const isAuthenticated = !!saved;
+
+    // If logged-in user tries to access auth pages, redirect to dashboard
+    if (isAuthenticated && isAuthPage) {
+      window.location.href = "/Student/dashboard";
+      return null;
+    }
+
+    // If unauthenticated user tries to access protected student pages, redirect to login
+    if (!isAuthenticated && !isAuthPage) {
+      window.location.href = "/Student/login";
+      return null;
+    }
+  }
+
+  // Hide sidebar on authentication pages (Login / Signup / Forgot Password)
+  if (isAuthPage) {
     return <div style={{ minHeight: "100vh", backgroundColor: "var(--background)" }}>{children}</div>;
   }
 

@@ -120,10 +120,10 @@ export default function MyProgressPage() {
           setStudent((prev: any) => (prev ? { ...prev, ...data.student } : data.student));
         }
         if (data.stats) setStats(data.stats);
-        if (data.weeklyWatchTime?.length) setWeeklyWatchTime(data.weeklyWatchTime);
-        if (data.monthlyTrend?.length) setMonthlyTrend(data.monthlyTrend);
-        if (data.categoryBreakdown?.length) setCategoryBreakdown(data.categoryBreakdown);
-        if (data.recentVideos?.length) setRecentVideos(data.recentVideos);
+        setWeeklyWatchTime(data.weeklyWatchTime || []);
+        setMonthlyTrend(data.monthlyTrend || []);
+        setCategoryBreakdown(data.categoryBreakdown || []);
+        setRecentVideos(data.recentVideos || []);
       } else {
         setError(data.message || "Failed to load progress data.");
       }
@@ -189,16 +189,6 @@ export default function MyProgressPage() {
           <p className="sp-page-subtitle">
             Real-time analytics of your video learning journey
           </p>
-        </div>
-        <div className="sp-action-btns">
-          <button className="sp-btn sp-btn-secondary" onClick={() => window.print()}>
-            <Printer size={15} />
-            <span>Print</span>
-          </button>
-          <button className="sp-btn sp-btn-emerald" onClick={() => fetchProgressData(student?.id || 0)}>
-            <TrendingUp size={15} />
-            <span>Refresh</span>
-          </button>
         </div>
       </div>
 
@@ -340,7 +330,7 @@ export default function MyProgressPage() {
                 <span className="sp-chart-tag">This Week</span>
               </div>
               <div className="sp-chart-body" style={{ minHeight: 220 }}>
-                {mounted && weeklyWatchTime.length > 0 ? (
+                {mounted && weeklyWatchTime.some(w => w.hours > 0) ? (
                   <ResponsiveContainer width="100%" height={220}>
                     <AreaChart data={weeklyWatchTime} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                       <defs>
@@ -383,7 +373,7 @@ export default function MyProgressPage() {
                 <span className="sp-chart-tag">Last 6 Months</span>
               </div>
               <div className="sp-chart-body" style={{ minHeight: 220 }}>
-                {mounted && monthlyTrend.length > 0 ? (
+                {mounted && monthlyTrend.some(m => m.progress > 0) ? (
                   <ResponsiveContainer width="100%" height={220}>
                     <AreaChart data={monthlyTrend} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                       <defs>
@@ -501,26 +491,26 @@ export default function MyProgressPage() {
                           <span
                             className="sp-cat-badge"
                             style={{
-                              background: getCategoryColor(vid.category) + "18",
-                              color: getCategoryColor(vid.category),
+                              background: getCategoryColor(vid.category || "General") + "18",
+                              color: getCategoryColor(vid.category || "General"),
                             }}
                           >
-                            {vid.category}
+                            {vid.category || "General"}
                           </span>
                         </td>
-                        <td><span className="sp-dur-text">{vid.duration}</span></td>
+                        <td><span className="sp-dur-text">{vid.duration || "N/A"}</span></td>
                         <td>
                           <div className="sp-progress-cell">
                             <div className="sp-mini-track">
                               <div
                                 className="sp-mini-fill"
                                 style={{
-                                  width: `${vid.progress}%`,
-                                  background: getCategoryColor(vid.category),
+                                  width: `${vid.progress || 0}%`,
+                                  background: getCategoryColor(vid.category || "General"),
                                 }}
                               />
                             </div>
-                            <span className="sp-progress-text">{vid.progress}%</span>
+                            <span className="sp-progress-text">{vid.progress || 0}%</span>
                           </div>
                         </td>
                         <td>

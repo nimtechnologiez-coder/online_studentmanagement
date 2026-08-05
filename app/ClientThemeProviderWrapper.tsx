@@ -48,7 +48,7 @@ export default function ClientThemeProviderWrapper({
 
   return (
     <ThemeProvider>
-      <div className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}>
+      <div className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`} suppressHydrationWarning>
         {children}
       </div>
     </ThemeProvider>

@@ -16,16 +16,21 @@
 
 /* Header Navbar */
 .sdb-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   min-width: 0;
-  background-color: var(--card-bg, #0b1120);
+  background-color: rgba(11, 17, 32, 0.92);
   border: 1px solid var(--card-border, #1e293b);
   border-radius: 16px;
   padding: 12px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .sdb-brand-info {
@@ -211,12 +216,46 @@
   white-space: nowrap;
 }
 
-/* Top Row Grid: Hero Welcome Banner (2.2fr) + 4 Stat Cards (1fr each) */
-.sdb-top-grid {
+/* 4 Stat Cards 4-Column Grid */
+.sdb-stats-4col-grid {
   display: grid;
-  grid-template-columns: minmax(0, 2.2fr) repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .sdb-stats-4col-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sdb-stats-4col-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1280px) {
+  .sdb-top-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sdb-hero-banner {
+    grid-column: span 2;
+  }
+  .sdb-row2-grid,
+  .sdb-row3-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .sdb-top-grid {
+    grid-template-columns: 1fr;
+  }
+  .sdb-hero-banner {
+    grid-column: span 1;
+  }
 }
 
 /* Welcome Hero Banner Card */
@@ -469,12 +508,12 @@
   white-space: nowrap;
 }
 
-.sdb-quick-btns {
-  display: flex;
-  align-items: center;
+.sdb-quick-btns,
+.sdb-quick-btns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
-  flex-wrap: wrap;
-  flex: 1;
+  width: 100%;
 }
 
 .sdb-quick-btn {
@@ -1120,7 +1159,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-    padding: 12px;
+    padding: 12px 14px;
   }
 
   .sdb-brand-info h1 {
@@ -1133,44 +1172,46 @@
   }
 
   .sdb-header-right {
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 100%;
-  }
-
-  .sdb-top-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .sdb-stat-card {
-    display: none;
   }
 
   .sdb-hero-banner {
-    padding: 14px;
+    padding: 16px;
   }
 
   .sdb-banner-content h2 {
-    font-size: 16px;
+    font-size: 18px;
   }
 
-  .sdb-hero-mini-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .sdb-quick-actions-box {
+  .sdb-hero-btns {
     flex-direction: column;
-    align-items: flex-start;
+    width: 100%;
     gap: 8px;
-    padding: 10px 14px;
   }
 
-  .sdb-quick-btns {
+  .sdb-btn-blue,
+  .sdb-btn-glass {
     width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 4px;
+    justify-content: center;
+  }
+
+  .sdb-stats-4col-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .sdb-stat-card {
+    display: flex !important;
+    padding: 12px;
+  }
+
+  .sdb-stat-val {
+    font-size: 18px;
+  }
+
+  .sdb-quick-cat-section {
+    display: none !important;
   }
 
   .sdb-cw-split-container {
@@ -1189,14 +1230,13 @@
     overflow: hidden;
   }
 
-  /* Recommended For You - Single column card layout on mobile screens */
   .sdb-rec-cards-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .sdb-rec-thumb {
-    height: 140px;
+    height: 120px;
   }
 
   .sdb-rec-next-btn {
@@ -1209,23 +1249,19 @@
   }
 
   .sdb-cat-horizontal-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 }
 
 @media (max-width: 480px) {
-  .sdb-top-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+  .sdb-stats-4col-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
   }
 
-  .sdb-stat-card {
-    padding: 10px;
-  }
-
-  .sdb-stat-val {
-    font-size: 16px;
+  .sdb-quick-btns-grid {
+    grid-template-columns: 1fr !important;
   }
 
   .sdb-rec-cards-grid {

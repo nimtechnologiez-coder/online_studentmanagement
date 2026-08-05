@@ -19,6 +19,7 @@ import {
   SlidersHorizontal,
   Building2,
   PlaySquare,
+  ShieldCheck,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import "./Sidebar.css";
@@ -36,7 +37,6 @@ const menuGroups = [
     label: "REPORTS",
     items: [
       { title: "Video Reports", href: "/principal/video_report", icon: PlaySquare },
-      { title: "Attendance Reports", href: "/principal/attendance_reports", icon: CalendarDays },
     ],
   },
   {
@@ -88,6 +88,8 @@ export default function Sidebar() {
   }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem("principal");
+    sessionStorage.removeItem("principal");
     router.push("/");
   };
 

@@ -1,7 +1,18 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Building2,
+  ShieldCheck,
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  CheckCircle2,
+  Activity,
+} from "lucide-react";
 import "./PrincipalLogin.css";
 
 export default function PrincipalLogin() {
@@ -11,6 +22,29 @@ export default function PrincipalLogin() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const saved =
+      typeof window !== "undefined"
+        ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
+        : null;
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed) {
+          router.replace("/dashboard");
+          return;
+        }
+      } catch (e) {
+        localStorage.removeItem("principal");
+        sessionStorage.removeItem("principal");
+      }
+    }
+    setCheckingAuth(false);
+  }, [router]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,7 +109,7 @@ export default function PrincipalLogin() {
         alert("Login Successful");
 
         // Redirect to Dashboard
-        router.push("/principal/dashboard");
+        router.push("/dashboard");
 
       } else {
         alert(result.message || "Invalid Username or Password");
@@ -89,110 +123,187 @@ export default function PrincipalLogin() {
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#070b14", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
+        <p>Verifying authentication...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="login-page">
-            {/* Left Section */}
-      <div className="left-section">
-        <div className="left-overlay"></div>
+      {/* Background Glow Meshes */}
+      <div className="bg-glow-orb glow-1"></div>
+      <div className="bg-glow-orb glow-2"></div>
 
-        <div className="left-content">
-          <div className="brand-mark">
-            <span>OV</span>
-          </div>
+      {/* Main Split Layout */}
+      <div className="login-wrapper">
+        
+        {/* Left Branding & Highlights Panel */}
+        <div className="left-section">
+          <div className="left-grid-pattern"></div>
+          <div className="left-overlay"></div>
 
-          <span className="eyebrow">
-            Principal Portal
-          </span>
-
-          <h1>
-            Online Video
-            <br />
-            Management System
-          </h1>
-
-          <p>
-            Secure centralized access for principals to monitor students,
-            departments, attendance, educational videos, analytics and reports.
-          </p>
-
-          <div className="left-footer">
-            <div className="stat">
-              <h3>256-bit</h3>
-              <span>Encrypted Access</span>
+          <div className="left-content">
+            {/* Top Badge */}
+            <div className="system-status-pill">
+              <span className="status-dot"></span>
+              <span>Enterprise Portal • Secure v2.4</span>
             </div>
 
-            <div className="divider"></div>
+            {/* Brand Logo & Name */}
+            <div className="brand-header">
+              <div className="brand-icon-box">
+                <Building2 className="brand-icon" size={24} />
+              </div>
+              <div className="brand-title-wrap">
+                <span className="brand-eyebrow">Academic Administration</span>
+                <h2 className="brand-name">Online Video Management</h2>
+              </div>
+            </div>
 
-            <div className="stat">
-              <h3>24 / 7</h3>
-              <span>Support</span>
+            <h1>Executive Principal Portal</h1>
+
+            <p className="description-text">
+              Unified governance platform providing principals real-time control over institutional analytics, video streaming, attendance tracking, and department metrics.
+            </p>
+
+            {/* Core Value Highlights */}
+            <div className="features-list">
+              <div className="feature-item">
+                <CheckCircle2 size={18} className="feature-icon" />
+                <span>Centralized Departmental Governance & Analytics</span>
+              </div>
+              <div className="feature-item">
+                <CheckCircle2 size={18} className="feature-icon" />
+                <span>Real-Time Student Attendance & Doubt Resolution Reports</span>
+              </div>
+              <div className="feature-item">
+                <CheckCircle2 size={18} className="feature-icon" />
+                <span>Encrypted Academic Video & Performance Auditing</span>
+              </div>
+            </div>
+
+            {/* Left Footer Stats */}
+            <div className="left-footer">
+              <div className="stat-card">
+                <div className="stat-header">
+                  <ShieldCheck size={18} className="stat-icon" />
+                  <span className="stat-value">256-bit AES</span>
+                </div>
+                <span className="stat-label">Bank-Grade Encryption</span>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-header">
+                  <Activity size={18} className="stat-icon" />
+                  <span className="stat-value">99.9% Uptime</span>
+                </div>
+                <span className="stat-label">Institutional SLA</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Section */}
-      <div className="right-section">
-        <div className="login-card">
-
-          <span className="login-tag">
-            Secure Access
-          </span>
-
-          <h2>Principal Login</h2>
-
-          <p className="subtitle">
-            Welcome back! Login using your institution account.
-          </p>
-
-          <form onSubmit={handleSubmit}>
-
-            <div className="input-box">
-              <label>Username</label>
-
-              <input
-                type="text"
-                placeholder="Enter Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoComplete="username"
-                required
-              />
+        {/* Right Interactive Login Card Panel */}
+        <div className="right-section">
+          <div className="login-card">
+            
+            <div className="login-card-header">
+              <div className="security-tag">
+                <Lock size={13} />
+                <span>Secure Access</span>
+              </div>
+              <h2>Principal Login</h2>
+              <p className="subtitle">
+                Access your executive dashboard using your institutional credentials.
+              </p>
             </div>
 
-            <div className="input-box">
-              <label>Password</label>
+            <form onSubmit={handleSubmit} className="login-form">
 
-              <input
-                type="password"
-                placeholder="Enter Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-              />
+              {/* Username Input */}
+              <div className="input-group">
+                <label htmlFor="username">Username</label>
+                <div className="input-wrapper">
+                  <User size={18} className="field-icon" />
+                  <input
+                    id="username"
+                    type="text"
+                    placeholder="Enter institutional username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoComplete="username"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div className="input-group">
+                <label htmlFor="password">Password</label>
+                <div className="input-wrapper">
+                  <Lock size={18} className="field-icon" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me Toggle */}
+              <div className="form-options">
+                <label className="remember-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                  />
+                  <span className="checkbox-custom"></span>
+                  <span className="remember-label">Keep me signed in</span>
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? (
+                  <span className="btn-loading">
+                    <span className="spinner"></span>
+                    Authenticating...
+                  </span>
+                ) : (
+                  <span className="btn-content">
+                    Sign In to Dashboard
+                    <ArrowRight size={18} className="btn-arrow" />
+                  </span>
+                )}
+              </button>
+
+            </form>
+
+            <div className="card-footer-note">
+              <ShieldCheck size={14} className="footer-shield" />
+              <span>Protected by Enterprise Security. Contact administrator if needed.</span>
             </div>
 
-            <label className="remember">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-              />
-              <span>Keep me signed in</span>
-            </label>
-
-            <button type="submit" disabled={loading}>
-              {loading ? "Signing In..." : "Sign In"}
-            </button>
-
-          </form>
-
-          <div className="footer-note">
-            Contact your administrator if you cannot access your account.
           </div>
-
         </div>
+
       </div>
     </div>
   );
