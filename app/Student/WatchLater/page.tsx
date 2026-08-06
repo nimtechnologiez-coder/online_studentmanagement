@@ -59,11 +59,11 @@ export default function StudentWatchLaterPage() {
       if (saved) {
         setWatchLater(JSON.parse(saved));
       } else {
-        setWatchLater(INITIAL_WATCH_LATER);
-        localStorage.setItem("student_watch_later", JSON.stringify(INITIAL_WATCH_LATER));
+        setWatchLater([]);
+        localStorage.setItem("student_watch_later", JSON.stringify([]));
       }
     } catch (e) {
-      setWatchLater(INITIAL_WATCH_LATER);
+      setWatchLater([]);
     }
   }, []);
 

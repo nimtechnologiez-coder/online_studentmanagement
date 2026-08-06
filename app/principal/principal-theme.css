@@ -10,32 +10,32 @@
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Page backgrounds */
-  --p-bg-main:          #f1f5f9;
-  --p-bg-card:          rgba(255, 255, 255, 0.92);
+  --p-bg-main:          #f8fafc;
+  --p-bg-card:          #ffffff;
   --p-bg-elevated:      #ffffff;
   --p-bg-subtle:        #f8fafc;
-  --p-bg-input:         #f1f5f9;
+  --p-bg-input:         #f8fafc;
 
   /* Borders */
-  --p-border:           rgba(226, 232, 240, 0.85);
+  --p-border:           #cbd5e1;
   --p-border-strong:    #cbd5e1;
-  --p-border-table:     #e2e8f0;
-  --p-border-table-row: #f1f5f9;
+  --p-border-table:     #cbd5e1;
+  --p-border-table-row: #cbd5e1;
 
   /* Text */
   --p-text-primary:     #0f172a;
-  --p-text-muted:       #64748b;
-  --p-text-light:       #94a3b8;
+  --p-text-muted:       #475569;
+  --p-text-light:       #64748b;
 
   /* Header */
-  --p-header-bg:        rgba(255, 255, 255, 0.88);
-  --p-header-border:    rgba(226, 232, 240, 0.8);
+  --p-header-bg:        rgba(255, 255, 255, 0.96);
+  --p-header-border:    #94a3b8;
 
   /* Sidebar */
   --p-sidebar-bg-from:  #ffffff;
   --p-sidebar-bg-to:    #f8fafc;
-  --p-sidebar-border:   rgba(226, 232, 240, 0.8);
-  --p-sidebar-heading-border: rgba(226, 232, 240, 0.8);
+  --p-sidebar-border:   #cbd5e1;
+  --p-sidebar-heading-border: #cbd5e1;
   --p-sidebar-label:    #64748b;
   --p-sidebar-link:     #334155;
   --p-sidebar-link-hover-bg: #f1f5f9;

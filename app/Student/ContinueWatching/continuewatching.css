@@ -100,20 +100,89 @@
   font-size: 14px;
 }
 
-.cw-empty-full {
+.cw-empty-full,
+.cw-empty-card {
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, #e2e8f0);
+  border-radius: 20px;
+  padding: 64px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 0;
-  color: var(--muted-text, #64748b);
-  gap: 8px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  margin: 16px 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-.cw-empty-full h3 {
+html.dark .cw-empty-card,
+html.dark .cw-empty-full {
+  background-color: #111827 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cw-empty-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background-color: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  margin-bottom: 16px;
+}
+
+html.dark .cw-empty-icon-wrap {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.cw-empty-title {
+  font-size: 20px;
+  font-weight: 800;
   color: var(--card-text, #0f172a);
-  margin: 0;
-  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+html.dark .cw-empty-title {
+  color: #f8fafc;
+}
+
+.cw-empty-desc {
+  font-size: 14px;
+  color: var(--muted-text, #475569);
+  max-width: 440px;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+}
+
+html.dark .cw-empty-desc {
+  color: #94a3b8;
+}
+
+.cw-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s ease;
+}
+
+.cw-empty-btn:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
 /* Section 1: Hero Grid (Main Hero + Side Box) */

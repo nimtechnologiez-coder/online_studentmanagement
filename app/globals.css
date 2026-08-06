@@ -18,7 +18,7 @@ body {
    CSS CUSTOM PROPERTIES — Light Theme (default)
    ============================================================ */
 :root {
-  --background: #f1f5f9;
+  --background: #f8fafc;
   --foreground: #0f172a;
 
   --card-bg: #ffffff;
@@ -32,7 +32,7 @@ body {
   --input-placeholder: #64748b;
 
   --sidebar-bg: #ffffff;
-  --sidebar-border: #e2e8f0;
+  --sidebar-border: #cbd5e1;
 
   --tag-bg: #e2e8f0;
   --tag-text: #334155;
@@ -41,7 +41,7 @@ body {
 
   --table-head-bg: #f8fafc;
   --table-row-hover: #f1f5f9;
-  --table-border: #e2e8f0;
+  --table-border: #cbd5e1;
 
   --progress-track: #e2e8f0;
   --badge-bg: #eff6ff;

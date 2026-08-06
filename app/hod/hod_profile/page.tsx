@@ -221,10 +221,13 @@ export default function HodProfilePage() {
             className="relative h-48 transition-all" 
             style={{ background: coverBg }}
           >
-            <div className="absolute right-4 top-4">
-              <label className="dash-action-btn cursor-pointer" title="Change Background Cover">
-                <Camera size={16} />
-                <span className="btn-text">Cover Photo</span>
+            <div className="absolute right-4 top-4 z-10">
+              <label 
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all" 
+                title="Change Background Cover"
+              >
+                <Camera size={15} />
+                <span>Cover Photo</span>
                 <input 
                   type="file" 
                   accept="image/*" 
@@ -240,12 +243,25 @@ export default function HodProfilePage() {
             <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
               {/* Avatar */}
               <div className="relative group">
-                <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-lg">
-                  <img 
-                    src={avatarSrc || profile?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-32 h-32 rounded-full border-4 border-white bg-indigo-600 text-white flex items-center justify-center overflow-hidden shadow-lg">
+                  {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
+                    <img 
+                      src={avatarSrc || profile?.avatar} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="font-extrabold text-4xl select-none tracking-wider">
+                      {(() => {
+                        const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
+                        const parts = cleanName.split(" ").filter(Boolean);
+                        if (parts.length >= 2) {
+                          return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                        }
+                        return (cleanName[0] || "H").toUpperCase();
+                      })()}
+                    </span>
+                  )}
                 </div>
                 <label 
                   className="absolute bottom-1 right-1 p-2 bg-white border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
@@ -298,15 +314,15 @@ export default function HodProfilePage() {
               Quick Contact
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Email</span>
                 <span className="text-sm font-semibold text-right truncate" style={{ color: "var(--p-text-primary)" }}>{email}</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Phone</span>
                 <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{phone}</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Joined</span>
                 <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{joined}</span>
               </div>
@@ -321,17 +337,17 @@ export default function HodProfilePage() {
             </h3>
             
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Username</span>
                 <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{profile?.username || "hod_admin"}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Department</span>
                 <span className="text-sm font-semibold text-right leading-snug" style={{ color: "var(--p-text-primary)", maxWidth: "60%" }}>{department}</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Status</span>
                 <span className="status-badge status-active">
                   <span className="status-dot" />

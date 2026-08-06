@@ -150,6 +150,17 @@ export default function HodPerformancePage() {
   const [payload, setPayload] = useState<PerformancePayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const tickColor = isDark ? "#94a3b8" : "#475569";
 
   useEffect(() => {
     const loadPerformance = async () => {
@@ -342,8 +353,8 @@ export default function HodPerformancePage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} allowDecimals={false} />
                     <Tooltip content={<ViewsTooltip />} cursor={{ stroke: "var(--p-border)" }} />
                     <Area type="monotone" dataKey="value" stroke="#4f46e5" strokeWidth={2.5} fillOpacity={1} fill="url(#perfViewsGrad)"
                       dot={{ r: 4, fill: "#4f46e5", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
@@ -409,8 +420,8 @@ export default function HodPerformancePage() {
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={weeklyActiveStudents} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} allowDecimals={false} />
                     <Tooltip content={<ActiveStudentsTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} />
                     <Bar dataKey="value" fill="#0d9488" radius={[6, 6, 0, 0]} maxBarSize={42} />
                   </BarChart>
@@ -480,7 +491,7 @@ export default function HodPerformancePage() {
                       </td>
                       <td>
                         <span className="table-dur-badge" style={{ fontWeight: 600 }}>
-                          {s.videosWatched} / {s.videosTotal || maxVideosWatched} Videos
+                          {s.videosWatched} / {s.videosTotal} Videos
                         </span>
                       </td>
                       <td>
@@ -525,21 +536,19 @@ export default function HodPerformancePage() {
               <button
                 onClick={() => goPage(safePage - 1)}
                 disabled={safePage === 1}
-                className="dash-action-btn"
-                style={{ opacity: safePage === 1 ? 0.5 : 1, padding: "4px 10px" }}
+                className="perf-page-btn"
               >
                 Previous
               </button>
 
-              <span className="text-xs font-semibold px-2" style={{ color: "var(--p-text-primary)" }}>
+              <span className="perf-page-text">
                 Page {safePage} of {totalPages}
               </span>
 
               <button
                 onClick={() => goPage(safePage + 1)}
                 disabled={safePage === totalPages}
-                className="dash-action-btn"
-                style={{ opacity: safePage === totalPages ? 0.5 : 1, padding: "4px 10px" }}
+                className="perf-page-btn"
               >
                 Next
               </button>

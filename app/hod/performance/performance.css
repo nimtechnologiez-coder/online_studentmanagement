@@ -158,6 +158,38 @@
   color: var(--p-text-muted, #94a3b8);
 }
 
+/* Pagination Buttons */
+.perf-page-btn {
+  background-color: var(--p-bg-card, #ffffff);
+  border: 1px solid var(--p-border, #cbd5e1);
+  color: var(--p-text-primary, #0f172a);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.perf-page-btn:hover:not(:disabled) {
+  background-color: var(--p-bg-subtle, #f8fafc);
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.perf-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.perf-page-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-text-primary, #0f172a);
+  padding: 0 6px;
+}
+
 /* ═══════════════════════════ CHARTS ROW ═══════════════════════════ */
 
 .dash-charts-row {
@@ -214,12 +246,15 @@
 }
 
 .chart-empty-state {
+  width: 100%;
   height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--p-text-muted, #94a3b8);
+  text-align: center;
+  color: var(--p-text-muted, #64748b);
   font-size: 13px;
+  font-weight: 500;
 }
 
 /* Donut & Legends */

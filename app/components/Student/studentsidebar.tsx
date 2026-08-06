@@ -36,17 +36,14 @@ const topMenuItems = [
   { icon: User, name: "Profile", href: "/Student/profile" },
 ];
 
-const bottomMenuItems = [
-  { icon: Settings, name: "Settings", href: "/Student/settings" },
-  { icon: HelpCircle, name: "Help & Support", href: "/Student/profile" },
-];
+const bottomMenuItems: any[] = [];
 
 export default function StudentSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [overallProgress, setOverallProgress] = useState<number>(71);
+  const [overallProgress, setOverallProgress] = useState<number>(0);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -64,11 +61,13 @@ export default function StudentSidebar() {
       if (res.ok && data.status === "success" && data.stats) {
         const total = data.stats.totalVideos || 0;
         const completed = data.stats.completed || 0;
-        const pct = total > 0 ? Math.round((completed / total) * 100) : 71;
+        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
         setOverallProgress(pct);
+      } else {
+        setOverallProgress(0);
       }
     } catch (e) {
-      // Fallback default 71%
+      setOverallProgress(0);
     }
   }
 

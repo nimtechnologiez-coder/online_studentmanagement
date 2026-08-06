@@ -64,7 +64,7 @@ export default function MyVideosPage() {
     try {
       const savedFavs = localStorage.getItem("student_favorites");
       if (savedFavs) {
-        const list = JSON.parse(savedFavs);
+        const list = JSON.parse(savedFavs).filter((item: any) => !([101, 102, 103, 104, 105].includes(item.id)));
         const map: Record<number, boolean> = {};
         list.forEach((item: any) => {
           if (item.id) map[item.id] = true;

@@ -297,9 +297,9 @@ export default function StudentDashboardPage() {
                 <Link href="/Student/MyVideos" className="sdb-view-all">View All ↗</Link>
               </div>
 
-              <div className="sdb-cat-horizontal-grid">
-                {topCategories.length > 0 ? (
-                  topCategories.slice(0, 4).map((cat, i) => {
+              {topCategories.length > 0 ? (
+                <div className="sdb-cat-horizontal-grid">
+                  {topCategories.slice(0, 4).map((cat, i) => {
                     const CatConfig = CATEGORY_ICONS[cat.name] || { icon: BookOpen, colorClass: "cat-icon-blue" };
                     const CatIcon = CatConfig.icon;
                     return (
@@ -313,11 +313,13 @@ export default function StudentDashboardPage() {
                         </div>
                       </div>
                     );
-                  })
-                ) : (
-                  <div className="p-4 text-center text-xs text-slate-400 font-medium">No course categories found.</div>
-                )}
-              </div>
+                  })}
+                </div>
+              ) : (
+                <div className="py-6 px-4 text-center text-xs text-slate-400 font-medium w-full flex items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl my-1">
+                  No course categories found.
+                </div>
+              )}
             </div>
           </div>
 

@@ -330,14 +330,7 @@ export default function PrincipalDashboard() {
     collegeName = "",
   } = dashData || {};
 
-  const defaultSystemActivities: LiveActivity[] = useMemo(() => [
-    { id: 1, description: "Department audit report generated for CSE & EEE", time: "Just now", badge: "Audit" },
-    { id: 2, description: "New course video content published by Faculty HOD", time: "10m ago", badge: "Upload" },
-    { id: 3, description: "Student batch attendance & engagement logs synced", time: "25m ago", badge: "Sync" },
-    { id: 4, description: "Monthly academic performance summary ready for review", time: "1h ago", badge: "System" },
-  ], []);
-
-  const liveActivities = backendLiveActivities.length > 0 ? backendLiveActivities : defaultSystemActivities;
+  const liveActivities = backendLiveActivities;
 
   const engagement = s.engagementRate ?? (s.students > 0 ? Math.round(((s.activeStudents || 0) / s.students) * 100) : 0);
   const totalDepts = s.totalDepartments ?? departmentPerformance.length;

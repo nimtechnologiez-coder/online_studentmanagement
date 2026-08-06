@@ -480,22 +480,6 @@ export default function HodDashboardPage() {
 
         {/* Right actions */}
         <div className="dash-header-actions">
-          <button
-            type="button"
-            className="dash-action-btn"
-            onClick={fetchDashboardData}
-            disabled={loading}
-            title="Refresh Dashboard"
-          >
-            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
-            <span className="btn-text">Sync</span>
-          </button>
-
-          <div className="dash-notif-btn">
-            <Bell size={17} />
-            <span className="notif-badge" />
-          </div>
-
           <div className="dash-profile-wrapper">
             <button
               type="button"
@@ -575,9 +559,11 @@ export default function HodDashboardPage() {
                     </span>
                   )}
                 </div>
-                <div className="kpi-card-value">{card.value}</div>
-                <div className="kpi-card-label">{card.label}</div>
-                <div className="kpi-card-sub">{card.subtext}</div>
+                <div className="kpi-card-body">
+                  <div className="kpi-card-value">{card.value}</div>
+                  <div className="kpi-card-label">{card.label}</div>
+                  <div className="kpi-card-sub">{card.subtext}</div>
+                </div>
               </div>
             );
           })}

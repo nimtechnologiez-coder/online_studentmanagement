@@ -181,38 +181,44 @@ export default function HODSidebar() {
         {/* Footer */}
         <div className="sidebar-footer">
           {/* Theme Toggle Pill Switch */}
-          <div className="theme-toggle-row" onClick={toggleTheme}>
-            <div className="theme-toggle-label">
-              <Sun size={16} className="theme-icon" />
-              <span>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
-            </div>
-            <div className={`theme-switch-track ${theme === "dark" ? "switch-dark" : "switch-light"}`}>
-              <div className="theme-switch-thumb" />
+          <div className="sidebar-footer-item pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="theme-toggle-row" onClick={toggleTheme}>
+              <div className="theme-toggle-label">
+                <Sun size={16} className="theme-icon" />
+                <span>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
+              </div>
+              <div className={`theme-switch-track ${theme === "dark" ? "switch-dark" : "switch-light"}`}>
+                <div className="theme-switch-thumb" />
+              </div>
             </div>
           </div>
 
           {/* Profile Card */}
-          <div className="sidebar-profile-card cursor-pointer hover:opacity-90 transition-opacity" onClick={() => router.push("/hod/hod_profile")}>
-            <div className="profile-avatar-box">
-              <User size={20} />
-            </div>
-            <div className="sidebar-profile-text">
-              <span className="sidebar-profile-name">{hodName}</span>
-              <p className="sidebar-profile-role">Head of Department</p>
-              {hodEmail && (
-                <p className="sidebar-profile-email" style={{ fontSize: "11px", opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {hodEmail}
-                </p>
-              )}
-              <p className="sidebar-profile-college">{departmentName}</p>
+          <div className="sidebar-footer-item pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="sidebar-profile-card cursor-pointer hover:opacity-90 transition-opacity" onClick={() => router.push("/hod/hod_profile")}>
+              <div className="profile-avatar-box">
+                <span>{hodName.replace(/^Dr\.\s*/i, '').trim().charAt(0).toUpperCase() || "H"}</span>
+              </div>
+              <div className="sidebar-profile-text">
+                <span className="sidebar-profile-name">{hodName}</span>
+                <p className="sidebar-profile-role">Head of Department</p>
+                {hodEmail && (
+                  <p className="sidebar-profile-email" style={{ fontSize: "11px", opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {hodEmail}
+                  </p>
+                )}
+                <p className="sidebar-profile-college">{departmentName}</p>
+              </div>
             </div>
           </div>
 
           {/* Logout Button */}
-          <button type="button" className="sidebar-logout-btn" onClick={handleLogout}>
-            <LogOut size={16} strokeWidth={2} />
-            <span>Logout</span>
-          </button>
+          <div className="sidebar-footer-item">
+            <button type="button" className="sidebar-logout-btn" onClick={handleLogout}>
+              <LogOut size={16} strokeWidth={2} />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
     </>

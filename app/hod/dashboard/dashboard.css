@@ -1,30 +1,30 @@
 /* ===================== HOD Dashboard — Variables ===================== */
 
 .hd-page {
-  --hd-bg: #f4f6fb;
+  --hd-bg: #f8fafc;
   --hd-white: #ffffff;
-  --hd-border: #eaecf4;
-  --hd-text: #111827;
-  --hd-text-sec: #6b7280;
-  --hd-text-muted: #9ca3af;
+  --hd-border: #cbd5e1;
+  --hd-text: #0f172a;
+  --hd-text-sec: #475569;
+  --hd-text-muted: #64748b;
 
-  --hd-blue: #4f6cf7;
-  --hd-blue-lt: #eef1fe;
+  --hd-blue: #2563eb;
+  --hd-blue-lt: #eff6ff;
   --hd-green: #22c55e;
   --hd-green-lt: #dcfce7;
   --hd-purple: #8b5cf6;
-  --hd-purple-lt: #ede9fe;
-  --hd-orange: #f97316;
-  --hd-orange-lt: #fff7ed;
+  --hd-purple-lt: #f3e8ff;
+  --hd-orange: #f59e0b;
+  --hd-orange-lt: #fef3c7;
   --hd-red: #ef4444;
   --hd-red-lt: #fef2f2;
-  --hd-teal: #06b6d4;
-  --hd-teal-lt: #ecfeff;
+  --hd-teal: #0ea5e9;
+  --hd-teal-lt: #e0f2fe;
   --hd-yellow: #eab308;
   --hd-yellow-lt: #fefce8;
 
-  --hd-shadow: 0 1px 4px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04);
-  --hd-shadow-lg: 0 12px 32px rgba(16,24,40,0.14), 0 4px 10px rgba(16,24,40,0.06);
+  --hd-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --hd-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
   --hd-radius: 12px;
   --hd-radius-lg: 16px;
 
@@ -33,6 +33,18 @@
   color: var(--hd-text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+html.dark .hd-page {
+  --hd-bg: #0f172a;
+  --hd-white: #111827;
+  --hd-border: #334155;
+  --hd-text: #f8fafc;
+  --hd-text-sec: #94a3b8;
+  --hd-text-muted: #64748b;
+  --hd-blue-lt: rgba(37, 99, 235, 0.15);
+  --hd-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .hd-page * { box-sizing: border-box; margin: 0; padding: 0; }

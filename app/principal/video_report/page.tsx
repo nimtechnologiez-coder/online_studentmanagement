@@ -10,12 +10,8 @@ import {
   PlayCircle,
   FolderOpen,
   Star,
-  Clock,
-  Calendar,
-  UserCircle,
   BarChart3,
   PieChart as PieChartIcon,
-  TrendingUp,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -53,212 +49,15 @@ interface Video {
   videoUrl: string;
 }
 
-/* ---------------------------------- DATA ---------------------------------- */
-
-const categories = [
-  "All Categories",
-  "AI",
-  "Soft Skills",
-  "Programming",
-  "Interview",
-  "Time Management",
-  "Communication",
-  "Resume",
-  "Leadership",
-];
 const statuses: Array<"All Status" | VideoStatus> = ["All Status", "Published", "Draft"];
 const PAGE_SIZE = 10;
-const TOTAL_VIDEOS_IN_SYSTEM = 45;
-
-const videos: Video[] = [
-  {
-    id: "v1",
-    title: "AI Basics",
-    category: "AI",
-    duration: "20 min",
-    views: 1250,
-    uploadedDate: "15 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 420,
-    completionRate: 78,
-    description: "Introduction to Artificial Intelligence and its applications.",
-    thumbnail: "AI",
-    videoUrl: "/videos/ai-basics.mp4",
-  },
-  {
-    id: "v2",
-    title: "Resume Building",
-    category: "Soft Skills",
-    duration: "15 min",
-    views: 980,
-    uploadedDate: "13 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 360,
-    completionRate: 82,
-    description: "Step-by-step guidance on crafting a resume that stands out to recruiters.",
-    thumbnail: "RB",
-    videoUrl: "/videos/resume-building.mp4",
-  },
-  {
-    id: "v3",
-    title: "Python Basics",
-    category: "Programming",
-    duration: "30 min",
-    views: 860,
-    uploadedDate: "10 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 310,
-    completionRate: 65,
-    description: "A beginner-friendly walkthrough of Python syntax, variables, and control flow.",
-    thumbnail: "PY",
-    videoUrl: "/videos/python-basics.mp4",
-  },
-  {
-    id: "v4",
-    title: "Interview Skills",
-    category: "Interview",
-    duration: "18 min",
-    views: 720,
-    uploadedDate: "08 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 275,
-    completionRate: 71,
-    description: "Practical tips for answering common interview questions with confidence.",
-    thumbnail: "IS",
-    videoUrl: "/videos/interview-skills.mp4",
-  },
-  {
-    id: "v5",
-    title: "Time Management",
-    category: "Time Management",
-    duration: "12 min",
-    views: 540,
-    uploadedDate: "05 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 198,
-    completionRate: 59,
-    description: "Techniques to prioritize tasks and stay productive under deadlines.",
-    thumbnail: "TM",
-    videoUrl: "/videos/time-management.mp4",
-  },
-  {
-    id: "v6",
-    title: "Communication Skills",
-    category: "Communication",
-    duration: "22 min",
-    views: 610,
-    uploadedDate: "03 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 240,
-    completionRate: 68,
-    description: "Building clarity and confidence in verbal and written workplace communication.",
-    thumbnail: "CS",
-    videoUrl: "/videos/communication-skills.mp4",
-  },
-  {
-    id: "v7",
-    title: "Resume Tips",
-    category: "Resume",
-    duration: "10 min",
-    views: 430,
-    uploadedDate: "01 Jul 2026",
-    uploadedBy: "Company Admin",
-    status: "Draft",
-    studentsViewed: 90,
-    completionRate: 34,
-    description: "Quick-fire tips to fix the most common resume mistakes before you apply.",
-    thumbnail: "RT",
-    videoUrl: "/videos/resume-tips.mp4",
-  },
-  {
-    id: "v8",
-    title: "Leadership Fundamentals",
-    category: "Leadership",
-    duration: "25 min",
-    views: 310,
-    uploadedDate: "28 Jun 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 150,
-    completionRate: 55,
-    description: "Core principles of leading teams, delegating, and giving feedback.",
-    thumbnail: "LF",
-    videoUrl: "/videos/leadership-fundamentals.mp4",
-  },
-  {
-    id: "v9",
-    title: "Advanced Python",
-    category: "Programming",
-    duration: "35 min",
-    views: 275,
-    uploadedDate: "25 Jun 2026",
-    uploadedBy: "Company Admin",
-    status: "Draft",
-    studentsViewed: 60,
-    completionRate: 22,
-    description: "Deeper dive into decorators, generators, and Python's object model.",
-    thumbnail: "AP",
-    videoUrl: "/videos/advanced-python.mp4",
-  },
-  {
-    id: "v10",
-    title: "Group Discussion Skills",
-    category: "Soft Skills",
-    duration: "16 min",
-    views: 480,
-    uploadedDate: "22 Jun 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 205,
-    completionRate: 63,
-    description: "How to contribute effectively and stand out in group discussion rounds.",
-    thumbnail: "GD",
-    videoUrl: "/videos/group-discussion-skills.mp4",
-  },
-  {
-    id: "v11",
-    title: "AI in Everyday Work",
-    category: "AI",
-    duration: "19 min",
-    views: 690,
-    uploadedDate: "18 Jun 2026",
-    uploadedBy: "Company Admin",
-    status: "Published",
-    studentsViewed: 260,
-    completionRate: 70,
-    description: "Practical ways AI tools are used across everyday professional tasks.",
-    thumbnail: "AE",
-    videoUrl: "/videos/ai-everyday-work.mp4",
-  },
-  {
-    id: "v12",
-    title: "Mock Interview Walkthrough",
-    category: "Interview",
-    duration: "28 min",
-    views: 390,
-    uploadedDate: "15 Jun 2026",
-    uploadedBy: "Company Admin",
-    status: "Draft",
-    studentsViewed: 75,
-    completionRate: 28,
-    description: "A full mock interview session broken down question by question.",
-    thumbnail: "MI",
-    videoUrl: "/videos/mock-interview-walkthrough.mp4",
-  },
-];
 
 /* --------------------------------- HELPERS --------------------------------- */
 
 function VideoStatusBadge({ status }: { status: VideoStatus }) {
   return (
-    <span className={`status-badge ${status === "Published" ? "status-active" : "status-inactive"}`}>
-      <span className="status-dot" />
+    <span className={`principal-video-status-badge ${status === "Published" ? "principal-video-status-active" : "principal-video-status-inactive"}`}>
+      <span className="principal-video-status-dot" />
       {status}
     </span>
   );
@@ -266,7 +65,7 @@ function VideoStatusBadge({ status }: { status: VideoStatus }) {
 
 function ThumbnailBox({ label }: { label: string }) {
   return (
-    <div className="video-thumb-box" aria-hidden="true">
+    <div className="principal-video-thumb-box" aria-hidden="true">
       {label}
     </div>
   );
@@ -298,91 +97,63 @@ function CompletionRing({ value }: { value: number }) {
       </svg>
       <div className="ring-label">
         <span className="ring-value">{value}%</span>
+        <span className="ring-sub">Done</span>
       </div>
     </div>
   );
 }
 
-function VideoDetailsModal({
-  video,
-  onClose,
-}: {
+interface VideoDetailModalProps {
   video: Video;
   onClose: () => void;
-}) {
-  const [showPlayer, setShowPlayer] = useState(false);
+}
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (showPlayer) setShowPlayer(false);
-        else onClose();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [onClose, showPlayer]);
+function VideoDetailModal({ video, onClose }: VideoDetailModalProps) {
+  const [showPlayer, setShowPlayer] = useState(false);
 
   return (
     <>
       <div className="modal-backdrop" onClick={onClose}>
-        <div
-          className="modal-panel"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="video-details-title"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="modal-card shadow-lg" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
-            <h3 id="video-details-title">{video.title}</h3>
-            <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+            <div className="modal-title-wrap">
+              <span className="modal-category-tag">{video.category || "General"}</span>
+              <h3 className="modal-title-text">{video.title}</h3>
+            </div>
+            <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close modal">
               <X size={18} strokeWidth={2} />
             </button>
           </div>
 
           <div className="modal-body">
-            <div className="modal-profile">
-              <div className="video-modal-thumb">{video.thumbnail}</div>
-              <div className="modal-profile-text">
-                <div className="modal-student-name">{video.title}</div>
-                <div className="modal-student-dept">{video.category}</div>
-                <div className="modal-meta-row">
-                  <span className="modal-meta-item">
-                    <Clock size={12} strokeWidth={2} />
-                    {video.duration}
-                  </span>
-                  <span className="modal-meta-item">
-                    <Calendar size={12} strokeWidth={2} />
-                    {video.uploadedDate}
-                  </span>
-                </div>
-                <div className="modal-meta-row">
-                  <span className="modal-meta-item">
-                    <UserCircle size={12} strokeWidth={2} />
-                    Uploaded by {video.uploadedBy}
-                  </span>
-                </div>
+            <div className="modal-hero">
+              <div className="modal-completion-col">
+                <CompletionRing value={video.completionRate || 0} />
               </div>
-              <VideoStatusBadge status={video.status} />
-            </div>
 
-            <div className="modal-highlight">
-              <CompletionRing value={video.completionRate} />
-              <div className="modal-stats-grid">
+              <div className="modal-meta-grid">
                 <div className="modal-stat">
-                  <span className="modal-stat-value">{video.views.toLocaleString()}</span>
+                  <span className="modal-stat-value">{video.duration || "N/A"}</span>
+                  <span className="modal-stat-label">Duration</span>
+                </div>
+                <div className="modal-stat">
+                  <span className="modal-stat-value">{(video.views || 0).toLocaleString()}</span>
                   <span className="modal-stat-label">Total Views</span>
                 </div>
                 <div className="modal-stat">
-                  <span className="modal-stat-value">{video.studentsViewed}</span>
+                  <span className="modal-stat-value">{video.uploadedDate || "N/A"}</span>
+                  <span className="modal-stat-label">Uploaded</span>
+                </div>
+                <div className="modal-stat">
+                  <span className="modal-stat-value">{video.uploadedBy || "System Admin"}</span>
+                  <span className="modal-stat-label">Uploaded By</span>
+                </div>
+                <div className="modal-stat">
+                  <span className="modal-stat-value">{video.studentsViewed || 0}</span>
                   <span className="modal-stat-label">Students Viewed</span>
                 </div>
                 <div className="modal-stat modal-stat-wide">
-                  <span className="modal-stat-value">{video.completionRate}%</span>
+                  <span className="modal-stat-value">{video.completionRate || 0}%</span>
                   <span className="modal-stat-label">Completion Rate</span>
                 </div>
               </div>
@@ -395,7 +166,7 @@ function VideoDetailsModal({
                 <PlayCircle size={15} strokeWidth={2} />
                 Description
               </h4>
-              <p className="modal-description-text">{video.description}</p>
+              <p className="modal-description-text">{video.description || "No description available for this video."}</p>
             </div>
           </div>
 
@@ -480,8 +251,7 @@ function VideoDetailsModal({
   );
 }
 
-
-/* --------------------------------- COMPONENT -------------------------------- */
+/* --------------------------------- MAIN PAGE COMPONENT -------------------------------- */
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -494,6 +264,8 @@ export default function VideosPage() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   const [deptBreakdownRaw, setDeptBreakdownRaw] = useState<Array<{ department: string; views: number }>>([]);
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
   useEffect(() => {
     async function fetchVideos() {
@@ -513,10 +285,9 @@ export default function VideosPage() {
 
         let res: Response;
         try {
-          res = await fetch("/api/principal/videos/", { headers, credentials: "include" });
-          if (!res.ok) res = await fetch("http://127.0.0.1:8000/api/principal/videos/", { headers, credentials: "include" });
+          res = await fetch(`${API_BASE}/api/principal/videos/`, { headers, credentials: "include" });
         } catch {
-          res = await fetch("http://127.0.0.1:8000/api/principal/videos/", { headers, credentials: "include" });
+          res = await fetch("/api/principal/videos/", { headers, credentials: "include" });
         }
 
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -538,17 +309,23 @@ export default function VideosPage() {
         }
       } catch (err: any) {
         console.error("Videos fetch error:", err);
-        setError(err.message || "Failed to load videos.");
+        setError(err.message || "Failed to load video analytics.");
       } finally {
         setLoading(false);
       }
     }
     fetchVideos();
-  }, []);
+  }, [API_BASE]);
 
-  const totalViews = useMemo(() => videos.reduce((sum, v) => sum + v.views, 0), [videos]);
+  // Dynamic Categories Dropdown list
+  const categoryOptions = useMemo(() => {
+    const uniqueCats = Array.from(new Set(videos.map((v) => v.category).filter(Boolean)));
+    return ["All Categories", ...uniqueCats];
+  }, [videos]);
+
+  const totalViews = useMemo(() => videos.reduce((sum, v) => sum + (v.views || 0), 0), [videos]);
   const topVideo = useMemo(
-    () => videos.length > 0 ? videos.reduce((top, v) => (v.views > top.views ? v : top), videos[0]) : null,
+    () => videos.length > 0 ? videos.reduce((top, v) => ((v.views || 0) > (top.views || 0) ? v : top), videos[0]) : null,
     [videos]
   );
 
@@ -556,22 +333,15 @@ export default function VideosPage() {
 
   const deptDonutData = useMemo(() => {
     if (deptBreakdownRaw.length > 0) {
-      const sum = deptBreakdownRaw.reduce((acc, d) => acc + d.views, 0);
+      const sum = deptBreakdownRaw.reduce((acc, d) => acc + (d.views || 0), 0);
       return deptBreakdownRaw.map((d, idx) => ({
         name: d.department,
-        value: d.views,
+        value: d.views || 0,
         color: COLOR_PALETTE[idx % COLOR_PALETTE.length],
-        percentage: sum > 0 ? Math.round((d.views / sum) * 100) : 0,
+        percentage: sum > 0 ? Math.round(((d.views || 0) / sum) * 100) : 0,
       }));
     }
-    // Fallback based on videos dataset if raw breakdown not ready
-    return [
-      { name: "Computer Science", value: 1420, color: "#3b82f6", percentage: 33 },
-      { name: "Electronics & Comm", value: 980, color: "#0d9488", percentage: 23 },
-      { name: "Information Tech", value: 890, color: "#10b981", percentage: 20 },
-      { name: "Mechanical Eng", value: 650, color: "#f59e0b", percentage: 15 },
-      { name: "Civil Eng", value: 430, color: "#8b5cf6", percentage: 9 },
-    ];
+    return [];
   }, [deptBreakdownRaw]);
 
   const totalDeptViewsFormatted = useMemo(() => {
@@ -585,18 +355,10 @@ export default function VideosPage() {
       const cat = v.category || "General";
       map[cat] = (map[cat] || 0) + (v.views || 0);
     });
-    const result = Object.keys(map).map((cat) => ({
+    return Object.keys(map).map((cat) => ({
       category: cat,
       views: map[cat],
     }));
-    return result.length > 0
-      ? result
-      : [
-          { category: "AI & ML", views: 1940 },
-          { category: "Soft Skills", views: 1460 },
-          { category: "Programming", views: 1135 },
-          { category: "Interview Prep", views: 950 },
-        ];
   }, [videos]);
 
   const filteredVideos = useMemo(() => {
@@ -637,327 +399,368 @@ export default function VideosPage() {
   }, [currentPage, totalPages]);
 
   return (
-    <div className="dash-main">
+    <div className="principal-video-page">
       {/* Header */}
-      <header className="dash-header">
-        <div className="dash-header-left">
-          <VideoIcon size={20} strokeWidth={1.8} className="dash-header-icon" />
-          <span className="dash-header-title">Videos</span>
+      <header className="principal-video-header">
+        <div className="principal-video-header-left">
+          <VideoIcon size={20} strokeWidth={1.8} className="principal-video-header-icon" />
+          <span className="principal-video-header-title">Videos</span>
         </div>
 
-        <div className="dash-search">
+        <div className="principal-video-header-search">
           <Search size={17} strokeWidth={1.8} />
-          <input type="text" placeholder="Search Video" />
+          <input 
+            type="text" 
+            placeholder="Search Video" 
+            value={query} 
+            onChange={(e) => setQuery(e.target.value)} 
+          />
         </div>
 
-        <div className="dash-header-right">
-          <div className="dash-profile">
-            <div className="dash-avatar">
-              <User size={18} strokeWidth={1.8} />
-            </div>
-            <span className="dash-profile-name">Principal</span>
+        <div className="principal-video-header-profile">
+          <div className="principal-video-header-avatar">
+            <User size={18} strokeWidth={1.8} />
           </div>
+          <span className="principal-video-header-username">Principal</span>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="dash-content">
-        <div className="dash-page-title">
-          <h2>Video Reports</h2>
-          <p>View all training videos and monitor their performance.</p>
+      {/* Main Content Body */}
+      <main className="principal-video-content">
+        <div className="principal-video-welcome">
+          <h2 className="principal-video-welcome-title">Video Reports</h2>
+          <p className="principal-video-welcome-desc">View all training videos and monitor their performance across your institution.</p>
         </div>
 
         {/* Error Banner */}
         {error && (
-          <div style={{ display:"flex", alignItems:"center", gap:"8px", padding:"12px 16px", marginBottom:"16px",
-            background:"#fef2f2", border:"1px solid #fecaca", borderRadius:"8px", color:"#dc2626", fontSize:"13px" }}>
+          <div className="principal-video-error">
             ⚠ {error}
           </div>
         )}
 
         {/* Loading State */}
         {loading && (
-          <div style={{ textAlign:"center", padding:"60px 0", color:"#64748b", fontSize:"14px" }}>
-            Loading videos...
+          <div className="principal-video-loading">
+            Loading video analytics...
           </div>
         )}
 
-        {/* Summary cards */}
-        <section className="summary-grid">
-          <div className="summary-card">
-            <div className="summary-icon tone-indigo">
+        {/* Summary KPI Cards */}
+        <section className="principal-video-stats-grid">
+          <div className="principal-video-stat-card">
+            <div className="principal-video-stat-icon principal-video-stat-icon-indigo">
               <VideoIcon size={20} strokeWidth={1.8} />
             </div>
-            <div className="summary-body">
-              <span className="summary-value">{videos.length}</span>
-              <span className="summary-label">Total Videos</span>
+            <div className="principal-video-stat-body">
+              <span className="principal-video-stat-value">{videos.length}</span>
+              <span className="principal-video-stat-label">Total Videos</span>
             </div>
           </div>
-          <div className="summary-card">
-            <div className="summary-icon tone-amber">
+
+          <div className="principal-video-stat-card">
+            <div className="principal-video-stat-icon principal-video-stat-icon-amber">
               <Eye size={20} strokeWidth={1.8} />
             </div>
-            <div className="summary-body">
-              <span className="summary-value">{totalViews.toLocaleString()}</span>
-              <span className="summary-label">Total Views</span>
+            <div className="principal-video-stat-body">
+              <span className="principal-video-stat-value">{totalViews.toLocaleString()}</span>
+              <span className="principal-video-stat-label">Total Views</span>
             </div>
           </div>
-          <div className="summary-card">
-            <div className="summary-icon tone-teal">
+
+          <div className="principal-video-stat-card">
+            <div className="principal-video-stat-icon principal-video-stat-icon-teal">
               <FolderOpen size={20} strokeWidth={1.8} />
             </div>
-            <div className="summary-body">
-              <span className="summary-value">{categories.length - 1}</span>
-              <span className="summary-label">Categories</span>
+            <div className="principal-video-stat-body">
+              <span className="principal-video-stat-value">{categoryOptions.length > 1 ? categoryOptions.length - 1 : 0}</span>
+              <span className="principal-video-stat-label">Categories</span>
             </div>
           </div>
-          <div className="summary-card">
-            <div className="summary-icon tone-emerald">
+
+          <div className="principal-video-stat-card">
+            <div className="principal-video-stat-icon principal-video-stat-icon-emerald">
               <Star size={20} strokeWidth={1.8} />
             </div>
-            <div className="summary-body">
-              <span className="summary-value summary-value-text">{topVideo ? topVideo.title : "—"}</span>
-              <span className="summary-label">Top Video</span>
+            <div className="principal-video-stat-body">
+              <span className="principal-video-stat-value principal-video-stat-value-text">{topVideo ? topVideo.title : "—"}</span>
+              <span className="principal-video-stat-label">Top Video</span>
             </div>
           </div>
         </section>
 
-        {/* Corporate Charts Analytics Grid */}
-        <section className="analytics-charts-grid">
+        {/* Charts Analytics Grid */}
+        <section className="principal-video-charts-grid">
           {/* Department-Wise Video Views Donut Chart */}
-          <div className="analytics-chart-card">
-            <div className="chart-card-header">
-              <div className="chart-header-title">
-                <PieChartIcon size={18} className="chart-header-icon text-indigo" />
+          <div className="principal-video-chart-card">
+            <div className="principal-video-chart-header">
+              <div className="principal-video-chart-title">
+                <PieChartIcon size={18} className="principal-video-chart-icon" />
                 <h3>Department-Wise Video Distribution & Views</h3>
               </div>
-              <span className="chart-pill-badge">Institutional Audit</span>
+              <span className="principal-video-chart-badge">Institutional Audit</span>
             </div>
-            <div className="chart-card-body">
-              <div className="donut-layout-wrap">
-                <div className="donut-canvas-box">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={deptDonutData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={50}
-                        outerRadius={75}
-                        paddingAngle={3}
-                      >
-                        {deptDonutData.map((entry) => (
-                          <Cell key={`cell-${entry.name}`} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          background: "#0f172a",
-                          borderColor: "rgba(255,255,255,0.12)",
-                          borderRadius: "8px",
-                          color: "#fff",
-                          fontSize: "12px",
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="donut-center-overlay">
-                    <span className="donut-center-val">{totalDeptViewsFormatted}</span>
-                    <span className="donut-center-sub">Views</span>
+
+            <div className="principal-video-chart-body">
+              {deptDonutData.length === 0 ? (
+                <div className="principal-video-chart-empty">
+                  No department video distribution data available.
+                </div>
+              ) : (
+                <div className="principal-video-donut-wrap">
+                  <div className="principal-video-donut-canvas">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={deptDonutData}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={48}
+                          outerRadius={72}
+                          paddingAngle={3}
+                        >
+                          {deptDonutData.map((entry) => (
+                            <Cell key={`cell-${entry.name}`} fill={entry.color} stroke="var(--p-bg-card, #0f172a)" strokeWidth={2} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            background: "#0f172a",
+                            borderColor: "rgba(255,255,255,0.12)",
+                            borderRadius: "8px",
+                            color: "#fff",
+                            fontSize: "12px",
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="principal-video-donut-overlay">
+                      <span className="principal-video-donut-overlay-val">{totalDeptViewsFormatted}</span>
+                      <span className="principal-video-donut-overlay-sub">Views</span>
+                    </div>
+                  </div>
+
+                  <div className="principal-video-donut-legend">
+                    {deptDonutData.map((item) => (
+                      <div key={item.name} className="principal-video-legend-item">
+                        <span className="principal-video-legend-dot" style={{ background: item.color }} />
+                        <span className="principal-video-legend-label">{item.name}</span>
+                        <span className="principal-video-legend-val">{item.value.toLocaleString()} ({item.percentage}%)</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="donut-legend-list">
-                  {deptDonutData.map((item) => (
-                    <div key={item.name} className="donut-legend-item">
-                      <span className="legend-dot" style={{ background: item.color }} />
-                      <span className="legend-label">{item.name}</span>
-                      <span className="legend-value">{item.value.toLocaleString()} ({item.percentage}%)</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Category-Wise Video Watch Views Bar Chart */}
-          <div className="analytics-chart-card">
-            <div className="chart-card-header">
-              <div className="chart-header-title">
-                <BarChart3 size={18} className="chart-header-icon text-teal" />
+          <div className="principal-video-chart-card">
+            <div className="principal-video-chart-header">
+              <div className="principal-video-chart-title">
+                <BarChart3 size={18} className="principal-video-chart-icon text-teal" />
                 <h3>Category-Wise Total Video Views</h3>
               </div>
-              <span className="chart-pill-badge">Performance</span>
+              <span className="principal-video-chart-badge">Performance</span>
             </div>
-            <div className="chart-card-body">
-              <ResponsiveContainer width="100%" height={210}>
-                <BarChart
-                  data={categoryBarData}
-                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                  <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#0f172a",
-                      borderColor: "rgba(255,255,255,0.12)",
-                      borderRadius: "8px",
-                      color: "#fff",
-                      fontSize: "12px",
-                    }}
-                  />
-                  <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={44} />
-                </BarChart>
-              </ResponsiveContainer>
+
+            <div className="principal-video-chart-body">
+              {categoryBarData.length === 0 ? (
+                <div className="principal-video-chart-empty">
+                  No category video views logged.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={210}>
+                  <BarChart
+                    data={categoryBarData}
+                    margin={{ top: 4, right: 10, left: -18, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border, #1e293b)" vertical={false} />
+                    <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--p-text-muted, #94a3b8)" }} axisLine={false} tickLine={false} />
+                    <YAxis 
+                      tick={{ fontSize: 11, fill: "var(--p-text-muted, #94a3b8)" }} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      allowDecimals={false} 
+                      domain={[0, (dataMax: number) => (dataMax > 0 ? Math.ceil(dataMax * 1.1) : 100)]}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "#0f172a",
+                        borderColor: "rgba(255,255,255,0.12)",
+                        borderRadius: "8px",
+                        color: "#fff",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={44} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </section>
 
         {/* Filters */}
-        <section className="filters-bar">
+        <section className="principal-video-filters-bar">
           <select
-            className="filter-select"
+            className="principal-video-filter-select"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            aria-label="Filter by category"
           >
-            {categories.map((cat, idx) => (
-              <option key={`cat-${idx}`} value={cat}>
+            {categoryOptions.map((cat) => (
+              <option key={cat} value={cat}>
                 {cat}
               </option>
             ))}
           </select>
 
           <select
-            className="filter-select"
+            className="principal-video-filter-select"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            aria-label="Filter by status"
           >
-            {statuses.map((s) => (
-              <option key={s} value={s}>
-                {s}
+            {statuses.map((st) => (
+              <option key={st} value={st}>
+                {st}
               </option>
             ))}
           </select>
 
-          <div className="filter-search">
-            <Search size={15} strokeWidth={1.8} />
+          <div className="principal-video-search-box">
+            <Search size={15} strokeWidth={1.8} className="principal-video-search-icon" />
             <input
               type="text"
               placeholder="Search Video"
+              className="principal-video-search-input"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
         </section>
 
-        {/* Videos table */}
-        <section className="card table-card">
-          <div className="table-wrap">
-            <table>
+        {/* Video Table Card */}
+        <section className="principal-video-table-card">
+          <div className="principal-video-table-wrap">
+            <table className="principal-video-table">
+              <colgroup>
+                <col className="col-thumb" />
+                <col className="col-title" />
+                <col className="col-category" />
+                <col className="col-duration" />
+                <col className="col-views" />
+                <col className="col-date" />
+                <col className="col-uploader" />
+                <col className="col-status" />
+                <col className="col-action" />
+              </colgroup>
               <thead>
                 <tr>
-                  <th>Thumbnail</th>
-                  <th>Video Title</th>
-                  <th>Category</th>
-                  <th>Duration</th>
-                  <th>Views</th>
-                  <th>Uploaded Date</th>
-                  <th>Uploaded By</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th className="principal-video-th">Thumbnail</th>
+                  <th className="principal-video-th">Video Title</th>
+                  <th className="principal-video-th">Category</th>
+                  <th className="principal-video-th">Duration</th>
+                  <th className="principal-video-th">Views</th>
+                  <th className="principal-video-th">Uploaded Date</th>
+                  <th className="principal-video-th">Uploaded By</th>
+                  <th className="principal-video-th">Status</th>
+                  <th className="principal-video-th">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedVideos.map((video) => (
-                  <tr key={video.id}>
-                    <td>
-                      <ThumbnailBox label={video.thumbnail} />
-                    </td>
-                    <td className="video-title-cell">{video.title}</td>
-                    <td>{video.category}</td>
-                    <td>{video.duration}</td>
-                    <td>{video.views.toLocaleString()}</td>
-                    <td>{video.uploadedDate}</td>
-                    <td>
-                      <span className="uploader-pill-badge">
-                        {video.uploadedBy || "System Admin"}
-                      </span>
-                    </td>
-                    <td>
-                      <VideoStatusBadge status={video.status} />
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="view-report-btn"
-                        onClick={() => setSelectedVideo(video)}
-                      >
-                        <Eye size={14} strokeWidth={2} />
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {paginatedVideos.length === 0 && (
+                {paginatedVideos.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="empty-row">
+                    <td colSpan={9} className="principal-video-table-empty">
                       No videos match these filters.
                     </td>
                   </tr>
+                ) : (
+                  paginatedVideos.map((vid) => (
+                    <tr key={vid.id}>
+                      <td className="principal-video-td">
+                        <ThumbnailBox label={vid.thumbnail || (vid.title ? vid.title.slice(0, 2).toUpperCase() : "VD")} />
+                      </td>
+                      <td className="principal-video-td principal-video-cell-title" title={vid.title}>
+                        {vid.title}
+                      </td>
+                      <td className="principal-video-td">
+                        <span className="principal-video-category-badge">{vid.category || "General"}</span>
+                      </td>
+                      <td className="principal-video-td">{vid.duration || "N/A"}</td>
+                      <td className="principal-video-td principal-video-cell-views">{(vid.views || 0).toLocaleString()}</td>
+                      <td className="principal-video-td">{vid.uploadedDate || "N/A"}</td>
+                      <td className="principal-video-td">
+                        <span className="principal-video-uploader-truncate" title={vid.uploadedBy || "System Admin"}>
+                          {vid.uploadedBy || "System Admin"}
+                        </span>
+                      </td>
+                      <td className="principal-video-td">
+                        <VideoStatusBadge status={vid.status || "Published"} />
+                      </td>
+                      <td className="principal-video-td">
+                        <button
+                          type="button"
+                          className="principal-video-action-btn"
+                          onClick={() => setSelectedVideo(vid)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination */}
-          <div className="pagination-row">
-            <span className="pagination-summary">
-              Showing {rangeStart}–{rangeEnd} of {TOTAL_VIDEOS_IN_SYSTEM} Videos
+          {/* Pagination Footer */}
+          <div className="principal-video-pagination-footer">
+            <span className="principal-video-pagination-info">
+              Showing {rangeStart} to {rangeEnd} of {filteredVideos.length} videos
             </span>
 
-            <div className="pagination-controls">
+            <div className="principal-video-pagination-controls">
               <button
                 type="button"
-                className="pagination-btn"
+                className="principal-video-page-btn"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
+                aria-label="Previous Page"
               >
-                <ChevronLeft size={15} strokeWidth={2} />
-                Prev
+                <ChevronLeft size={16} strokeWidth={2} />
               </button>
 
-              <div className="pagination-pages">
-                {pageNumbers.map((page) => (
-                  <button
-                    key={page}
-                    type="button"
-                    className={`pagination-page ${page === currentPage ? "pagination-page-active" : ""}`}
-                    onClick={() => setCurrentPage(page)}
-                    aria-current={page === currentPage ? "page" : undefined}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
+              {pageNumbers.map((pageNo) => (
+                <button
+                  key={pageNo}
+                  type="button"
+                  className={`principal-video-page-btn ${pageNo === currentPage ? "principal-video-page-btn-active" : ""}`}
+                  onClick={() => setCurrentPage(pageNo)}
+                >
+                  {pageNo}
+                </button>
+              ))}
 
               <button
                 type="button"
-                className="pagination-btn"
+                className="principal-video-page-btn"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
+                aria-label="Next Page"
               >
-                Next
-                <ChevronRight size={15} strokeWidth={2} />
+                <ChevronRight size={16} strokeWidth={2} />
               </button>
             </div>
           </div>
         </section>
       </main>
 
+      {/* Video Detail Modal */}
       {selectedVideo && (
-        <VideoDetailsModal video={selectedVideo} onClose={() => setSelectedVideo(null)} />
+        <VideoDetailModal
+          video={selectedVideo}
+          onClose={() => setSelectedVideo(null)}
+        />
       )}
     </div>
   );

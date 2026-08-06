@@ -531,14 +531,14 @@ export default function HodStudentsPage() {
                   </div>
                   <div className="stu-modal-field">
                     <span className="stu-modal-field-label">Videos Watched</span>
-                    <div className="stu-modal-field-val">{modal.videosWatched} / 42</div>
+                    <div className="stu-modal-field-val">{modal.videosWatched} / {modal.videosTotal !== undefined ? modal.videosTotal : (modal.videosWatched > 0 ? modal.videosWatched : 0)} Videos</div>
                   </div>
                   <div className="stu-modal-field stu-modal-field-full">
                     <span className="stu-modal-field-label">Completion Rate</span>
                     <div className="stu-completion-wrap">
                       <div className="stu-completion-row">
                         <span className="stu-completion-pct">{modal.completionRate}%</span>
-                        <span style={{ fontSize: '11.5px', color: 'var(--stu-text-muted)' }}>{modal.videosWatched} of 42 videos</span>
+                        <span style={{ fontSize: '11.5px', color: 'var(--stu-text-muted)' }}>{modal.videosWatched} of {modal.videosTotal !== undefined ? modal.videosTotal : (modal.videosWatched > 0 ? modal.videosWatched : 0)} videos</span>
                       </div>
                       <div className="stu-completion-bar-bg">
                         <div

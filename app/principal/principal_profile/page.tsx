@@ -180,8 +180,8 @@ export default function PrincipalProfile() {
   };
 
   return (
-    <div className="dash-main">
-      <div className="dash-content">
+    <div className="dash-main min-h-screen" style={{ padding: "28px 32px 48px" }}>
+      <div className="dash-content max-w-[1440px] mx-auto">
         
         {/* Banner Header */}
         <div className="dash-welcome-banner mb-8">
@@ -206,10 +206,13 @@ export default function PrincipalProfile() {
                 : coverBg 
             }}
           >
-            <div className="absolute right-4 top-4">
-              <label className="dash-action-btn cursor-pointer" title="Change Background Cover">
-                <Camera size={16} />
-                <span className="btn-text">Cover Photo</span>
+            <div className="absolute right-4 top-4 z-10">
+              <label 
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all" 
+                title="Change Background Cover"
+              >
+                <Camera size={15} />
+                <span>Cover Photo</span>
                 <input 
                   type="file" 
                   accept="image/*" 
@@ -225,12 +228,25 @@ export default function PrincipalProfile() {
             <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
               {/* Avatar */}
               <div className="relative group">
-                <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-lg">
-                  <img 
-                    src={profile?.avatar || avatarSrc || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-32 h-32 rounded-full border-4 border-white bg-indigo-600 text-white flex items-center justify-center overflow-hidden shadow-lg">
+                  {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
+                    <img 
+                      src={avatarSrc || profile?.avatar} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="font-extrabold text-4xl select-none tracking-wider">
+                      {(() => {
+                        const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
+                        const parts = cleanName.split(" ").filter(Boolean);
+                        if (parts.length >= 2) {
+                          return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                        }
+                        return (cleanName[0] || "P").toUpperCase();
+                      })()}
+                    </span>
+                  )}
                 </div>
                 <label 
                   className="absolute bottom-1 right-1 p-2 bg-white border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
@@ -270,38 +286,35 @@ export default function PrincipalProfile() {
             </div>
 
             {/* Action Tabs */}
-            <div className="flex border-b border-slate-100 mt-8" style={{ borderColor: "var(--p-border-table)" }}>
+            <div className="flex border-b mt-8" style={{ borderColor: "var(--p-border-table)" }}>
               <button className="px-6 py-3 text-sm font-bold border-b-2" style={{ borderColor: "var(--p-indigo)", color: "var(--p-indigo)" }}>Overview</button>
-              <button className="px-6 py-3 text-sm font-medium" style={{ color: "var(--p-text-muted)" }}>Academic Bio</button>
-              <button className="px-6 py-3 text-sm font-medium" style={{ color: "var(--p-text-muted)" }}>Certifications</button>
-              <button className="px-6 py-3 text-sm font-medium" style={{ color: "var(--p-text-muted)" }}>Security</button>
             </div>
           </div>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-16">
           
           {/* Left Column: Details & Bio */}
           <div className="lg:col-span-2 space-y-8">
             
             {/* Quick Contact Section */}
             <div className="corp-card grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <div className="p-2 rounded-lg text-indigo-600 shadow-sm" style={{ background: "var(--p-indigo-soft)" }}><Mail size={18} /></div>
                 <div className="flex flex-col">
                   <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Email</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{email}</span>
+                  <span className="text-sm font-semibold truncate" style={{ color: "var(--p-text-primary)" }}>{email}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <div className="p-2 rounded-lg text-emerald-600 shadow-sm" style={{ background: "var(--p-emerald-soft)" }}><Phone size={18} /></div>
                 <div className="flex flex-col">
                   <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Phone</span>
                   <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{phone}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
+              <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <div className="p-2 rounded-lg text-amber-600 shadow-sm" style={{ background: "var(--p-amber-soft)" }}><Calendar size={18} /></div>
                 <div className="flex flex-col">
                   <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Joined</span>
@@ -348,12 +361,12 @@ export default function PrincipalProfile() {
               </h3>
               
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
+                <div className="flex items-center justify-between p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                   <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Username</span>
-                  <span className="text-sm font-semibold">{profile?.username || "principal"}</span>
+                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{profile?.username || "principal"}</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: "var(--p-bg-subtle)" }}>
+                <div className="flex items-center justify-between p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                   <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Status</span>
                   <span className="status-badge status-active">
                     <span className="status-dot" />

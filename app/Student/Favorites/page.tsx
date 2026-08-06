@@ -85,21 +85,35 @@ export default function StudentFavoritesPage() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("student_favorites");
+      const studentStr = localStorage.getItem("student") || sessionStorage.getItem("student");
+      const student = studentStr ? JSON.parse(studentStr) : null;
+      const studentKey = student?.id ? `student_favorites_${student.id}` : "student_favorites";
+
+      const saved = localStorage.getItem(studentKey) || localStorage.getItem("student_favorites");
       if (saved) {
-        setFavorites(JSON.parse(saved));
+        let parsed = JSON.parse(saved);
+        // Automatically purge old dummy seed items (IDs 101-105)
+        parsed = parsed.filter((item: any) => !([101, 102, 103, 104, 105].includes(item.id)));
+        setFavorites(parsed);
+        localStorage.setItem(studentKey, JSON.stringify(parsed));
+        localStorage.setItem("student_favorites", JSON.stringify(parsed));
       } else {
-        setFavorites(INITIAL_FAVORITES);
-        localStorage.setItem("student_favorites", JSON.stringify(INITIAL_FAVORITES));
+        setFavorites([]);
+        localStorage.setItem(studentKey, JSON.stringify([]));
+        localStorage.setItem("student_favorites", JSON.stringify([]));
       }
     } catch (e) {
-      setFavorites(INITIAL_FAVORITES);
+      setFavorites([]);
     }
   }, []);
 
   const saveFavoritesToStorage = (newList: any[]) => {
     setFavorites(newList);
     try {
+      const studentStr = localStorage.getItem("student") || sessionStorage.getItem("student");
+      const student = studentStr ? JSON.parse(studentStr) : null;
+      const studentKey = student?.id ? `student_favorites_${student.id}` : "student_favorites";
+      localStorage.setItem(studentKey, JSON.stringify(newList));
       localStorage.setItem("student_favorites", JSON.stringify(newList));
     } catch (e) {}
   };

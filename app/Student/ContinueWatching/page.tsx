@@ -190,18 +190,15 @@ export default function ContinueWatchingPage() {
       )}
 
       {!loading && !hasWatchHistory && (
-        <div className="cw-empty-full flex flex-col items-center justify-center py-20 px-4 text-center bg-slate-900/40 rounded-3xl border border-slate-800 my-6">
-          <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4 text-blue-400">
+        <div className="cw-empty-card">
+          <div className="cw-empty-icon-wrap">
             <Video size={32} />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">No video activity found</h3>
-          <p className="text-slate-400 text-sm max-w-md mb-6">
+          <h3 className="cw-empty-title">No video activity found</h3>
+          <p className="cw-empty-desc">
             You haven't watched any video lectures yet. Start watching your first video to track your progress and pick up where you left off.
           </p>
-          <Link
-            href="/Student/MyVideos"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/20"
-          >
+          <Link href="/Student/MyVideos" className="cw-empty-btn">
             <Play size={16} fill="white" />
             <span>Browse Video Lectures</span>
           </Link>
