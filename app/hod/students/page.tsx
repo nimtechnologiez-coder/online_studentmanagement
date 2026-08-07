@@ -18,6 +18,7 @@ type Student = {
   section: string;
   completionRate: number;
   videosWatched: number;
+  videosTotal?: number;
 };
 
 /* ─────────────────────────── Constants ─────────────────────── */
@@ -111,6 +112,7 @@ export default function HodStudentsPage() {
           section: "A",
           completionRate: student.completionRate || 0,
           videosWatched: student.videosWatched || 0,
+          videosTotal: student.videosTotal ?? student.totalVideos ?? 0,
         }));
         setStudents(studentData);
       } else {
