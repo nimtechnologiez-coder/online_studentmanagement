@@ -20,14 +20,14 @@ import {
 } from "lucide-react";
 import "./continuewatching.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 function getStudentId(): string | null {
   if (typeof window === "undefined") return null;
   try {
     const saved = localStorage.getItem("student") || sessionStorage.getItem("student");
     if (saved) return String(JSON.parse(saved).id);
-  } catch {}
+  } catch { }
   return null;
 }
 
@@ -55,13 +55,13 @@ export default function ContinueWatchingPage() {
       setLoading(true);
       setError("");
       const studentId = getStudentId();
-      
+
       // 1. Fetch watched videos & active sessions
       const vRes = await fetch(`${API_BASE}/api/student/videos/`, {
         headers: studentId ? { "X-Student-Id": studentId } : {},
       });
       const vData = await vRes.json();
-      
+
       let vList: any[] = [];
       if (vData.status === "success") {
         vList = vData.videos || [];

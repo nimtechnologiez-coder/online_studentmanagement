@@ -219,7 +219,7 @@ function buildStudentDonut(yearDist: YearDistItem[] = [], students: StudentPerfo
   }));
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
 const INITIAL_DASHBOARD_DATA: HodDashboardData = {
   summaryCards: {
@@ -300,7 +300,7 @@ export default function HodDashboardPage() {
           const parsed = JSON.parse(savedHod);
           hodId = parsed?.id || "";
           if (parsed?.name) setHodDisplayName(parsed.name);
-        } catch (e) {}
+        } catch (e) { }
       }
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -330,7 +330,7 @@ export default function HodDashboardPage() {
         const topSt = Array.isArray(json.topStudents) ? json.topStudents : [];
 
         const dailyViews: DailyView[] = eng.map((e: any) => ({ day: e.day, views: e.value ?? 0 }));
-        
+
         const recentViews: RecentView[] = acts.map((a: any) => ({
           student: a.name || "",
           department: json.hod?.department || "",

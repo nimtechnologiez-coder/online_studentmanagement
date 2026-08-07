@@ -32,7 +32,7 @@ export default function StudentLoginPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       document.documentElement.classList.add("light-page");
-      
+
       // Check for password update success notice from forgot-password flow
       const notice = sessionStorage.getItem("login_notice");
       if (notice) {
@@ -64,7 +64,7 @@ export default function StudentLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/login/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/login/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -89,9 +89,9 @@ export default function StudentLoginPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-['Inter'] antialiased flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white relative overflow-x-hidden">
-      
+
       {/* Education Academic Watermark Pattern */}
-      <div 
+      <div
         className="absolute inset-0 bg-repeat opacity-[0.04] pointer-events-none z-0"
         style={{ backgroundImage: "url('/edu_pattern.png')", backgroundSize: "320px" }}
       />
@@ -125,7 +125,7 @@ export default function StudentLoginPage() {
 
       {/* Main Single Centered SaaS Card Container (Exact Match to Signup Layout) */}
       <main className="relative z-10 w-full max-w-md mx-auto px-4 sm:px-6 my-auto py-8 sm:py-10">
-        
+
         {/* Header Hero Section */}
         <div className="text-center space-y-2 mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20 shadow-sm">
@@ -144,7 +144,7 @@ export default function StudentLoginPage() {
 
         {/* Central SaaS Login Card */}
         <div className="bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-[28px] border border-slate-200/90 shadow-xl shadow-slate-200/60 text-[#1E293B] space-y-5">
-          
+
           {/* Feedback Messages */}
           {error && (
             <div className="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold p-3.5 rounded-[14px] flex items-center gap-2.5 shadow-sm">
@@ -162,7 +162,7 @@ export default function StudentLoginPage() {
 
           {/* Login Form */}
           <form onSubmit={handleLoginSubmit} className="space-y-4">
-            
+
             {/* Email / Username Input */}
             <div className="space-y-1.5">
               <label className="block text-[11px] sm:text-xs font-bold text-[#1E293B]">

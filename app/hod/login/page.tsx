@@ -87,7 +87,7 @@ export default function HODLoginPage() {
           throw new Error("404 relative route");
         }
       } catch (err) {
-        response = await fetch("http://127.0.0.1:8000/api/hod/login/", {
+        response = await fetch("https://online-management-backend.onrender.com/api/hod/login/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -150,7 +150,7 @@ export default function HODLoginPage() {
 
       {/* Main Split Layout Container */}
       <div className="login-wrapper">
-        
+
         {/* Left Branding & Visual Panel */}
         <div className="left-section">
           <div className="left-grid-pattern"></div>
@@ -220,7 +220,7 @@ export default function HODLoginPage() {
         {/* Right Form Card Panel */}
         <div className="right-section">
           <div className="login-card">
-            
+
             <div className="login-card-header">
               <div className="security-tag">
                 <Lock size={13} />

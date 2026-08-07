@@ -105,7 +105,7 @@ export default function StudentSignupPage() {
 
   const fetchCollegesAndDepartments = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/get-colleges/");
+      const res = await fetch("https://online-management-backend.onrender.com/api/get-colleges/");
       const data = await res.json();
       if (data.status === "success") {
         setColleges(data.colleges || []);
@@ -130,7 +130,7 @@ export default function StudentSignupPage() {
     setFilteredDepartments(depts);
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/get-principal-by-college/${selectedId}/`);
+      const res = await fetch(`https://online-management-backend.onrender.com/api/get-principal-by-college/${selectedId}/`);
       const data = await res.json();
       if (data.status === "success") {
         setPrincipalInfo({
@@ -156,7 +156,7 @@ export default function StudentSignupPage() {
     setSendingOtp(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/send-otp/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/send-otp/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -193,7 +193,7 @@ export default function StudentSignupPage() {
     setVerifyingOtp(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/verify-otp/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/verify-otp/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim().toLowerCase(), otp_code: otpCode.trim() }),
@@ -254,7 +254,7 @@ export default function StudentSignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/create-account/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/create-account/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -287,9 +287,9 @@ export default function StudentSignupPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-['Inter'] antialiased flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white relative overflow-x-hidden">
-      
+
       {/* Education Watermark Pattern */}
-      <div 
+      <div
         className="absolute inset-0 bg-repeat opacity-[0.04] pointer-events-none z-0"
         style={{ backgroundImage: "url('/edu_pattern.png')", backgroundSize: "320px" }}
       />
@@ -323,7 +323,7 @@ export default function StudentSignupPage() {
 
       {/* Main Content Area */}
       <main className="relative z-10 w-full max-w-2xl mx-auto px-3.5 sm:px-6 my-auto py-6 sm:py-8">
-        
+
         {/* Header Hero Title Section */}
         <div className="text-center space-y-2 mb-5 sm:mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20 shadow-sm">
@@ -342,24 +342,23 @@ export default function StudentSignupPage() {
 
         {/* Central Registration SaaS Card */}
         <div className="bg-white/95 backdrop-blur-xl p-4.5 sm:p-7 md:p-8 rounded-[24px] sm:rounded-[28px] border border-slate-200/90 shadow-xl shadow-slate-200/60 text-[#1E293B] space-y-5 sm:space-y-6">
-          
+
           {/* Responsive Stepper Progress Indicator */}
           <div className="relative border-b border-slate-100 pb-4 sm:pb-5">
             <div className="flex items-center justify-between relative z-10 max-w-md mx-auto">
-              
+
               {/* Step 1 */}
               <button
                 type="button"
                 onClick={() => goToStep(1)}
                 className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
               >
-                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${
-                  activeStep === 1
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${activeStep === 1
                     ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
                     : activeStep > 1
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
-                }`}>
+                      ? "bg-emerald-500 text-white"
+                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  }`}>
                   {activeStep > 1 ? <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : "1"}
                 </div>
                 <div className="text-left">
@@ -368,9 +367,8 @@ export default function StudentSignupPage() {
               </button>
 
               {/* Connector 1 */}
-              <div className={`flex-1 h-[2px] mx-2 sm:mx-3 rounded-full transition-colors duration-300 ${
-                activeStep > 1 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
-              }`} />
+              <div className={`flex-1 h-[2px] mx-2 sm:mx-3 rounded-full transition-colors duration-300 ${activeStep > 1 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
+                }`} />
 
               {/* Step 2 */}
               <button
@@ -378,13 +376,12 @@ export default function StudentSignupPage() {
                 onClick={() => goToStep(2)}
                 className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
               >
-                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${
-                  activeStep === 2
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${activeStep === 2
                     ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
                     : activeStep > 2
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
-                }`}>
+                      ? "bg-emerald-500 text-white"
+                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  }`}>
                   {activeStep > 2 ? <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : "2"}
                 </div>
                 <div className="text-left">
@@ -393,9 +390,8 @@ export default function StudentSignupPage() {
               </button>
 
               {/* Connector 2 */}
-              <div className={`flex-1 h-[2px] mx-2 sm:mx-3 rounded-full transition-colors duration-300 ${
-                activeStep > 2 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
-              }`} />
+              <div className={`flex-1 h-[2px] mx-2 sm:mx-3 rounded-full transition-colors duration-300 ${activeStep > 2 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
+                }`} />
 
               {/* Step 3 */}
               <button
@@ -403,11 +399,10 @@ export default function StudentSignupPage() {
                 onClick={() => goToStep(3)}
                 className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
               >
-                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${
-                  activeStep === 3
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${activeStep === 3
                     ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
                     : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
-                }`}>
+                  }`}>
                   3
                 </div>
                 <div className="text-left">
@@ -435,11 +430,11 @@ export default function StudentSignupPage() {
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-            
+
             {/* STEP 1: Personal Details */}
             {activeStep === 1 && (
               <div className="space-y-4 animate-in fade-in duration-300">
-                
+
                 {/* Full Name */}
                 <div className="space-y-1 sm:space-y-1.5">
                   <label className="block text-[11px] sm:text-xs font-bold text-[#1E293B]">Full Name *</label>

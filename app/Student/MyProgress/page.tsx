@@ -36,14 +36,14 @@ import {
 } from "recharts";
 import "./myprogress.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 function getStudentData() {
   if (typeof window === "undefined") return null;
   try {
     const saved = localStorage.getItem("student") || sessionStorage.getItem("student");
     if (saved) return JSON.parse(saved);
-  } catch (e) {}
+  } catch (e) { }
   return null;
 }
 

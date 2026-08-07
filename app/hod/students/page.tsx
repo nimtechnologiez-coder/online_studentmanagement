@@ -49,7 +49,7 @@ export default function HodStudentsPage() {
   const [hodName, setHodName] = useState("HOD");
   const [deptName, setDeptName] = useState("Department");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -189,7 +189,7 @@ export default function HodStudentsPage() {
       <main className="stu-main">
         {/* ======== STAT CARDS ======== */}
         <section className="stu-stats">
-         <StatCard
+          <StatCard
             icon={<UsersIcon color="#4f6cf7" />}
             color="blue"
             label="Total Students"
@@ -272,18 +272,18 @@ export default function HodStudentsPage() {
               </thead>
               <tbody>
                 {loading ? (
-                <tr>
-                  <td colSpan={9} className="stu-empty light-student-table-empty-cell">
-                    Loading students...
-                  </td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={9} className="stu-empty light-student-table-empty-cell">
-                    {error}
-                  </td>
-                </tr>
-              ) : pageSlice.length > 0 ? (
+                  <tr>
+                    <td colSpan={9} className="stu-empty light-student-table-empty-cell">
+                      Loading students...
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={9} className="stu-empty light-student-table-empty-cell">
+                      {error}
+                    </td>
+                  </tr>
+                ) : pageSlice.length > 0 ? (
                   pageSlice.map((s, idx) => (
                     <tr key={s.id} className="light-student-table-row">
                       <td className="stu-td-num">{(safePage - 1) * PAGE_SIZE + idx + 1}</td>
@@ -305,11 +305,11 @@ export default function HodStudentsPage() {
                       <td className="stu-td-strong">{s.username}</td>
 
                       {/* Password */}
-                     <td>
-  <span className="stu-password">
-    {s.password || "—"}
-  </span>
-</td>
+                      <td>
+                        <span className="stu-password">
+                          {s.password || "—"}
+                        </span>
+                      </td>
 
                       {/* Email */}
                       <td className="stu-td-strong">{s.email}</td>

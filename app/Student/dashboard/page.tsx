@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import "./dashboard.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 const CATEGORY_ICONS: Record<string, { icon: any; colorClass: string }> = {
   Mathematics: { icon: Sigma, colorClass: "cat-icon-emerald" },

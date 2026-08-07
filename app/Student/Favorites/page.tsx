@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import "./favorites.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 const INITIAL_FAVORITES = [
   {
@@ -115,7 +115,7 @@ export default function StudentFavoritesPage() {
       const studentKey = student?.id ? `student_favorites_${student.id}` : "student_favorites";
       localStorage.setItem(studentKey, JSON.stringify(newList));
       localStorage.setItem("student_favorites", JSON.stringify(newList));
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const removeFavorite = (id: number, e: React.MouseEvent) => {

@@ -809,7 +809,7 @@ export default function VideosPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<UploadFormData | null>(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
   const authHeaders = (): Record<string, string> => {
     const hodId = getHodId();

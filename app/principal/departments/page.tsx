@@ -104,7 +104,7 @@ export default function DepartmentOverview() {
         try {
           const saved = typeof window !== "undefined" ? (localStorage.getItem("principal") || sessionStorage.getItem("principal")) : null;
           if (saved) principalId = JSON.parse(saved)?.id || "";
-        } catch {}
+        } catch { }
 
         const headers: Record<string, string> = {};
         if (principalId) headers["X-Principal-Id"] = String(principalId);
@@ -113,10 +113,10 @@ export default function DepartmentOverview() {
         try {
           res = await fetch("/api/principal/departments/", { headers, credentials: "include" });
           if (!res.ok) {
-            res = await fetch("http://127.0.0.1:8000/api/principal/departments/", { headers, credentials: "include" });
+            res = await fetch("https://online-management-backend.onrender.com/api/principal/departments/", { headers, credentials: "include" });
           }
         } catch {
-          res = await fetch("http://127.0.0.1:8000/api/principal/departments/", { headers, credentials: "include" });
+          res = await fetch("https://online-management-backend.onrender.com/api/principal/departments/", { headers, credentials: "include" });
         }
 
         if (!res.ok) throw new Error(`Server error: ${res.status}`);

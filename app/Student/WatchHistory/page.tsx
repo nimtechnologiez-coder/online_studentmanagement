@@ -4,14 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { Clock, Play, Trash2, Search, Calendar, CheckCircle2, Loader2, AlertCircle, Video, X, FileText } from "lucide-react";
 import "./watchhistory.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 function getStudentId(): string | null {
   if (typeof window === "undefined") return null;
   try {
     const saved = localStorage.getItem("student") || sessionStorage.getItem("student");
     if (saved) return String(JSON.parse(saved).id);
-  } catch {}
+  } catch { }
   return null;
 }
 

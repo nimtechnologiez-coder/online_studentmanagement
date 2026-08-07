@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { 
-  ChevronLeft, 
-  Camera, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Edit3, 
-  ShieldCheck, 
-  GraduationCap, 
+import {
+  ChevronLeft,
+  Camera,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Edit3,
+  ShieldCheck,
+  GraduationCap,
   Building2,
   BookOpen,
   X
@@ -48,7 +48,7 @@ export default function HodProfilePage() {
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const [coverBg, setCoverBg] = useState<string>("linear-gradient(135deg, #4f46e5 0%, #312e81 100%)");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
   const fetchProfile = async () => {
     try {
@@ -59,7 +59,7 @@ export default function HodProfilePage() {
         try {
           const parsed = JSON.parse(savedHod);
           hodId = parsed?.id || "";
-        } catch (e) {}
+        } catch (e) { }
       }
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -98,7 +98,7 @@ export default function HodProfilePage() {
         try {
           const parsed = JSON.parse(savedHod);
           hodId = parsed?.id || "";
-        } catch (e) {}
+        } catch (e) { }
       }
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -201,7 +201,7 @@ export default function HodProfilePage() {
   return (
     <div className="dash-main">
       <div className="dash-content">
-        
+
         {/* Banner Header */}
         <div className="dash-welcome-banner mb-8">
           <div className="banner-content">
@@ -217,22 +217,22 @@ export default function HodProfilePage() {
         {/* Profile Header Card */}
         <div className="corp-card overflow-hidden mb-8" style={{ padding: 0 }}>
           {/* Cover Photo */}
-          <div 
-            className="relative h-48 transition-all" 
+          <div
+            className="relative h-48 transition-all"
             style={{ background: coverBg }}
           >
             <div className="absolute right-4 top-4 z-10">
-              <label 
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all" 
+              <label
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all"
                 title="Change Background Cover"
               >
                 <Camera size={15} />
                 <span>Cover Photo</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
-                  onChange={handleCoverChange} 
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleCoverChange}
                 />
               </label>
             </div>
@@ -245,9 +245,9 @@ export default function HodProfilePage() {
               <div className="relative group">
                 <div className="w-32 h-32 rounded-full border-4 border-white bg-indigo-600 text-white flex items-center justify-center overflow-hidden shadow-lg">
                   {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
-                    <img 
-                      src={avatarSrc || profile?.avatar} 
-                      alt="Profile" 
+                    <img
+                      src={avatarSrc || profile?.avatar}
+                      alt="Profile"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -263,16 +263,16 @@ export default function HodProfilePage() {
                     </span>
                   )}
                 </div>
-                <label 
+                <label
                   className="absolute bottom-1 right-1 p-2 bg-white border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
                   title="Upload Profile Picture"
                 >
                   <Camera size={15} />
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    className="hidden" 
-                    onChange={handleAvatarChange} 
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
                   />
                 </label>
               </div>
@@ -287,7 +287,7 @@ export default function HodProfilePage() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => {
                   setEditEmail(email);
                   setEditPhone(phone);
@@ -306,7 +306,7 @@ export default function HodProfilePage() {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          
+
           {/* Quick Contact Section */}
           <div className="corp-card flex flex-col justify-center gap-4">
             <h3 className="font-bold flex items-center gap-2 mb-2" style={{ color: "var(--p-text-primary)" }}>
@@ -335,7 +335,7 @@ export default function HodProfilePage() {
               <ShieldCheck size={18} style={{ color: "var(--p-indigo)" }} />
               Account Details
             </h3>
-            
+
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Username</span>
@@ -346,7 +346,7 @@ export default function HodProfilePage() {
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Department</span>
                 <span className="text-sm font-semibold text-right leading-snug" style={{ color: "var(--p-text-primary)", maxWidth: "60%" }}>{department}</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
                 <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Status</span>
                 <span className="status-badge status-active">
@@ -395,7 +395,7 @@ export default function HodProfilePage() {
                 <Edit3 size={18} style={{ color: "var(--p-indigo)" }} />
                 <h3>Edit HOD Profile</h3>
               </div>
-              <button 
+              <button
                 type="button"
                 className="password-toggle-btn"
                 onClick={() => setIsEditModalOpen(false)}

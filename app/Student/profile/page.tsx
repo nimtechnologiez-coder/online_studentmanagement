@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import "./profile.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 function getStudentData() {
     if (typeof window === "undefined") return null;

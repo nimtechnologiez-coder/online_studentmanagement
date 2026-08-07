@@ -80,7 +80,7 @@ type PerformancePayload = {
   students: StudentRow[];
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
 const AVATAR_COLORS = [
   "#4f46e5", "#10b981", "#f59e0b", "#8b5cf6",
@@ -270,7 +270,7 @@ export default function HodPerformancePage() {
   return (
     <div className="dash-main hod-perf-container">
       <div className="dash-content">
-        
+
         <div className="dash-welcome-banner mb-8">
           <div className="banner-content">
             <Link href="/hod/dashboard" className="banner-badge hover:underline">
@@ -331,7 +331,7 @@ export default function HodPerformancePage() {
         </section>
 
         <section className="dash-charts-row mb-8">
-          
+
           <div className="corp-card chart-card chart-wide">
             <div className="corp-card-header">
               <div>

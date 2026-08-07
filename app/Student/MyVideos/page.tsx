@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import "./myvideos.css";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://online-management-backend.onrender.com";
 
 const GRADIENTS = [
   "from-slate-900 via-blue-950 to-slate-900",
@@ -81,7 +81,7 @@ export default function MyVideosPage() {
         });
         setWatchLaterMap(map);
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function toggleFavorite(video: any, e: React.MouseEvent) {

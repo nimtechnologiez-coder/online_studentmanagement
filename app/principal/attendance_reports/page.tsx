@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  ChevronLeft, 
-  Users, 
-  UserX, 
-  Calendar, 
-  Search, 
-  Filter, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Download, 
-  AlertCircle, 
+import {
+  ChevronLeft,
+  Users,
+  UserX,
+  Calendar,
+  Search,
+  Filter,
+  ArrowUpRight,
+  ArrowDownRight,
+  Download,
+  AlertCircle,
   CheckCircle2,
   RefreshCw
 } from "lucide-react";
@@ -72,7 +72,7 @@ export default function AttendanceReports() {
         try {
           const saved = typeof window !== "undefined" ? (localStorage.getItem("principal") || sessionStorage.getItem("principal")) : null;
           if (saved) principalId = JSON.parse(saved)?.id || "";
-        } catch {}
+        } catch { }
 
         const headers: Record<string, string> = {};
         if (principalId) headers["X-Principal-Id"] = String(principalId);
@@ -81,10 +81,10 @@ export default function AttendanceReports() {
         try {
           res = await fetch("/api/principal/attendance_reports/", { headers, credentials: "include" });
           if (!res.ok) {
-            res = await fetch("http://127.0.0.1:8000/api/principal/attendance_reports/", { headers, credentials: "include" });
+            res = await fetch("https://online-management-backend.onrender.com/api/principal/attendance_reports/", { headers, credentials: "include" });
           }
         } catch {
-          res = await fetch("http://127.0.0.1:8000/api/principal/attendance_reports/", { headers, credentials: "include" });
+          res = await fetch("https://online-management-backend.onrender.com/api/principal/attendance_reports/", { headers, credentials: "include" });
         }
 
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -107,8 +107,8 @@ export default function AttendanceReports() {
   }, []);
 
   const filteredData = attendanceList.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          item.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "All" || item.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -116,7 +116,7 @@ export default function AttendanceReports() {
   return (
     <div className="dash-main">
       <div className="dash-content">
-        
+
         {/* Banner Header */}
         <div className="dash-welcome-banner mb-6">
           <div className="banner-content">
@@ -127,9 +127,9 @@ export default function AttendanceReports() {
             <h2>Attendance Reports</h2>
             <p>Monitor college-wide attendance trends & student warnings across all departments.</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => {
                 const listToExport = filteredData.length > 0 ? filteredData : attendanceList;
                 if (listToExport.length === 0) return;
@@ -210,23 +210,23 @@ export default function AttendanceReports() {
 
         {/* Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
+
           {/* Students List (Left 2/3) */}
           <div className="lg:col-span-2 space-y-4">
             <div className="corp-card table-card-corp">
               <div className="corp-card-header mb-4">
                 <div className="dash-search-container" style={{ maxWidth: 300 }}>
                   <Search size={15} className="search-icon" />
-                  <input 
-                    type="text" 
-                    placeholder="Search student ID or name..." 
+                  <input
+                    type="text"
+                    placeholder="Search student ID or name..."
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Filter size={15} style={{ color: "var(--p-text-muted)" }} />
-                  <select 
+                  <select
                     className="corp-select"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
@@ -266,21 +266,20 @@ export default function AttendanceReports() {
                         <td>
                           <div className="flex items-center gap-2.5">
                             <div className="w-16 md:w-20 h-2 rounded-full overflow-hidden" style={{ background: "var(--p-border-table)" }}>
-                              <div 
+                              <div
                                 className="h-full rounded-full"
-                                style={{ 
+                                style={{
                                   width: `${item.attendance}%`,
-                                  background: item.attendance >= 75 ? "var(--p-emerald)" : item.attendance >= 70 ? "var(--p-amber)" : "var(--p-red)" 
-                                }} 
+                                  background: item.attendance >= 75 ? "var(--p-emerald)" : item.attendance >= 70 ? "var(--p-amber)" : "var(--p-red)"
+                                }}
                               />
                             </div>
                             <span className="font-bold">{item.attendance}%</span>
                           </div>
                         </td>
                         <td>
-                          <span className={`status-badge ${
-                            item.status === 'Safe' ? 'status-active' : 'status-inactive'
-                          }`}>
+                          <span className={`status-badge ${item.status === 'Safe' ? 'status-active' : 'status-inactive'
+                            }`}>
                             <span className="status-dot" />
                             {item.status}
                           </span>
@@ -313,8 +312,8 @@ export default function AttendanceReports() {
                       <span className="font-bold">{dept.rate}%</span>
                     </div>
                     <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--p-border-table)" }}>
-                      <div 
-                        className="h-full rounded-full" 
+                      <div
+                        className="h-full rounded-full"
                         style={{ width: `${dept.rate}%`, background: "var(--p-indigo)" }}
                       />
                     </div>

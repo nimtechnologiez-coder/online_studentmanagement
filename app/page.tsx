@@ -69,7 +69,7 @@ export default function PrincipalLogin() {
           throw new Error("404 relative route");
         }
       } catch (err) {
-        response = await fetch("http://127.0.0.1:8000/api/principal/login/", {
+        response = await fetch("https://online-management-backend.onrender.com/api/principal/login/", {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ export default function PrincipalLogin() {
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         // Retry directly against Django server if Next.js proxy returned HTML error page
-        response = await fetch("http://127.0.0.1:8000/api/principal/login/", {
+        response = await fetch("https://online-management-backend.onrender.com/api/principal/login/", {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -139,7 +139,7 @@ export default function PrincipalLogin() {
 
       {/* Main Split Layout */}
       <div className="login-wrapper">
-        
+
         {/* Left Branding & Highlights Panel */}
         <div className="left-section">
           <div className="left-grid-pattern"></div>
@@ -209,7 +209,7 @@ export default function PrincipalLogin() {
         {/* Right Interactive Login Card Panel */}
         <div className="right-section">
           <div className="login-card">
-            
+
             <div className="login-card-header">
               <div className="security-tag">
                 <Lock size={13} />

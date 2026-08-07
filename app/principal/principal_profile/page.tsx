@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { 
-  ChevronLeft, 
-  Camera, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Edit3, 
-  ShieldCheck, 
-  GraduationCap, 
+import {
+  ChevronLeft,
+  Camera,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Edit3,
+  ShieldCheck,
+  GraduationCap,
   Building2,
   X
 } from "lucide-react";
@@ -70,7 +70,7 @@ export default function PrincipalProfile() {
       try {
         res = await fetch("/api/principal/profile/", { method: "GET", headers, credentials: "include" });
       } catch (_) {
-        res = await fetch("http://127.0.0.1:8000/api/principal/profile/", { method: "GET", headers, credentials: "include" });
+        res = await fetch("https://online-management-backend.onrender.com/api/principal/profile/", { method: "GET", headers, credentials: "include" });
       }
       const json = await res.json();
       if (json.status === "success" && json.data) {
@@ -105,7 +105,7 @@ export default function PrincipalProfile() {
       try {
         res = await fetch("/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
       } catch (_) {
-        res = await fetch("http://127.0.0.1:8000/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
+        res = await fetch("https://online-management-backend.onrender.com/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
       }
       const json = await res.json();
       if (json.status === "success" && json.data) {
@@ -140,7 +140,7 @@ export default function PrincipalProfile() {
       try {
         res = await fetch("/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
       } catch (_) {
-        res = await fetch("http://127.0.0.1:8000/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
+        res = await fetch("https://online-management-backend.onrender.com/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
       }
       const json = await res.json();
       if (json.status === "success" && json.data) {
@@ -221,12 +221,12 @@ export default function PrincipalProfile() {
 
       {/* Hero Header Card */}
       <div className="p-profile-hero-card">
-        <div 
-          className="p-profile-cover-box" 
-          style={{ 
-            background: profile?.cover_photo 
-              ? `url(${profile.cover_photo}) center/cover no-repeat` 
-              : coverBg 
+        <div
+          className="p-profile-cover-box"
+          style={{
+            background: profile?.cover_photo
+              ? `url(${profile.cover_photo}) center/cover no-repeat`
+              : coverBg
           }}
         >
           <label className="p-profile-cover-btn" title="Change Cover Photo">
@@ -267,7 +267,7 @@ export default function PrincipalProfile() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => {
                 setEditEmail(email);
                 setEditPhone(phone);
@@ -339,14 +339,14 @@ export default function PrincipalProfile() {
                 <GraduationCap size={18} className="p-profile-card-title-icon" />
                 Academic Biography
               </h3>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => {
                   setEditEmail(email);
                   setEditPhone(phone);
                   setEditBio(profile?.bio || "");
                   setIsEditModalOpen(true);
-                }} 
+                }}
                 className="p-profile-edit-trigger"
                 style={{ fontSize: 12, padding: "4px 10px", borderRadius: 8 }}
               >
@@ -370,13 +370,13 @@ export default function PrincipalProfile() {
                 Account Details
               </h3>
             </div>
-            
+
             <div className="p-profile-rows-container">
               <div className="p-profile-data-row">
                 <span className="p-profile-row-label">Username</span>
                 <span className="p-profile-row-value">{profile?.username || "principal"}</span>
               </div>
-              
+
               <div className="p-profile-data-row">
                 <span className="p-profile-row-label">Status</span>
                 <span className="p-profile-status-pill">
@@ -403,8 +403,8 @@ export default function PrincipalProfile() {
                 <Edit3 size={18} style={{ color: "#2563eb" }} />
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Edit Principal Profile</h3>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setIsEditModalOpen(false)}
                 style={{ background: "transparent", border: "none", color: "var(--p-text-muted)", cursor: "pointer" }}
               >

@@ -77,7 +77,7 @@ export default function StudentForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/forgot-password/send-otp/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/forgot-password/send-otp/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -113,7 +113,7 @@ export default function StudentForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/forgot-password/verify-otp/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/forgot-password/verify-otp/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp_code: otpCode }),
@@ -158,7 +158,7 @@ export default function StudentForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/student/forgot-password/reset/", {
+      const res = await fetch("https://online-management-backend.onrender.com/api/student/forgot-password/reset/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -187,9 +187,9 @@ export default function StudentForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-['Inter'] antialiased flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white relative overflow-x-hidden">
-      
+
       {/* Education Academic Pattern Watermark */}
-      <div 
+      <div
         className="absolute inset-0 bg-repeat opacity-[0.04] pointer-events-none z-0"
         style={{ backgroundImage: "url('/edu_pattern.png')", backgroundSize: "320px" }}
       />
@@ -223,7 +223,7 @@ export default function StudentForgotPasswordPage() {
 
       {/* Main Single Centered SaaS Card Container */}
       <main className="relative z-10 w-full max-w-md mx-auto px-4 sm:px-6 my-auto py-8 sm:py-10">
-        
+
         {/* Header Hero Section */}
         <div className="text-center space-y-2 mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20 shadow-sm">
@@ -244,56 +244,51 @@ export default function StudentForgotPasswordPage() {
 
         {/* Central SaaS Card */}
         <div className="bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-[28px] border border-slate-200/90 shadow-xl shadow-slate-200/60 text-[#1E293B] space-y-5">
-          
+
           {/* Timeline Stepper Progress Indicator */}
           <div className="relative border-b border-slate-100 pb-4">
             <div className="flex items-center justify-between relative z-10 max-w-xs mx-auto">
-              
+
               {/* Step 1 */}
               <div className="flex items-center gap-1.5">
-                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${
-                  activeStep === 1
+                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${activeStep === 1
                     ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
                     : activeStep > 1
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
-                }`}>
+                      ? "bg-emerald-500 text-white"
+                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  }`}>
                   {activeStep > 1 ? <CheckCircle2 className="w-3.5 h-3.5" /> : "1"}
                 </div>
                 <span className={`text-[11px] font-bold ${activeStep === 1 ? "text-[#4F46E5]" : "text-[#1E293B]"}`}>Email</span>
               </div>
 
               {/* Connector 1 */}
-              <div className={`flex-1 h-[2px] mx-2 rounded-full transition-colors duration-300 ${
-                activeStep > 1 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
-              }`} />
+              <div className={`flex-1 h-[2px] mx-2 rounded-full transition-colors duration-300 ${activeStep > 1 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
+                }`} />
 
               {/* Step 2 */}
               <div className="flex items-center gap-1.5">
-                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${
-                  activeStep === 2
+                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${activeStep === 2
                     ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
                     : activeStep > 2
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
-                }`}>
+                      ? "bg-emerald-500 text-white"
+                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  }`}>
                   {activeStep > 2 ? <CheckCircle2 className="w-3.5 h-3.5" /> : "2"}
                 </div>
                 <span className={`text-[11px] font-bold ${activeStep === 2 ? "text-[#4F46E5]" : "text-[#1E293B]"}`}>OTP</span>
               </div>
 
               {/* Connector 2 */}
-              <div className={`flex-1 h-[2px] mx-2 rounded-full transition-colors duration-300 ${
-                activeStep > 2 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
-              }`} />
+              <div className={`flex-1 h-[2px] mx-2 rounded-full transition-colors duration-300 ${activeStep > 2 ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]" : "bg-slate-200"
+                }`} />
 
               {/* Step 3 */}
               <div className="flex items-center gap-1.5">
-                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${
-                  activeStep === 3
+                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${activeStep === 3
                     ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
                     : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
-                }`}>
+                  }`}>
                   3
                 </div>
                 <span className={`text-[11px] font-bold ${activeStep === 3 ? "text-[#4F46E5]" : "text-[#1E293B]"}`}>Reset</span>

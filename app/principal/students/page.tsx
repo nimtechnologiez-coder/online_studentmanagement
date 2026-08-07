@@ -453,7 +453,7 @@ export default function StudentsPage() {
           credentials: "include",
         });
       } catch {
-        res = await fetch(`http://127.0.0.1:8000/api/principal/students/${deleteStudentId}/delete/`, {
+        res = await fetch(`https://online-management-backend.onrender.com/api/principal/students/${deleteStudentId}/delete/`, {
           method: "POST",
           headers,
           credentials: "include",

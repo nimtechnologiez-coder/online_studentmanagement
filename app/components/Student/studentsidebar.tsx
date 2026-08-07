@@ -54,7 +54,7 @@ export default function StudentSidebar() {
     try {
       const saved = typeof window !== "undefined" ? localStorage.getItem("student") || sessionStorage.getItem("student") : null;
       const studentId = saved ? JSON.parse(saved).id : 0;
-      const res = await fetch(`http://127.0.0.1:8000/api/student/dashboard/`, {
+      const res = await fetch(`https://online-management-backend.onrender.com/api/student/dashboard/`, {
         headers: studentId ? { "X-Student-Id": String(studentId) } : {},
       });
       const data = await res.json();

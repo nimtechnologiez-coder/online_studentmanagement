@@ -67,7 +67,7 @@ export default function AdminVideoApprovalPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
   const fetchApprovals = useCallback(async () => {
     try {
@@ -192,7 +192,7 @@ export default function AdminVideoApprovalPage() {
 
   return (
     <div className="dash-main p-6 space-y-6">
-      
+
       {/* Top Banner */}
       <div className="dash-welcome-banner">
         <div className="banner-content">
@@ -208,11 +208,10 @@ export default function AdminVideoApprovalPage() {
       {/* Action Notification Toasts */}
       {actionMessage && (
         <div
-          className={`flex items-center gap-3 p-4 rounded-xl border text-sm font-semibold transition-all ${
-            actionMessage.type === "success"
+          className={`flex items-center gap-3 p-4 rounded-xl border text-sm font-semibold transition-all ${actionMessage.type === "success"
               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
               : "bg-red-500/10 border-red-500/30 text-red-400"
-          }`}
+            }`}
         >
           {actionMessage.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
           <span>{actionMessage.text}</span>
@@ -223,9 +222,8 @@ export default function AdminVideoApprovalPage() {
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div
           onClick={() => setActiveStatusFilter("Pending")}
-          className={`corp-card cursor-pointer transition-all ${
-            activeStatusFilter === "Pending" ? "border-amber-500/50 bg-amber-500/5" : "hover:border-amber-500/30"
-          }`}
+          className={`corp-card cursor-pointer transition-all ${activeStatusFilter === "Pending" ? "border-amber-500/50 bg-amber-500/5" : "hover:border-amber-500/30"
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase text-slate-400">Pending Approval</span>
@@ -237,9 +235,8 @@ export default function AdminVideoApprovalPage() {
 
         <div
           onClick={() => setActiveStatusFilter("Published")}
-          className={`corp-card cursor-pointer transition-all ${
-            activeStatusFilter === "Published" ? "border-emerald-500/50 bg-emerald-500/5" : "hover:border-emerald-500/30"
-          }`}
+          className={`corp-card cursor-pointer transition-all ${activeStatusFilter === "Published" ? "border-emerald-500/50 bg-emerald-500/5" : "hover:border-emerald-500/30"
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase text-slate-400">Published / Approved</span>
@@ -251,9 +248,8 @@ export default function AdminVideoApprovalPage() {
 
         <div
           onClick={() => setActiveStatusFilter("Rejected")}
-          className={`corp-card cursor-pointer transition-all ${
-            activeStatusFilter === "Rejected" ? "border-red-500/50 bg-red-500/5" : "hover:border-red-500/30"
-          }`}
+          className={`corp-card cursor-pointer transition-all ${activeStatusFilter === "Rejected" ? "border-red-500/50 bg-red-500/5" : "hover:border-red-500/30"
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase text-slate-400">Rejected Videos</span>
@@ -265,9 +261,8 @@ export default function AdminVideoApprovalPage() {
 
         <div
           onClick={() => setActiveStatusFilter("All")}
-          className={`corp-card cursor-pointer transition-all ${
-            activeStatusFilter === "All" ? "border-indigo-500/50 bg-indigo-500/5" : "hover:border-indigo-500/30"
-          }`}
+          className={`corp-card cursor-pointer transition-all ${activeStatusFilter === "All" ? "border-indigo-500/50 bg-indigo-500/5" : "hover:border-indigo-500/30"
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase text-slate-400">Total Videos</span>
@@ -280,49 +275,45 @@ export default function AdminVideoApprovalPage() {
 
       {/* Main Table Container */}
       <div className="corp-card space-y-4">
-        
+
         {/* Controls Row: Status Tabs, Search, Department Filter, Refresh */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border-b border-white/10 pb-4">
-          
+
           {/* Status Filter Tabs */}
           <div className="flex items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-xl border border-white/10 overflow-x-auto w-full lg:w-auto">
             <button
               onClick={() => setActiveStatusFilter("Pending")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-                activeStatusFilter === "Pending"
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "Pending"
                   ? "bg-amber-500 text-slate-950 shadow"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               Pending ({counts.pending})
             </button>
             <button
               onClick={() => setActiveStatusFilter("Published")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-                activeStatusFilter === "Published"
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "Published"
                   ? "bg-emerald-500 text-slate-950 shadow"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               Approved ({counts.published})
             </button>
             <button
               onClick={() => setActiveStatusFilter("Rejected")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-                activeStatusFilter === "Rejected"
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "Rejected"
                   ? "bg-red-500 text-white shadow"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               Rejected ({counts.rejected})
             </button>
             <button
               onClick={() => setActiveStatusFilter("All")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-                activeStatusFilter === "All"
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "All"
                   ? "bg-indigo-600 text-white shadow"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               All ({counts.total})
             </button>
@@ -330,7 +321,7 @@ export default function AdminVideoApprovalPage() {
 
           {/* Search Box + Department Filter + Sync Button */}
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
-            
+
             {/* Search Box */}
             <div className="relative flex-1 sm:w-64 min-w-[200px]">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -479,7 +470,7 @@ export default function AdminVideoApprovalPage() {
                     {/* Action Buttons Column: View, Approve, Reject */}
                     <td className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        
+
                         {/* View Video Button */}
                         <button
                           onClick={() => setPreviewVideo(video)}
@@ -599,13 +590,12 @@ export default function AdminVideoApprovalPage() {
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase text-[10px]">Status</span>
                   <span
-                    className={`font-bold ${
-                      previewVideo.status === "Published"
+                    className={`font-bold ${previewVideo.status === "Published"
                         ? "text-emerald-400"
                         : previewVideo.status === "Pending"
-                        ? "text-amber-400"
-                        : "text-red-400"
-                    }`}
+                          ? "text-amber-400"
+                          : "text-red-400"
+                      }`}
                   >
                     {previewVideo.status}
                   </span>
