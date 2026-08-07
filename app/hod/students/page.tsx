@@ -5,6 +5,7 @@ import "./students.css";
 
 /* ─────────────────────────── Types ─────────────────────────── */
 
+/** Student data model for HOD view */
 type Student = {
   id: number;
   name: string;
