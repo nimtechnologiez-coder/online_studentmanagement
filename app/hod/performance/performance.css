@@ -259,8 +259,12 @@
 
 /* Donut & Legends */
 .donut-chart-box {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  overflow: visible !important;
 }
 
 .donut-center-label {
@@ -539,51 +543,557 @@
 @media (max-width: 1200px) {
   .dash-charts-row {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
 @media (max-width: 1024px) {
   .dash-main {
-    padding: 18px 20px 36px;
+    padding: 16px;
   }
 
   .kpi-cards-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 }
 
 @media (max-width: 640px) {
   .dash-main {
-    padding: 14px;
+    padding: 12px;
   }
 
   .dash-welcome-banner {
-    padding: 20px;
+    padding: 18px 16px;
+    border-radius: 14px;
   }
 
   .dash-welcome-banner h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .kpi-cards-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
   }
 
   .kpi-card {
-    padding: 16px 18px;
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
   }
 
-  .kpi-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 10px;
+  .kpi-card-value {
+    font-size: 20px !important;
+  }
+
+  .kpi-card-label {
+    font-size: 11px !important;
   }
 
   .kpi-icon-box {
-    width: 38px;
-    height: 38px;
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .corp-card {
+    padding: 16px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .corp-card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .perf-footer-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .perf-pagination-nav {
+    margin-left: auto !important;
+    align-self: flex-end !important;
+  }
+
+  .corp-table th,
+  .corp-table td {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* ==========================================================
+   MOST WATCHED VIDEOS CARD (SCOPED UNIQUE CLASS NAMES)
+========================================================== */
+
+.light-most-watched-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.light-most-watched-chart-container {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: visible !important;
+}
+
+.light-most-watched-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 220px;
+  gap: 16px;
+}
+
+.light-most-watched-chart {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.light-most-watched-center-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+}
+
+.light-most-watched-center-value {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--p-text-primary, #ffffff);
+  line-height: 1.1;
+}
+
+.light-most-watched-center-sub {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--p-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.light-most-watched-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding-left: 8px;
+}
+
+.light-most-watched-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.light-most-watched-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.light-most-watched-legend-name {
+  color: var(--p-text-primary, #e2e8f0);
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.light-most-watched-legend-val {
+  color: var(--p-text-muted, #94a3b8);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Centered Empty State for 0 Views or Empty Dataset */
+.light-most-watched-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 220px;
+  padding: 24px;
+}
+
+.light-most-watched-empty-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.light-most-watched-empty-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--p-text-primary, #ffffff);
+  margin-bottom: 4px;
+}
+
+.light-most-watched-empty-sub {
+  font-size: 12px;
+  color: var(--p-text-muted, #94a3b8);
+}
+
+@media (max-width: 480px) {
+  .light-most-watched-wrapper {
+    flex-direction: column !important;
+    height: auto !important;
+    gap: 16px !important;
+    padding: 8px 0 !important;
+  }
+
+  .light-most-watched-legend {
+    width: 100% !important;
+    padding-left: 0 !important;
+  }
+}
+
+/* ==========================================================
+   WEEKLY ACTIVE LEARNERS CARD (SCOPED UNIQUE CLASS NAMES)
+========================================================== */
+
+.light-weekly-active-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.light-weekly-active-chart {
+  width: 100%;
+  min-height: 240px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Scoped Modern Glass Tooltip */
+.light-weekly-active-tooltip {
+  background: var(--p-bg-card, #ffffff);
+  border: 1px solid var(--p-border, #cbd5e1);
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  color: var(--p-text-primary, #0f172a);
+}
+
+html.dark .light-weekly-active-tooltip {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.light-weekly-active-tooltip-title {
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--p-text-primary, #0f172a);
+}
+
+html.dark .light-weekly-active-tooltip-title {
+  color: #cbd5e1;
+}
+
+.light-weekly-active-tooltip-row {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.light-weekly-active-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0d9488;
+  flex-shrink: 0;
+}
+
+/* Centered Empty State for 0 Active Learners */
+.light-weekly-active-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 240px;
+  padding: 24px;
+}
+
+.light-weekly-active-empty-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.light-weekly-active-empty-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--p-text-primary, #ffffff);
+  margin-bottom: 4px;
+}
+
+.light-weekly-active-empty-sub {
+  font-size: 12px;
+  color: var(--p-text-muted, #94a3b8);
+}
+
+/* ==========================================================
+   STUDENT PERFORMANCE OVERVIEW SECTION (SCOPED UNIQUE CLASS NAMES)
+========================================================== */
+
+.light-student-performance-card {
+  padding: 24px 24px 16px !important;
+}
+
+.light-student-performance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.light-student-performance-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.light-student-performance-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.light-student-performance-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--p-text-muted, #94a3b8);
+  pointer-events: none;
+}
+
+.light-student-performance-search-input {
+  padding: 8px 16px 8px 36px;
+  font-size: 13.5px;
+  border-radius: var(--p-radius-md, 12px);
+  border: 1px solid #cbd5e1;
+  background: var(--p-bg-subtle, #f8fafc);
+  color: var(--p-text-primary, #0f172a);
+  outline: none;
+  width: 220px;
+  transition: all 0.2s ease;
+}
+
+.light-student-performance-search-input:hover {
+  border-color: #94a3b8;
+}
+
+.light-student-performance-search-input:focus {
+  background: var(--p-bg-card, #ffffff);
+  border-color: var(--p-indigo, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.light-student-performance-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--p-teal, #0d9488);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  white-space: nowrap;
+}
+
+.light-student-performance-table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.light-student-performance-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13.5px;
+}
+
+.light-student-performance-table th {
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--p-border-table, #cbd5e1);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--p-text-muted, #64748b);
+}
+
+.light-student-performance-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--p-border-table-row, #e2e8f0);
+  color: var(--p-text-primary, #0f172a);
+  vertical-align: middle;
+  transition: background 0.15s ease;
+}
+
+.light-student-performance-row:nth-child(even) {
+  background: rgba(248, 250, 252, 0.6);
+}
+
+.light-student-performance-row:hover {
+  background: var(--p-table-hover, #f1f5f9) !important;
+}
+
+/* Centered Professional Empty State */
+.light-student-performance-empty-cell {
+  text-align: center;
+  padding: 48px 24px !important;
+}
+
+.light-student-performance-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.light-student-performance-empty-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.light-student-performance-empty-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--p-text-primary, #0f172a);
+  margin-bottom: 4px;
+}
+
+.light-student-performance-empty-sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--p-text-muted, #475569);
+  margin-bottom: 2px;
+}
+
+.light-student-performance-empty-hint {
+  font-size: 12px;
+  color: var(--p-text-light, #64748b);
+}
+
+/* Pagination Footer */
+.light-student-performance-footer {
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--p-border-table, #cbd5e1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.light-student-performance-showing {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--p-text-muted, #64748b);
+}
+
+.light-student-performance-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.light-student-performance-page-btn {
+  background-color: var(--p-btn-bg, #ffffff);
+  border: 1px solid #cbd5e1;
+  color: var(--p-text-primary, #0f172a);
+  padding: 6px 14px;
+  border-radius: var(--p-radius-md, 12px);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.light-student-performance-page-btn:hover:not(:disabled) {
+  background-color: var(--p-btn-hover, #f8fafc);
+  border-color: var(--p-indigo, #4f46e5);
+  color: var(--p-indigo, #4f46e5);
+}
+
+.light-student-performance-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.light-student-performance-page-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-text-primary, #0f172a);
+  padding: 0 6px;
+}
+
+@media (max-width: 640px) {
+  .light-student-performance-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .light-student-performance-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .light-student-performance-search-wrap {
+    flex: 1 !important;
+  }
+
+  .light-student-performance-search-input {
+    width: 100% !important;
+  }
+
+  .light-student-performance-footer {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .light-student-performance-pagination {
+    margin-left: auto !important;
+    align-self: flex-end !important;
   }
 }

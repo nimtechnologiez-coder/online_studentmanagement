@@ -188,16 +188,15 @@ html.dark {
 }
 
 /* ================================ SMOOTH TRANSITION on TOGGLE ================================ */
-.principal-themed,
-.principal-themed *,
-.principal-themed *::before,
-.principal-themed *::after {
+/* ================================ SMOOTH TRANSITION on TOGGLE ================================ */
+.principal-themed:not(.sidebar):not(.principal-sidebar-backdrop),
+.principal-themed *:not(.sidebar):not(.principal-sidebar-backdrop) {
   transition:
     background-color 0.25s ease,
     background 0.25s ease,
     border-color 0.22s ease,
     color 0.2s ease,
-    box-shadow 0.2s ease !important;
+    box-shadow 0.2s ease;
 }
 
 /* ================================ RESPONSIVE LAYOUT SYSTEM ================================ */

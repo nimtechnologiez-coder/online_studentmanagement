@@ -108,6 +108,7 @@ interface DashboardData {
   departmentPerformance?: DeptPerformance[];
   liveActivities?: LiveActivity[];
   collegeName?: string;
+  principalName?: string;
 }
 
 /* --------------------------------- HELPERS --------------------------------- */
@@ -272,33 +273,32 @@ export default function PrincipalDashboard() {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (principalId) headers["X-Principal-Id"] = String(principalId);
 
-      const apiBase = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3001";
-      const apiUrls = [
-        "/api/principal/dashboard/",
-        `${apiBase}/api/principal/dashboard/`,
-        "http://127.0.0.1:8000/api/principal/dashboard/",
-      ];
-
-      let response: Response | null = null;
-      let lastError: Error | null = null;
-
-      for (const url of apiUrls) {
-        try {
-          response = await fetch(url, { method: "GET", headers, credentials: "include" });
-          if (response.ok) break;
-          lastError = new Error(`Server error: ${response.status}`);
-        } catch (fetchErr: any) {
-          lastError = fetchErr;
-        }
+      let response: Response;
+      try {
+        response = await fetch("/api/principal/dashboard/", {
+          method: "GET",
+          headers,
+          credentials: "include",
+        });
+      } catch (fetchErr: any) {
+        throw new Error("Network error connecting to dashboard API.");
       }
 
-      if (!response || !response.ok) {
-        throw new Error(lastError?.message || "Failed to load dashboard data.");
+      if (!response.ok) {
+        let errMessage = `Server error: ${response.status}`;
+        try {
+          const errJson = await response.json();
+          if (errJson?.message) errMessage = errJson.message;
+        } catch (_) {}
+        throw new Error(errMessage);
       }
       const json = await response.json();
 
       if (json.status === "success" && json.data) {
         setDashData(json.data);
+        if (json.data.principalName) {
+          setPrincipalName(json.data.principalName);
+        }
         setLastUpdated(new Date());
       } else {
         throw new Error(json.message || "API returned an error");
@@ -720,18 +720,6 @@ export default function PrincipalDashboard() {
                     <p className="card-subtitle">Real-time log of student video watch sessions</p>
                   </div>
                   <div className="recent-header-actions">
-                    <button
-                      className="table-refresh-btn"
-                      onClick={fetchDashboardData}
-                      disabled={loading}
-                      title="Refresh Recent Activity"
-                    >
-                      <RefreshCw
-                        size={16}
-                        className={loading ? "animate-spin" : ""}
-                      />
-                    </button>
-
                     <span className="table-count-badge">
                       {Math.min(filteredRecentViews.length, 4)} Logged
                     </span>

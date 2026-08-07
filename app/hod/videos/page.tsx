@@ -120,6 +120,8 @@ function getHodId(): string {
   }
 }
 
+const DEFAULT_THUMBNAIL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='90' viewBox='0 0 160 90'%3E%3Crect width='160' height='90' fill='%231e293b'/%3E%3Cpath d='M65 30l40 15-40 15z' fill='%23818cf8'/%3E%3Ctext x='80' y='75' font-family='sans-serif' font-size='11' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3EVIDEO PREVIEW%3C/text%3E%3C/svg%3E";
+
 function mapVideo(video: any): Video {
   return {
     id: Number(video.id),
@@ -127,7 +129,7 @@ function mapVideo(video: any): Video {
     category: video.category,
     duration: video.duration,
     description: video.description || "",
-    thumbnail: video.thumbnail || "https://picsum.photos/90/50?0",
+    thumbnail: video.thumbnail && typeof video.thumbnail === "string" && video.thumbnail.trim().length > 0 ? video.thumbnail : DEFAULT_THUMBNAIL,
     isMine: Boolean(video.isMine),
     videoUrl: video.videoUrl || SAMPLE_VIDEO_URL,
     uploadedBy: video.uploadedBy || "HOD",
@@ -273,6 +275,7 @@ type VideoTableProps = {
   renderActions: (video: Video) => ReactNode;
   headerExtra?: ReactNode;
   showBreadcrumb?: boolean;
+  isMyVideos?: boolean;
 };
 
 function VideoTable({
@@ -287,6 +290,7 @@ function VideoTable({
   searchPlaceholder,
   renderActions,
   headerExtra,
+  isMyVideos = false,
 }: VideoTableProps) {
   const totalPages = Math.max(1, Math.ceil(videos.length / perPage));
   const safePage = Math.min(Math.max(1, page), totalPages);
@@ -296,9 +300,18 @@ function VideoTable({
     return videos.slice(start, start + perPage);
   }, [videos, safePage, perPage]);
 
+  const rootClass = isMyVideos ? "card light-my-videos-card" : "card";
+  const headerClass = isMyVideos ? "card-header light-my-videos-header" : "card-header";
+  const searchRowClass = isMyVideos ? "search-row light-my-videos-search-row" : "search-row";
+  const searchInputClass = isMyVideos ? "light-my-videos-search-input" : "";
+  const tableWrapClass = isMyVideos ? "table-scroll light-my-videos-table-wrap" : "table-scroll";
+  const tableClass = isMyVideos ? "video-table light-my-videos-table" : "video-table";
+  const footerClass = isMyVideos ? "table-footer light-my-videos-footer" : "table-footer";
+  const paginationClass = isMyVideos ? "pagination-numbers light-my-videos-pagination" : "pagination-numbers";
+
   return (
-    <div className="card">
-      <div className="card-header">
+    <div className={rootClass}>
+      <div className={headerClass}>
         <div>
           <h2 className="card-title-row">
             <VideoIcon size={30} className="card-title-icon" />
@@ -309,21 +322,22 @@ function VideoTable({
         {headerExtra}
       </div>
 
-      <div className="search-row">
+      <div className={searchRowClass}>
         <svg className="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none">
           <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
           <path d="m20 20-3.2-3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
         <input
           type="text"
+          className={searchInputClass}
           placeholder={searchPlaceholder}
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
 
-      <div className="table-scroll" role="region" aria-label={`${title} table`}>
-        <table className="video-table">
+      <div className={tableWrapClass} role="region" aria-label={`${title} table`}>
+        <table className={tableClass}>
           <thead>
             <tr>
               <th className="col-sno">S.No</th>
@@ -340,13 +354,20 @@ function VideoTable({
 
           <tbody>
             {pageItems.map((video, index) => (
-              <tr key={video.id}>
+              <tr key={video.id} className={isMyVideos ? "light-my-videos-row" : ""}>
                 <td data-label="S.No" className="col-sno">
                   {(safePage - 1) * perPage + index + 1}
                 </td>
 
                 <td data-label="Thumbnail">
-                  <img src={video.thumbnail} alt="" className="thumb" />
+                  <img
+                    src={video.thumbnail || DEFAULT_THUMBNAIL}
+                    alt={video.title}
+                    className="thumb"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = DEFAULT_THUMBNAIL;
+                    }}
+                  />
                 </td>
 
                 <td data-label="Video title">
@@ -395,8 +416,17 @@ function VideoTable({
 
             {pageItems.length === 0 && (
               <tr>
-                <td colSpan={8} className="empty-row">
-                  No videos found.
+                <td colSpan={9} className={isMyVideos ? "empty-row light-my-videos-empty-cell" : "empty-row"}>
+                  {isMyVideos ? (
+                    <div className="light-my-videos-empty">
+                      <div className="light-my-videos-empty-icon">📹</div>
+                      <div className="light-my-videos-empty-title">No Videos Available</div>
+                      <div className="light-my-videos-empty-sub">You haven't uploaded any videos yet.</div>
+                      <div className="light-my-videos-empty-hint">Click the "Upload Video" button to add your first video.</div>
+                    </div>
+                  ) : (
+                    "No videos found."
+                  )}
                 </td>
               </tr>
             )}
@@ -404,7 +434,7 @@ function VideoTable({
         </table>
       </div>
 
-      <div className="table-footer">
+      <div className={footerClass}>
         <span>
           Showing{" "}
           {videos.length === 0 ? 0 : (safePage - 1) * perPage + 1}
@@ -413,7 +443,7 @@ function VideoTable({
           of {videos.length} videos
         </span>
 
-        <div className="pagination-numbers">
+        <div className={paginationClass}>
           <button
             onClick={() => onPageChange(Math.max(1, safePage - 1))}
             disabled={safePage === 1}
@@ -1012,6 +1042,7 @@ export default function VideosPage() {
       <VideoTable
         title="My Videos"
         subtitle="Videos uploaded by you"
+        isMyVideos={true}
         videos={myVideos}
         page={myPage}
         onPageChange={setMyPage}

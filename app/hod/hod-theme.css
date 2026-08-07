@@ -187,10 +187,9 @@ html.dark {
 }
 
 /* ================================ SMOOTH TRANSITION on TOGGLE ================================ */
-.principal-themed,
-.principal-themed *,
-.principal-themed *::before,
-.principal-themed *::after {
+.principal-themed :not(.sidebar):not(.principal-sidebar-backdrop),
+.principal-themed :not(.sidebar):not(.principal-sidebar-backdrop)::before,
+.principal-themed :not(.sidebar):not(.principal-sidebar-backdrop)::after {
   transition:
     background-color 0.25s ease,
     background 0.25s ease,

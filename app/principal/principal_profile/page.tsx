@@ -11,15 +11,11 @@ import {
   Calendar, 
   Edit3, 
   ShieldCheck, 
-  Award, 
   GraduationCap, 
   Building2,
-  Lock,
   X
 } from "lucide-react";
-import "../dashboard/Principaldashboard.css";
-import "../video_report/VideoReports.css";
-import "../students/StudentsPage.css";
+import "./PrincipalProfile.css";
 
 interface ProfileData {
   name: string;
@@ -31,6 +27,7 @@ interface ProfileData {
   bio: string;
   username: string;
   status: string;
+  cover_photo?: string;
 }
 
 export default function PrincipalProfile() {
@@ -44,11 +41,37 @@ export default function PrincipalProfile() {
   const [editBio, setEditBio] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Helper to get headers with X-Principal-Id
+  const getAuthHeaders = (): Record<string, string> => {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    try {
+      const saved =
+        typeof window !== "undefined"
+          ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
+          : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.id) {
+          headers["X-Principal-Id"] = String(parsed.id);
+        }
+      }
+    } catch (e) {
+      console.error("Error reading saved principal for headers:", e);
+    }
+    return headers;
+  };
+
   // Fetch real profile data from Django API
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://127.0.0.1:8000/api/principal/profile/");
+      const headers = getAuthHeaders();
+      let res: Response;
+      try {
+        res = await fetch("/api/principal/profile/", { method: "GET", headers, credentials: "include" });
+      } catch (_) {
+        res = await fetch("http://127.0.0.1:8000/api/principal/profile/", { method: "GET", headers, credentials: "include" });
+      }
       const json = await res.json();
       if (json.status === "success" && json.data) {
         setProfile(json.data);
@@ -72,15 +95,18 @@ export default function PrincipalProfile() {
     e.preventDefault();
     try {
       setSaving(true);
-      const res = await fetch("http://127.0.0.1:8000/api/principal/profile/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: editEmail,
-          phone: editPhone,
-          bio: editBio,
-        }),
+      const headers = getAuthHeaders();
+      const body = JSON.stringify({
+        email: editEmail,
+        phone: editPhone,
+        bio: editBio,
       });
+      let res: Response;
+      try {
+        res = await fetch("/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
+      } catch (_) {
+        res = await fetch("http://127.0.0.1:8000/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
+      }
       const json = await res.json();
       if (json.status === "success" && json.data) {
         setProfile(json.data);
@@ -104,15 +130,18 @@ export default function PrincipalProfile() {
 
   // Image Upload state synced directly with Database API
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
-  const [coverBg, setCoverBg] = useState<string>("linear-gradient(135deg, #4f46e5 0%, #312e81 100%)");
+  const [coverBg, setCoverBg] = useState<string>("linear-gradient(135deg, #2563eb 0%, #1e40af 100%)");
 
   const saveImageToBackend = async (payload: { avatar?: string; cover_photo?: string }) => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/principal/profile/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const headers = getAuthHeaders();
+      const body = JSON.stringify(payload);
+      let res: Response;
+      try {
+        res = await fetch("/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
+      } catch (_) {
+        res = await fetch("http://127.0.0.1:8000/api/principal/profile/", { method: "POST", headers, credentials: "include", body });
+      }
       const json = await res.json();
       if (json.status === "success" && json.data) {
         setProfile(json.data);
@@ -122,7 +151,6 @@ export default function PrincipalProfile() {
     }
   };
 
-  // Helper function to compress images to crisp lightweight Base64 strings before uploading
   const compressImage = (dataUrl: string, maxWidth: number, maxHeight: number, quality: number): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -180,199 +208,186 @@ export default function PrincipalProfile() {
   };
 
   return (
-    <div className="dash-main min-h-screen" style={{ padding: "28px 32px 48px" }}>
-      <div className="dash-content max-w-[1440px] mx-auto">
-        
-        {/* Banner Header */}
-        <div className="dash-welcome-banner mb-8">
-          <div className="banner-content">
-            <Link href="/principal/dashboard" className="banner-badge hover:underline">
-              <ChevronLeft size={13} />
-              <span>Back to Dashboard</span>
-            </Link>
-            <h2>Principal Executive Profile</h2>
-            <p>Institutional leadership credentials and account configuration.</p>
-          </div>
+    <div className="p-profile-page-shell">
+      {/* Banner Header */}
+      <div className="p-profile-banner">
+        <Link href="/principal/dashboard" className="p-profile-back-link">
+          <ChevronLeft size={14} />
+          <span>Back to Dashboard</span>
+        </Link>
+        <h2 className="p-profile-banner-title">Principal Executive Profile</h2>
+        <p className="p-profile-banner-desc">Institutional leadership credentials and account configuration.</p>
+      </div>
+
+      {/* Hero Header Card */}
+      <div className="p-profile-hero-card">
+        <div 
+          className="p-profile-cover-box" 
+          style={{ 
+            background: profile?.cover_photo 
+              ? `url(${profile.cover_photo}) center/cover no-repeat` 
+              : coverBg 
+          }}
+        >
+          <label className="p-profile-cover-btn" title="Change Cover Photo">
+            <Camera size={14} />
+            <span>Cover Photo</span>
+            <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+          </label>
         </div>
 
-        {/* Profile Header Card */}
-        <div className="corp-card overflow-hidden mb-8" style={{ padding: 0 }}>
-          {/* Cover Photo */}
-          <div 
-            className="relative h-48 transition-all" 
-            style={{ 
-              background: profile?.cover_photo 
-                ? `url(${profile.cover_photo}) center/cover no-repeat` 
-                : coverBg 
-            }}
-          >
-            <div className="absolute right-4 top-4 z-10">
-              <label 
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all" 
-                title="Change Background Cover"
-              >
-                <Camera size={15} />
-                <span>Cover Photo</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
-                  onChange={handleCoverChange} 
-                />
+        <div className="p-profile-info-body">
+          <div className="p-profile-avatar-row">
+            <div className="p-profile-avatar-wrapper">
+              <div className="p-profile-avatar-circle">
+                {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
+                  <img src={avatarSrc || profile?.avatar} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span>
+                    {(() => {
+                      const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
+                      const parts = cleanName.split(" ").filter(Boolean);
+                      if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                      return (cleanName[0] || "P").toUpperCase();
+                    })()}
+                  </span>
+                )}
+              </div>
+              <label className="p-profile-avatar-upload-icon" title="Upload Profile Picture">
+                <Camera size={14} />
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
               </label>
+            </div>
+
+            <div className="p-profile-meta">
+              <h1 className="p-profile-name">{name}</h1>
+              <div className="p-profile-sub-badges">
+                <span className="p-profile-badge-item"><Building2 size={15} /> Principal, {college}</span>
+                <span className="p-profile-badge-item"><MapPin size={15} /> India</span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => {
+                setEditEmail(email);
+                setEditPhone(phone);
+                setEditBio(profile?.bio || "");
+                setIsEditModalOpen(true);
+              }}
+              className="p-profile-edit-trigger"
+            >
+              <Edit3 size={15} />
+              <span>Edit Profile</span>
+            </button>
+          </div>
+
+          <div className="p-profile-tabs">
+            <button className="p-profile-tab-active">Overview</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="p-profile-grid-layout">
+        {/* Left Column Stack */}
+        <div className="p-profile-col-stack">
+          {/* Contact Information Card */}
+          <div className="p-profile-card">
+            <div className="p-profile-card-header">
+              <h3 className="p-profile-card-title">
+                <Mail size={18} className="p-profile-card-title-icon" />
+                Contact Information
+              </h3>
+            </div>
+            <div className="p-profile-rows-container">
+              <div className="p-profile-data-row">
+                <div className="p-profile-data-label-group">
+                  <div className="p-profile-row-icon-box" style={{ background: "rgba(37, 99, 235, 0.12)", color: "#2563eb" }}>
+                    <Mail size={16} />
+                  </div>
+                  <span className="p-profile-row-label">Email</span>
+                </div>
+                <span className="p-profile-row-value">{email}</span>
+              </div>
+
+              <div className="p-profile-data-row">
+                <div className="p-profile-data-label-group">
+                  <div className="p-profile-row-icon-box" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
+                    <Phone size={16} />
+                  </div>
+                  <span className="p-profile-row-label">Phone</span>
+                </div>
+                <span className="p-profile-row-value">{phone}</span>
+              </div>
+
+              <div className="p-profile-data-row">
+                <div className="p-profile-data-label-group">
+                  <div className="p-profile-row-icon-box" style={{ background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b" }}>
+                    <Calendar size={16} />
+                  </div>
+                  <span className="p-profile-row-label">Joined</span>
+                </div>
+                <span className="p-profile-row-value">{joined}</span>
+              </div>
             </div>
           </div>
 
-          {/* Profile Info Area */}
-          <div className="px-8 pb-8 relative">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
-              {/* Avatar */}
-              <div className="relative group">
-                <div className="w-32 h-32 rounded-full border-4 border-white bg-indigo-600 text-white flex items-center justify-center overflow-hidden shadow-lg">
-                  {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
-                    <img 
-                      src={avatarSrc || profile?.avatar} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="font-extrabold text-4xl select-none tracking-wider">
-                      {(() => {
-                        const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
-                        const parts = cleanName.split(" ").filter(Boolean);
-                        if (parts.length >= 2) {
-                          return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-                        }
-                        return (cleanName[0] || "P").toUpperCase();
-                      })()}
-                    </span>
-                  )}
-                </div>
-                <label 
-                  className="absolute bottom-1 right-1 p-2 bg-white border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
-                  title="Upload Profile Picture"
-                >
-                  <Camera size={15} />
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    className="hidden" 
-                    onChange={handleAvatarChange} 
-                  />
-                </label>
-              </div>
-
-              {/* Name & Basic Info */}
-              <div className="flex-1 text-center md:text-left mt-2">
-                <h1 className="text-3xl font-bold" style={{ color: "var(--p-text-primary)" }}>{name}</h1>
-                <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-2 text-sm" style={{ color: "var(--p-text-muted)" }}>
-                  <span className="flex items-center gap-1.5"><Building2 size={16} /> Principal, {college}</span>
-                  <span className="flex items-center gap-1.5"><MapPin size={16} /> India</span>
-                </div>
-              </div>
-
+          {/* Academic Biography Card */}
+          <div className="p-profile-card">
+            <div className="p-profile-card-header">
+              <h3 className="p-profile-card-title">
+                <GraduationCap size={18} className="p-profile-card-title-icon" />
+                Academic Biography
+              </h3>
               <button 
+                type="button" 
                 onClick={() => {
                   setEditEmail(email);
                   setEditPhone(phone);
                   setEditBio(profile?.bio || "");
                   setIsEditModalOpen(true);
-                }}
-                className="dash-action-btn btn-export"
+                }} 
+                className="p-profile-edit-trigger"
+                style={{ fontSize: 12, padding: "4px 10px", borderRadius: 8 }}
               >
-                <Edit3 size={15} />
-                <span className="btn-text">Edit Profile</span>
+                <Edit3 size={13} />
+                <span>Edit Bio</span>
               </button>
             </div>
-
-            {/* Action Tabs */}
-            <div className="flex border-b mt-8" style={{ borderColor: "var(--p-border-table)" }}>
-              <button className="px-6 py-3 text-sm font-bold border-b-2" style={{ borderColor: "var(--p-indigo)", color: "var(--p-indigo)" }}>Overview</button>
-            </div>
+            <p className="p-profile-bio-text">
+              {profile?.bio || `${name} serves as the Principal at ${college}. With extensive leadership experience in higher education, institutional growth, academic governance, and educational innovation, ${name} oversees administrative operations and student engagement programs.`}
+            </p>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-16">
-          
-          {/* Left Column: Details & Bio */}
-          <div className="lg:col-span-2 space-y-8">
-            
-            {/* Quick Contact Section */}
-            <div className="corp-card grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <div className="p-2 rounded-lg text-indigo-600 shadow-sm" style={{ background: "var(--p-indigo-soft)" }}><Mail size={18} /></div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Email</span>
-                  <span className="text-sm font-semibold truncate" style={{ color: "var(--p-text-primary)" }}>{email}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <div className="p-2 rounded-lg text-emerald-600 shadow-sm" style={{ background: "var(--p-emerald-soft)" }}><Phone size={18} /></div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Phone</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{phone}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <div className="p-2 rounded-lg text-amber-600 shadow-sm" style={{ background: "var(--p-amber-soft)" }}><Calendar size={18} /></div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold" style={{ color: "var(--p-text-muted)" }}>Joined</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{joined}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Academic Biography */}
-            <div className="corp-card">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold flex items-center gap-2" style={{ color: "var(--p-text-primary)" }}>
-                  <GraduationCap style={{ color: "var(--p-indigo)" }} /> Academic Biography
-                </h3>
-                <button 
-                  type="button" 
-                  onClick={() => {
-                    setEditEmail(email);
-                    setEditPhone(phone);
-                    setEditBio(profile?.bio || "");
-                    setIsEditModalOpen(true);
-                  }} 
-                  className="dash-action-btn"
-                  style={{ fontSize: 12, padding: "4px 10px" }}
-                >
-                  <Edit3 size={13} />
-                  <span>Edit Bio</span>
-                </button>
-              </div>
-              <p className="leading-relaxed" style={{ color: "var(--p-text-muted)" }}>
-                {profile?.bio || `${name} serves as the Principal at ${college}. With extensive leadership experience in higher education, institutional growth, academic governance, and educational innovation, ${name} oversees administrative operations and student engagement programs.`}
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column: Settings & Security */}
-          <div className="space-y-8">
-            
-            {/* Administration Settings */}
-            <div className="corp-card">
-              <h3 className="font-bold mb-6 flex items-center gap-2" style={{ color: "var(--p-text-primary)" }}>
-                <ShieldCheck size={20} style={{ color: "var(--p-indigo)" }} />
+        {/* Right Column Stack */}
+        <div className="p-profile-col-stack">
+          {/* Account Details Card */}
+          <div className="p-profile-card">
+            <div className="p-profile-card-header">
+              <h3 className="p-profile-card-title">
+                <ShieldCheck size={18} className="p-profile-card-title-icon" />
                 Account Details
               </h3>
+            </div>
+            
+            <div className="p-profile-rows-container">
+              <div className="p-profile-data-row">
+                <span className="p-profile-row-label">Username</span>
+                <span className="p-profile-row-value">{profile?.username || "principal"}</span>
+              </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                  <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Username</span>
-                  <span className="text-sm font-semibold" style={{ color: "var(--p-text-primary)" }}>{profile?.username || "principal"}</span>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 rounded-xl border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                  <span className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>Status</span>
-                  <span className="status-badge status-active">
-                    <span className="status-dot" />
-                    {profile?.status || "Active"}
-                  </span>
-                </div>
+              <div className="p-profile-data-row">
+                <span className="p-profile-row-label">Status</span>
+                <span className="p-profile-status-pill">
+                  <span className="p-profile-status-dot" />
+                  {profile?.status || "Active"}
+                </span>
+              </div>
+
+              <div className="p-profile-data-row">
+                <span className="p-profile-row-label">Role</span>
+                <span className="p-profile-row-value">Institutional Principal</span>
               </div>
             </div>
           </div>
@@ -381,124 +396,67 @@ export default function PrincipalProfile() {
 
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsEditModalOpen(false)}>
-          <div className="modal-panel max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="flex items-center gap-2">
-                <Edit3 size={18} style={{ color: "var(--p-indigo)" }} />
-                <h3>Edit Principal Profile</h3>
+        <div className="p-profile-modal-backdrop" onClick={() => setIsEditModalOpen(false)}>
+          <div className="p-profile-modal-panel" onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--p-border, #1e293b)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Edit3 size={18} style={{ color: "#2563eb" }} />
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Edit Principal Profile</h3>
               </div>
               <button 
-                type="button"
-                className="password-toggle-btn"
+                type="button" 
                 onClick={() => setIsEditModalOpen(false)}
+                style={{ background: "transparent", border: "none", color: "var(--p-text-muted)", cursor: "pointer" }}
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="modal-body">
-              {/* Full Name - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  Full Name (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
-              </div>
-
-              {/* College Name - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  College Name (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={college}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
-              </div>
-
-              {/* Join Date - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  Join Date (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={joined}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
-              </div>
-
-              {/* Email Address - Editable */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Email Address
-                </label>
+            <form onSubmit={handleSaveProfile} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "var(--p-text-muted)" }}>Email Address</label>
                 <input
                   type="email"
                   required
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
-                  placeholder="Enter email address"
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
-                  style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--p-border, #1e293b)", background: "var(--p-bg-subtle)", color: "var(--p-text-primary)", fontSize: 14 }}
                 />
               </div>
 
-              {/* Mobile Phone - Editable */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Mobile Phone
-                </label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "var(--p-text-muted)" }}>Mobile Phone</label>
                 <input
                   type="text"
                   required
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
-                  placeholder="Enter phone number"
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
-                  style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--p-border, #1e293b)", background: "var(--p-bg-subtle)", color: "var(--p-text-primary)", fontSize: 14 }}
                 />
               </div>
 
-              {/* Academic Biography - Editable */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Academic Biography
-                </label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "var(--p-text-muted)" }}>Academic Biography</label>
                 <textarea
                   rows={4}
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
-                  placeholder="Write your academic biography, qualifications, and vision..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none resize-none"
-                  style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--p-border, #1e293b)", background: "var(--p-bg-subtle)", color: "var(--p-text-primary)", fontSize: 14, resize: "none" }}
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t" style={{ borderColor: "var(--p-border-table)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, paddingTop: 12, borderTop: "1px solid var(--p-border, #1e293b)" }}>
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="dash-action-btn"
+                  style={{ padding: "8px 16px", borderRadius: 10, border: "1px solid var(--p-border, #1e293b)", background: "transparent", color: "var(--p-text-primary)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="dash-action-btn btn-export"
+                  style={{ padding: "8px 18px", borderRadius: 10, border: "none", background: "#2563eb", color: "#ffffff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
                 >
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
@@ -508,17 +466,5 @@ export default function PrincipalProfile() {
         </div>
       )}
     </div>
-  );
-}
-
-// Helper component for the arrow icon used in the quick-panel
-function ArrowUpRight({ size = 16 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="15" y1="3" x2="21" y2="9"></line>
-      <polyline points="9 15 3 9 12 3"></polyline>
-      <line x1="15" y1="3" x2="15" y2="9"></line>
-      <line x1="9 15" x2="15" y2="15"></line>
-    </svg>
   );
 }

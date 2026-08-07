@@ -20,30 +20,7 @@ type Student = {
   videosWatched: number;
 };
 
-/* ─────────────────────────── Mock Data ─────────────────────── */
-
-const STUDENTS: Student[] = [
-  { id: 1, name: "Arun Kumar", username: "arun001", password: "Arun@2023", email: "arun@gmail.com", year: "III", joinDate: "10-Aug-23", status: "Active", phone: "+91 98400 11001", section: "A", completionRate: 98, videosWatched: 41 },
-  { id: 2, name: "Priya Dharshini", username: "priya01", password: "Priya@2023", email: "priya@gmail.com", year: "II", joinDate: "12-Aug-23", status: "Active", phone: "+91 98400 11002", section: "B", completionRate: 96, videosWatched: 40 },
-  { id: 3, name: "Sanjay Kumar", username: "sanjay01", password: "Sanjay@2023", email: "sanjay@gmail.com", year: "IV", joinDate: "15-Aug-23", status: "Active", phone: "+91 98400 11003", section: "A", completionRate: 94, videosWatched: 39 },
-  { id: 4, name: "Kavya Sri", username: "kavya01", password: "Kavya@2023", email: "kavya@gmail.com", year: "I", joinDate: "18-Aug-23", status: "Active", phone: "+91 98400 11004", section: "C", completionRate: 92, videosWatched: 38 },
-  { id: 5, name: "Vigneshwaran", username: "vignesh01", password: "Vign@2023", email: "vignesh@gmail.com", year: "III", joinDate: "20-Aug-23", status: "Active", phone: "+91 98400 11005", section: "A", completionRate: 90, videosWatched: 37 },
-  { id: 6, name: "Meena Kumari", username: "meena01", password: "Meena@2023", email: "meena@gmail.com", year: "II", joinDate: "22-Aug-23", status: "Active", phone: "+91 98400 11006", section: "B", completionRate: 88, videosWatched: 36 },
-  { id: 7, name: "Ravi Shankar", username: "ravi01", password: "Ravi@2023", email: "ravi@gmail.com", year: "IV", joinDate: "01-Sep-23", status: "Active", phone: "+91 98400 11007", section: "A", completionRate: 85, videosWatched: 35 },
-  { id: 8, name: "Divya Priya", username: "divya01", password: "Divya@2023", email: "divya@gmail.com", year: "I", joinDate: "03-Sep-23", status: "Active", phone: "+91 98400 11008", section: "C", completionRate: 82, videosWatched: 34 },
-  { id: 9, name: "Karthik Raja", username: "karthik01", password: "Kart@2023", email: "karthik@gmail.com", year: "III", joinDate: "05-Sep-23", status: "Inactive", phone: "+91 98400 11009", section: "B", completionRate: 45, videosWatched: 19 },
-  { id: 10, name: "Suresh Babu", username: "suresh01", password: "Suresh@2023", email: "suresh@gmail.com", year: "II", joinDate: "07-Sep-23", status: "Active", phone: "+91 98400 11010", section: "A", completionRate: 78, videosWatched: 33 },
-  { id: 11, name: "Anitha Devi", username: "anitha01", password: "Anitha@2023", email: "anitha@gmail.com", year: "IV", joinDate: "10-Sep-23", status: "Active", phone: "+91 98400 11011", section: "C", completionRate: 73, videosWatched: 31 },
-  { id: 12, name: "Balaji Ram", username: "balaji01", password: "Balaji@2023", email: "balaji@gmail.com", year: "I", joinDate: "12-Sep-23", status: "Inactive", phone: "+91 98400 11012", section: "B", completionRate: 30, videosWatched: 12 },
-  { id: 13, name: "Swetha Nair", username: "swetha01", password: "Sweth@2023", email: "swetha@gmail.com", year: "III", joinDate: "15-Sep-23", status: "Active", phone: "+91 98400 11013", section: "A", completionRate: 80, videosWatched: 33 },
-  { id: 14, name: "Murugan S", username: "murugan01", password: "Muru@2023", email: "murugan@gmail.com", year: "II", joinDate: "18-Sep-23", status: "Inactive", phone: "+91 98400 11014", section: "C", completionRate: 42, videosWatched: 17 },
-  { id: 15, name: "Lakshmi Priya", username: "lakshmi01", password: "Laksh@2023", email: "lakshmi@gmail.com", year: "IV", joinDate: "20-Sep-23", status: "Active", phone: "+91 98400 11015", section: "B", completionRate: 87, videosWatched: 36 },
-  { id: 16, name: "Vijay Kumar", username: "vijay01", password: "Vijay@2023", email: "vijay@gmail.com", year: "I", joinDate: "22-Sep-23", status: "Active", phone: "+91 98400 11016", section: "A", completionRate: 75, videosWatched: 31 },
-  { id: 17, name: "Nandhini S", username: "nandh01", password: "Nandh@2023", email: "nandhini@gmail.com", year: "III", joinDate: "01-Oct-23", status: "Active", phone: "+91 98400 11017", section: "C", completionRate: 83, videosWatched: 35 },
-  { id: 18, name: "Ashwin Kumar", username: "ashwin01", password: "Ashw@2023", email: "ashwin@gmail.com", year: "II", joinDate: "03-Oct-23", status: "Inactive", phone: "+91 98400 11018", section: "B", completionRate: 20, videosWatched: 8 },
-  { id: 19, name: "Pooja Kumari", username: "pooja01", password: "Pooja@2023", email: "pooja@gmail.com", year: "IV", joinDate: "05-Oct-23", status: "Active", phone: "+91 98400 11019", section: "A", completionRate: 91, videosWatched: 38 },
-  { id: 20, name: "Harish Babu", username: "harish01", password: "Hari@2023", email: "harish@gmail.com", year: "I", joinDate: "07-Oct-23", status: "Active", phone: "+91 98400 11020", section: "C", completionRate: 69, videosWatched: 29 },
-];
+/* ─────────────────────────── Constants ─────────────────────── */
 
 const AVATAR_COLORS = [
   "#4f6cf7", "#22c55e", "#f97316", "#8b5cf6",
@@ -69,6 +46,8 @@ export default function HodStudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hodName, setHodName] = useState("HOD");
+  const [deptName, setDeptName] = useState("Department");
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
@@ -83,6 +62,8 @@ export default function HodStudentsPage() {
       try {
         const parsed = JSON.parse(savedHod);
         hodId = parsed?.id || "";
+        if (parsed?.name) setHodName(parsed.name);
+        if (parsed?.department || parsed?.dept_name) setDeptName(parsed.department || parsed.dept_name);
       } catch (err) {
         console.error("Failed to parse saved HOD data:", err);
       }
@@ -116,30 +97,29 @@ export default function HodStudentsPage() {
         throw new Error("The server returned an invalid response.");
       }
 
-      if (!json || json.status !== "success" || !Array.isArray(json.students) || json.students.length === 0) {
-        setStudents(STUDENTS);
-        return;
+      if (json && json.status === "success" && Array.isArray(json.students)) {
+        const studentData: Student[] = json.students.map((student: any) => ({
+          id: student.id,
+          name: student.name,
+          username: student.username,
+          password: student.password || "",
+          email: student.email,
+          year: student.year || "I",
+          joinDate: student.joinDate || "N/A",
+          status: (student.status || "").toLowerCase() === "active" ? "Active" : "Inactive",
+          phone: student.phone || "N/A",
+          section: "A",
+          completionRate: student.completionRate || 0,
+          videosWatched: student.videosWatched || 0,
+        }));
+        setStudents(studentData);
+      } else {
+        setStudents([]);
       }
-
-      const studentData: Student[] = (json.students || []).map((student: any) => ({
-        id: student.id,
-        name: student.name,
-        username: student.username,
-        password: student.password || "",
-        email: student.email,
-        year: student.year,
-        joinDate: student.joinDate || "",
-        status: student.status === "active" ? "Active" : "Inactive",
-        phone: student.phone || "",
-        section: "N/A",
-        completionRate: 0,
-        videosWatched: 0,
-      }));
-
-      setStudents(studentData);
     } catch (err: any) {
-      console.error("Failed to load HOD students, using fallback:", err);
-      setStudents(STUDENTS);
+      console.error("Failed to load HOD students:", err);
+      setError("Unable to connect to backend server.");
+      setStudents([]);
     } finally {
       setLoading(false);
     }
@@ -191,20 +171,20 @@ export default function HodStudentsPage() {
         </div>
         <div className="stu-header-right">
           <div className="stu-profile">
-            <div className="stu-avatar">DA</div>
-            <div>
-              <span className="stu-profile-name">Dr. Arun Kumar</span>
-              <span className="stu-profile-role">HOD - CSE</span>
+            <div className="stu-avatar">
+              {(() => {
+                const parts = hodName.replace(/^Dr\.\s*/i, '').trim().split(" ").filter(Boolean);
+                if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                return (hodName[0] || "H").toUpperCase();
+              })()}
             </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M6 9l6 6 6-6" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <div>
+              <span className="stu-profile-name">{hodName}</span>
+              <span className="stu-profile-role">HOD — {deptName}</span>
+            </div>
           </div>
         </div>
       </header>
-
-
-      
 
       <main className="stu-main">
         {/* ======== STAT CARDS ======== */}
@@ -213,7 +193,7 @@ export default function HodStudentsPage() {
             icon={<UsersIcon color="#4f6cf7" />}
             color="blue"
             label="Total Students"
-            value={STUDENTS.length}
+            value={students.length}
             sub="All Years"
           />
           <StatCard
@@ -232,17 +212,17 @@ export default function HodStudentsPage() {
           />
         </section>
 
-        {/* ======== TOOLBAR ======== */}
-        <div className="stu-toolbar">
-          <div className="stu-search-wrap">
-            <span className="stu-search-icon">
+        {/* ======== TOOLBAR (SCOPED UNIQUE UI) ======== */}
+        <div className="stu-toolbar light-student-table-toolbar">
+          <div className="stu-search-wrap light-student-table-search-wrap">
+            <span className="stu-search-icon light-student-table-search-icon">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                 <circle cx="11" cy="11" r="7" stroke="#6b7280" strokeWidth="2" />
                 <path d="M21 21l-4.35-4.35" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </span>
             <input
-              className="stu-search-input"
+              className="stu-search-input light-student-table-search-input"
               type="text"
               placeholder="Search name, username, email…"
               value={search}
@@ -251,7 +231,7 @@ export default function HodStudentsPage() {
           </div>
 
           <select
-            className="stu-select"
+            className="stu-select light-student-table-select"
             value={yearFilter}
             onChange={(e) => { setYear(e.target.value); setPage(1); }}
           >
@@ -263,7 +243,7 @@ export default function HodStudentsPage() {
           </select>
 
           <select
-            className="stu-select"
+            className="stu-select light-student-table-select"
             value={statusFilter}
             onChange={(e) => { setStat(e.target.value); setPage(1); }}
           >
@@ -273,10 +253,10 @@ export default function HodStudentsPage() {
           </select>
         </div>
 
-        {/* ======== TABLE ======== */}
-        <div className="stu-table-card">
-          <div className="stu-table-scroll">
-            <table className="stu-table">
+        {/* ======== TABLE CARD (SCOPED UNIQUE UI) ======== */}
+        <div className="stu-table-card light-student-table-card">
+          <div className="stu-table-scroll light-student-table-scroll">
+            <table className="stu-table light-student-table">
               <thead>
                 <tr>
                   <th>#</th>
@@ -293,19 +273,19 @@ export default function HodStudentsPage() {
               <tbody>
                 {loading ? (
                 <tr>
-                  <td colSpan={9} className="stu-empty">
+                  <td colSpan={9} className="stu-empty light-student-table-empty-cell">
                     Loading students...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={9} className="stu-empty">
+                  <td colSpan={9} className="stu-empty light-student-table-empty-cell">
                     {error}
                   </td>
                 </tr>
               ) : pageSlice.length > 0 ? (
                   pageSlice.map((s, idx) => (
-                    <tr key={s.id}>
+                    <tr key={s.id} className="light-student-table-row">
                       <td className="stu-td-num">{(safePage - 1) * PAGE_SIZE + idx + 1}</td>
 
                       {/* Name */}
@@ -361,8 +341,13 @@ export default function HodStudentsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={9} className="stu-empty">
-                      No students found matching your criteria.
+                    <td colSpan={9} className="stu-empty light-student-table-empty-cell">
+                      <div className="light-student-table-empty">
+                        <div className="light-student-table-empty-icon">👨‍🎓</div>
+                        <div className="light-student-table-empty-title">No Students Available</div>
+                        <div className="light-student-table-empty-sub">No students match your current search or filters.</div>
+                        <div className="light-student-table-empty-hint">Try changing the filters or add new students.</div>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -371,14 +356,14 @@ export default function HodStudentsPage() {
           </div>
 
           {/* ---- Pagination footer ---- */}
-          <div className="stu-footer">
-            <span className="stu-showing">
+          <div className="stu-footer light-student-table-footer">
+            <span className="stu-showing light-student-table-showing">
               Showing {filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1}–
               {Math.min(safePage * PAGE_SIZE, filtered.length)} of {filtered.length} students
             </span>
-            <div className="stu-pagination">
+            <div className="stu-pagination light-student-table-pagination">
               <button
-                className="stu-page-btn stu-page-btn--nav"
+                className="stu-page-btn stu-page-btn--nav light-student-table-page-btn"
                 onClick={() => goPage(safePage - 1)}
                 disabled={safePage === 1}
                 aria-label="Previous page"
@@ -403,7 +388,7 @@ export default function HodStudentsPage() {
                     ) : (
                       <button
                         key={p}
-                        className={`stu-page-btn ${safePage === p ? "stu-page-btn--active" : ""}`}
+                        className={`stu-page-btn ${safePage === p ? "stu-page-btn--active" : ""} light-student-table-page-btn`}
                         onClick={() => goPage(p as number)}
                         aria-current={safePage === p ? "page" : undefined}
                       >
@@ -414,7 +399,7 @@ export default function HodStudentsPage() {
               </div>
 
               <button
-                className="stu-page-btn stu-page-btn--nav"
+                className="stu-page-btn stu-page-btn--nav light-student-table-page-btn"
                 onClick={() => goPage(safePage + 1)}
                 disabled={safePage === totalPages}
                 aria-label="Next page"

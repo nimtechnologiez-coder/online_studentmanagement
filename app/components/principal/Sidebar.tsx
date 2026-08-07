@@ -131,12 +131,10 @@ export default function Sidebar() {
       </div>
 
       {/* Backdrop overlay for mobile drawer */}
-      {mobileOpen && (
-        <div
-          className="principal-sidebar-backdrop"
-          onClick={closeMobileSidebar}
-        />
-      )}
+      <div
+        className={`principal-sidebar-backdrop ${mobileOpen ? "backdrop-active" : ""}`}
+        onClick={closeMobileSidebar}
+      />
 
       {/* Main Sidebar Drawer */}
       <aside className={`sidebar ${mobileOpen ? "mobile-open" : ""}`}>

@@ -115,10 +115,10 @@ function ViewsTooltip({ active, payload, label }: any) {
 function ActiveStudentsTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="chart-tooltip-glass">
-        <p className="chart-tooltip-title">{label}</p>
-        <p className="chart-tooltip-row">
-          <span className="chart-tooltip-dot" style={{ background: "#0d9488" }} />
+      <div className="light-weekly-active-tooltip">
+        <p className="light-weekly-active-tooltip-title">{label}</p>
+        <p className="light-weekly-active-tooltip-row">
+          <span className="light-weekly-active-tooltip-dot" />
           <span>Active Students: <strong>{payload[0].value}</strong></span>
         </p>
       </div>
@@ -268,7 +268,7 @@ export default function HodPerformancePage() {
   };
 
   return (
-    <div className="dash-main">
+    <div className="dash-main hod-perf-container">
       <div className="dash-content">
         
         <div className="dash-welcome-banner mb-8">
@@ -364,22 +364,28 @@ export default function HodPerformancePage() {
             </div>
           </div>
 
-          <div className="corp-card chart-card">
-            <div className="corp-card-header">
+          {/* ===== MOST WATCHED VIDEOS CARD (SCOPED UNIQUE UI) ===== */}
+          <div className="corp-card chart-card light-most-watched-card">
+            <div className="corp-card-header light-most-watched-header">
               <div>
                 <h3><PieIcon size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Most Watched Videos</h3>
                 <p className="card-subtitle">Popular video share</p>
               </div>
             </div>
-            <div className="chart-container donut-chart-box">
-              {mostWatchedVideos.length === 0 ? (
-                <div className="chart-empty-state">No video analytics found.</div>
+
+            <div className="light-most-watched-chart-container">
+              {mostWatchedVideos.length === 0 || stats.totalViews === 0 ? (
+                <div className="light-most-watched-empty">
+                  <div className="light-most-watched-empty-icon">📊</div>
+                  <div className="light-most-watched-empty-title">No Data Available</div>
+                  <div className="light-most-watched-empty-sub">No video analytics available yet.</div>
+                </div>
               ) : (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: 220 }}>
-                  <div style={{ position: "relative", width: 130, height: 130, flexShrink: 0 }}>
+                <div className="light-most-watched-wrapper">
+                  <div className="light-most-watched-chart">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={mostWatchedVideos} dataKey="value" nameKey="name" innerRadius={38} outerRadius={62} paddingAngle={3}>
+                        <Pie data={mostWatchedVideos} dataKey="value" nameKey="name" innerRadius={44} outerRadius={68} paddingAngle={4}>
                           {mostWatchedVideos.map((entry) => (
                             <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
                           ))}
@@ -387,17 +393,18 @@ export default function HodPerformancePage() {
                         <Tooltip content={<DonutTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="donut-center-label">
-                      <span className="donut-center-value">{stats.totalViews.toLocaleString()}</span>
-                      <span className="donut-center-sub">Views</span>
+                    <div className="light-most-watched-center-label">
+                      <span className="light-most-watched-center-value">{stats.totalViews.toLocaleString()}</span>
+                      <span className="light-most-watched-center-sub">Views</span>
                     </div>
                   </div>
-                  <div className="donut-custom-legend">
+
+                  <div className="light-most-watched-legend">
                     {mostWatchedVideos.map((d) => (
-                      <div className="legend-row-item" key={d.name} title={d.name}>
-                        <span className="legend-dot" style={{ background: d.color }} />
-                        <span className="legend-name truncate max-w-[90px]">{d.name}</span>
-                        <span className="legend-val">{d.percent}%</span>
+                      <div className="light-most-watched-legend-item" key={d.name} title={d.name}>
+                        <span className="light-most-watched-legend-dot" style={{ background: d.color }} />
+                        <span className="light-most-watched-legend-name">{d.name}</span>
+                        <span className="light-most-watched-legend-val">{d.percent}%</span>
                       </div>
                     ))}
                   </div>
@@ -406,24 +413,29 @@ export default function HodPerformancePage() {
             </div>
           </div>
 
-          <div className="corp-card chart-card">
-            <div className="corp-card-header">
+          {/* ===== WEEKLY ACTIVE LEARNERS CARD (SCOPED UNIQUE UI) ===== */}
+          <div className="corp-card chart-card light-weekly-active-card">
+            <div className="corp-card-header light-weekly-active-header">
               <div>
                 <h3><BarChart3 size={17} className="header-icon" style={{ color: "#0d9488" }} /> Weekly Active Learners</h3>
                 <p className="card-subtitle">Active student participation</p>
               </div>
             </div>
-            <div className="chart-container">
-              {weeklyActiveStudents.length === 0 ? (
-                <div className="chart-empty-state">No student activity logged.</div>
+            <div className="light-weekly-active-chart">
+              {weeklyActiveStudents.length === 0 || weeklyActiveStudents.every((d: any) => d.value === 0) ? (
+                <div className="light-weekly-active-empty">
+                  <div className="light-weekly-active-empty-icon">📊</div>
+                  <div className="light-weekly-active-empty-title">No Data Available</div>
+                  <div className="light-weekly-active-empty-sub">No student activity logged for this week.</div>
+                </div>
               ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={weeklyActiveStudents} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart data={weeklyActiveStudents} margin={{ top: 12, right: 12, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
                     <XAxis dataKey="label" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} allowDecimals={false} />
-                    <Tooltip content={<ActiveStudentsTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} />
-                    <Bar dataKey="value" fill="#0d9488" radius={[6, 6, 0, 0]} maxBarSize={42} />
+                    <Tooltip content={<ActiveStudentsTooltip />} cursor={{ fill: "rgba(13, 148, 136, 0.12)" }} />
+                    <Bar dataKey="value" fill="#0d9488" radius={[6, 6, 0, 0]} maxBarSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -432,34 +444,34 @@ export default function HodPerformancePage() {
 
         </section>
 
-        <section className="corp-card table-card-corp mb-8" style={{ padding: "24px 24px 16px" }}>
-          <div className="corp-card-header mb-4">
+        {/* ===== STUDENT PERFORMANCE OVERVIEW CARD (SCOPED UNIQUE UI) ===== */}
+        <section className="corp-card table-card-corp light-student-performance-card mb-8">
+          <div className="corp-card-header light-student-performance-header">
             <div>
               <h3><Award size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Student Performance Overview</h3>
               <p className="card-subtitle">Individual student video completion rates and watch duration</p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <div className="light-student-performance-actions">
+              <div className="light-student-performance-search-wrap">
+                <Search size={15} className="light-student-performance-search-icon" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                   placeholder="Search student..."
-                  className="pl-9 pr-4 py-2 text-sm rounded-xl border outline-none"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-primary)", borderColor: "var(--p-border-table)", width: 220 }}
+                  className="light-student-performance-search-input"
                 />
               </div>
 
-              <span className="table-count-badge">
+              <span className="light-student-performance-badge">
                 {filtered.length} Students
               </span>
             </div>
           </div>
 
-          <div className="corp-table-wrap">
-            <table className="corp-table">
+          <div className="light-student-performance-table-wrap">
+            <table className="light-student-performance-table">
               <thead>
                 <tr>
                   <th>Rank</th>
@@ -473,11 +485,18 @@ export default function HodPerformancePage() {
               <tbody>
                 {slice.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="empty-table-cell">No student performance records found.</td>
+                    <td colSpan={6} className="light-student-performance-empty-cell">
+                      <div className="light-student-performance-empty">
+                        <div className="light-student-performance-empty-icon">📊</div>
+                        <div className="light-student-performance-empty-title">No Student Performance Data</div>
+                        <div className="light-student-performance-empty-sub">No student performance records found.</div>
+                        <div className="light-student-performance-empty-hint">Data will appear here once students start watching videos.</div>
+                      </div>
+                    </td>
                   </tr>
                 ) : (
                   slice.map((s, idx) => (
-                    <tr key={s.id}>
+                    <tr key={s.id} className="light-student-performance-row">
                       <td style={{ fontWeight: 700, color: "var(--p-text-muted)", width: 60 }}>
                         #{(safePage - 1) * pageSize + idx + 1}
                       </td>
@@ -527,28 +546,28 @@ export default function HodPerformancePage() {
             </table>
           </div>
 
-          <div className="flex items-center justify-between pt-4 mt-2 border-t" style={{ borderColor: "var(--p-border-table)" }}>
-            <span className="text-xs" style={{ color: "var(--p-text-muted)" }}>
+          <div className="light-student-performance-footer">
+            <span className="light-student-performance-showing">
               Showing {filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1} to {Math.min(safePage * pageSize, filtered.length)} of {filtered.length} students
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="light-student-performance-pagination">
               <button
                 onClick={() => goPage(safePage - 1)}
                 disabled={safePage === 1}
-                className="perf-page-btn"
+                className="light-student-performance-page-btn"
               >
                 Previous
               </button>
 
-              <span className="perf-page-text">
+              <span className="light-student-performance-page-text">
                 Page {safePage} of {totalPages}
               </span>
 
               <button
                 onClick={() => goPage(safePage + 1)}
                 disabled={safePage === totalPages}
-                className="perf-page-btn"
+                className="light-student-performance-page-btn"
               >
                 Next
               </button>

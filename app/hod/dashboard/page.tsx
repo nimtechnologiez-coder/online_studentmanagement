@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import {
   GraduationCap,
   Video,
@@ -247,6 +247,7 @@ const INITIAL_DASHBOARD_DATA: HodDashboardData = {
 
 export default function HodDashboardPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [dashData, setDashData] = useState<HodDashboardData>(INITIAL_DASHBOARD_DATA);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -254,6 +255,35 @@ export default function HodDashboardPage() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [hodDisplayName, setHodDisplayName] = useState("HOD");
+
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setProfileOpen(false);
+  }, [pathname]);
+
+  // Close dropdown on outside click and Escape key press
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -366,7 +396,7 @@ export default function HodDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [hodDisplayName, router]);
+  }, [router]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -451,7 +481,7 @@ export default function HodDashboardPage() {
   ];
 
   return (
-    <div className="dash-corp-main">
+    <div className="dash-corp-main hod-dash-container">
       {/* ===== TOP HEADER ===== */}
       <header className="dash-corp-header">
         {/* Brand */}
@@ -480,7 +510,7 @@ export default function HodDashboardPage() {
 
         {/* Right actions */}
         <div className="dash-header-actions">
-          <div className="dash-profile-wrapper">
+          <div className="dash-profile-wrapper" ref={profileRef}>
             <button
               type="button"
               className="dash-profile-trigger"
@@ -491,28 +521,27 @@ export default function HodDashboardPage() {
                 <span className="profile-name">{hodDisplayName}</span>
                 <span className="profile-role">Head of Department</span>
               </div>
-              <ChevronDown size={13} className="profile-arrow" />
+              <ChevronDown size={13} className={`profile-arrow ${profileOpen ? "rotate-180" : ""}`} />
             </button>
 
-            {profileOpen && (
-              <div className="dash-profile-dropdown">
-                <a href="/hod/students"><Users size={14} /> My Students</a>
-                <a href="/hod/videos"><Video size={14} /> Videos</a>
-                <div className="dropdown-divider" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    localStorage.removeItem("hod");
-                    sessionStorage.removeItem("hod");
-                    localStorage.removeItem("user");
-                    sessionStorage.removeItem("user");
-                    window.location.href = "/hod/login";
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
+            <div className={`dash-profile-dropdown ${profileOpen ? "open" : ""}`}>
+              <a href="/hod/students" onClick={() => setProfileOpen(false)}><Users size={14} /> My Students</a>
+              <a href="/hod/videos" onClick={() => setProfileOpen(false)}><Video size={14} /> Videos</a>
+              <div className="dropdown-divider" />
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false);
+                  localStorage.removeItem("hod");
+                  sessionStorage.removeItem("hod");
+                  localStorage.removeItem("user");
+                  sessionStorage.removeItem("user");
+                  window.location.href = "/hod/login";
+                }}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -620,49 +649,53 @@ export default function HodDashboardPage() {
                 </div>
               </div>
 
-              {/* Students by Year Donut */}
-              <div className="corp-card chart-card">
-                <div className="corp-card-header">
+              {/* ===== STUDENTS BY YEAR DONUT (SCOPED UNIQUE UI) ===== */}
+              <div className="corp-card chart-card light-students-year-card">
+                <div className="corp-card-header light-students-year-header">
                   <div>
                     <h3><Users size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Students by Year</h3>
+                    <p className="card-subtitle">Year-wise student distribution</p>
                   </div>
                 </div>
-                <div className="chart-container donut-chart-box" style={{ position: "relative" }}>
-                  {studentDonut.length === 0 ? (
-                    <div className="chart-empty-state">No student data.</div>
+                <div className="light-students-year-chart-container">
+                  {studentDonut.length === 0 || totalDonutStudents === 0 ? (
+                    <div className="light-students-year-empty">
+                      <div className="light-students-year-empty-icon">👨‍🎓</div>
+                      <div className="light-students-year-empty-title">No Student Data Available</div>
+                      <div className="light-students-year-empty-sub">No students have been added yet.</div>
+                      <div className="light-students-year-empty-hint">The chart will appear automatically when data becomes available.</div>
+                    </div>
                   ) : (
-                    <>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: 220 }}>
-                        <div style={{ position: "relative", width: 140, height: 140, flexShrink: 0 }}>
-                          <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                              <Pie data={studentDonut} dataKey="value" nameKey="name" innerRadius={42} outerRadius={68} paddingAngle={3}>
-                                {studentDonut.map((entry) => (
-                                  <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
-                                ))}
-                              </Pie>
-                              <Tooltip content={<CategoryTooltip />} />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="donut-center-label">
-                            <span className="donut-center-value">{totalDonutStudents.toLocaleString()}</span>
-                            <span className="donut-center-sub">Students</span>
-                          </div>
-                        </div>
-                        <div className="donut-custom-legend">
-                          {studentDonut.map((d) => {
-                            const pct = totalDonutStudents > 0 ? Math.round((d.value / totalDonutStudents) * 100) : 0;
-                            return (
-                              <div className="legend-row-item" key={d.name}>
-                                <span className="legend-dot" style={{ background: d.color }} />
-                                <span className="legend-name">{d.name} Year</span>
-                                <span className="legend-val">{pct}% ({d.value})</span>
-                              </div>
-                            );
-                          })}
+                    <div className="light-students-year-wrapper">
+                      <div className="light-students-year-chart">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie data={studentDonut} dataKey="value" nameKey="name" innerRadius={42} outerRadius={68} paddingAngle={3}>
+                              {studentDonut.map((entry) => (
+                                <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
+                              ))}
+                            </Pie>
+                            <Tooltip content={<CategoryTooltip />} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="light-students-year-center-label">
+                          <span className="light-students-year-center-value">{totalDonutStudents.toLocaleString()}</span>
+                          <span className="light-students-year-center-sub">Students</span>
                         </div>
                       </div>
-                    </>
+                      <div className="light-students-year-legend">
+                        {studentDonut.map((d) => {
+                          const pct = totalDonutStudents > 0 ? Math.round((d.value / totalDonutStudents) * 100) : 0;
+                          return (
+                            <div className="light-students-year-legend-item" key={d.name} title={`${d.name} Year`}>
+                              <span className="light-students-year-legend-dot" style={{ background: d.color }} />
+                              <span className="light-students-year-legend-name">{d.name} Year</span>
+                              <span className="light-students-year-legend-val">{pct}% ({d.value})</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -718,23 +751,29 @@ export default function HodDashboardPage() {
                 </div>
               </div>
 
-              <div className="corp-card live-activity-card">
-                <div className="corp-card-header">
+              {/* ===== REAL-TIME ACTIVITY STREAM CARD (SCOPED UNIQUE UI) ===== */}
+              <div className="corp-card live-activity-card light-activity-card">
+                <div className="corp-card-header light-activity-header">
                   <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time Activity Stream</h3>
-                  <span className="header-badge live-dot-badge"><span className="pulse-dot" /> Live</span>
+                  <span className="header-badge live-dot-badge light-activity-live-badge"><span className="pulse-dot" /> Live</span>
                 </div>
-                <div className="activity-feed-list">
+                <div className="activity-feed-list light-activity-list">
                   {liveActivities.length === 0 ? (
-                    <div className="empty-feed">No recent activity logged yet.</div>
+                    <div className="light-activity-empty">
+                      <div className="light-activity-empty-icon">📈</div>
+                      <div className="light-activity-empty-title">No Recent Activity</div>
+                      <div className="light-activity-empty-sub">No student activity has been recorded yet.</div>
+                      <div className="light-activity-empty-hint">Activity will appear here automatically when students start watching videos.</div>
+                    </div>
                   ) : (
                     liveActivities.slice(0, 4).map((act) => (
-                      <div key={act.id} className="feed-item">
-                        <div className="feed-icon-dot"><CheckCircle2 size={14} /></div>
-                        <div className="feed-body">
-                          <div className="feed-title">{act.description}</div>
-                          <div className="feed-meta">
-                            <span className="feed-badge">{act.badge}</span>
-                            <span className="feed-time">{act.time}</span>
+                      <div key={act.id} className="feed-item light-activity-item">
+                        <div className="feed-icon-dot light-activity-icon-dot"><CheckCircle2 size={14} /></div>
+                        <div className="feed-body light-activity-body">
+                          <div className="feed-title light-activity-title">{act.description}</div>
+                          <div className="feed-meta light-activity-meta">
+                            <span className="feed-badge light-activity-badge">{act.badge}</span>
+                            <span className="feed-time light-activity-time">{act.time}</span>
                           </div>
                         </div>
                       </div>
@@ -788,45 +827,43 @@ export default function HodDashboardPage() {
 
             {/* ===== TABLES GRID ROW ===== */}
             <section className="dash-tables-grid">
-              {/* Recent Activity Table */}
-              <div className="corp-card table-card-corp">
-                <div className="corp-card-header">
+              {/* ===== RECENT ACTIVITY TABLE CARD (SCOPED UNIQUE UI) ===== */}
+              <div className="corp-card table-card-corp light-recent-activity-card">
+                <div className="corp-card-header light-recent-activity-header">
                   <div>
                     <h3><Activity size={18} className="header-icon" style={{ color: "#0d9488" }} /> Recent Activity</h3>
                     <p className="card-subtitle">Real-time log of student video watch sessions</p>
                   </div>
-                  <div className="recent-header-actions">
-                    <button
-                      className="table-refresh-btn"
-                      onClick={fetchDashboardData}
-                      disabled={loading}
-                      title="Refresh Recent Activity"
-                    >
-                      <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-                    </button>
-                    <span className="table-count-badge">
+                  <div className="recent-header-actions light-recent-activity-actions">
+                    <span className="table-count-badge light-recent-activity-badge">
                       {Math.min(filteredRecentViews.length, 4)} Logged
                     </span>
-                    <a href="/hod/students" className="card-header-link">
+                    <a href="/hod/students" className="card-header-link light-recent-activity-link">
                       View All <ArrowUpRight size={13} />
                     </a>
                   </div>
                 </div>
-                <div className="corp-table-wrap">
-                  <table className="corp-table">
-                    <thead>
-                      <tr>
-                        <th>Student Name</th>
-                        <th>Activity</th>
-                        <th>Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredRecentViews.length === 0 ? (
-                        <tr><td colSpan={3} className="empty-table-cell">No recent student activity found.</td></tr>
-                      ) : (
-                        filteredRecentViews.slice(0, 4).map((row, idx) => (
-                          <tr key={`${row.student}-${idx}`}>
+
+                {filteredRecentViews.length === 0 ? (
+                  <div className="light-recent-activity-empty">
+                    <div className="light-recent-activity-empty-icon">📈</div>
+                    <div className="light-recent-activity-empty-title">No Recent Activity</div>
+                    <div className="light-recent-activity-empty-sub">No student activity has been recorded yet.</div>
+                    <div className="light-recent-activity-empty-hint">Activity will appear here automatically when students start watching videos.</div>
+                  </div>
+                ) : (
+                  <div className="corp-table-wrap light-recent-activity-table-wrap">
+                    <table className="corp-table light-recent-activity-table">
+                      <thead>
+                        <tr>
+                          <th>Student Name</th>
+                          <th>Activity</th>
+                          <th>Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredRecentViews.slice(0, 4).map((row, idx) => (
+                          <tr key={`${row.student}-${idx}`} className="light-recent-activity-row">
                             <td>
                               <div className="student-cell-profile">
                                 <div className="avatar-circle">
@@ -838,39 +875,45 @@ export default function HodDashboardPage() {
                             <td style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
                             <td style={{ color: "var(--p-text-muted)", fontSize: 12.5 }}>{row.lastViewed}</td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
-              {/* Latest Videos Table */}
-              <div className="corp-card table-card-corp">
-                <div className="corp-card-header">
+              {/* ===== LATEST PUBLISHED VIDEOS TABLE CARD (SCOPED UNIQUE UI) ===== */}
+              <div className="corp-card table-card-corp light-latest-videos-card">
+                <div className="corp-card-header light-latest-videos-header">
                   <div>
                     <h3><PlayCircle size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Latest Published Videos</h3>
                     <p className="card-subtitle">Recently uploaded educational videos</p>
                   </div>
-                  <span className="table-count-badge">{filteredLatestVideos.length} Videos</span>
+                  <span className="table-count-badge light-latest-videos-badge">{filteredLatestVideos.length} Videos</span>
                 </div>
-                <div className="corp-table-wrap">
-                  <table className="corp-table">
-                    <thead>
-                      <tr>
-                        <th>Media</th>
-                        <th>Video Title</th>
-                        <th>Category</th>
-                        <th>Views</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredLatestVideos.length === 0 ? (
-                        <tr><td colSpan={4} className="empty-table-cell">No videos match your filter.</td></tr>
-                      ) : (
-                        filteredLatestVideos.slice(0, 4).map((video, idx) => (
-                          <tr key={`${video.title}-${idx}`}>
-                            <td>
+
+                {filteredLatestVideos.length === 0 ? (
+                  <div className="light-latest-videos-empty">
+                    <div className="light-latest-videos-empty-icon">📹</div>
+                    <div className="light-latest-videos-empty-title">No Videos Available</div>
+                    <div className="light-latest-videos-empty-sub">No published videos match your filter.</div>
+                    <div className="light-latest-videos-empty-hint">Uploaded videos will appear here automatically.</div>
+                  </div>
+                ) : (
+                  <div className="corp-table-wrap light-latest-videos-table-wrap">
+                    <table className="corp-table light-latest-videos-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: 70 }}>Media</th>
+                          <th>Video Title</th>
+                          <th>Category</th>
+                          <th style={{ width: 80, textAlign: "right" }}>Views</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredLatestVideos.slice(0, 4).map((video, idx) => (
+                          <tr key={`${video.title}-${idx}`} className="light-latest-videos-row">
+                            <td style={{ width: 70 }}>
                               <div className="table-media-thumb">
                                 <div className="table-media-fallback" style={{ display: "flex" }}>
                                   <PlayCircle size={18} />
@@ -879,13 +922,13 @@ export default function HodDashboardPage() {
                             </td>
                             <td style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{video.title}</td>
                             <td><span className="table-cat-badge">{video.category}</span></td>
-                            <td style={{ fontWeight: 600 }}>{video.views.toLocaleString()}</td>
+                            <td style={{ fontWeight: 600, textAlign: "right" }}>{video.views.toLocaleString()}</td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </section>
           </>

@@ -378,29 +378,15 @@ export default function StudentsPage() {
       if (principalId) {
         headers["X-Principal-Id"] = String(principalId);
       }
-
-      const apiBase = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3001";
-      const apiUrls = [
-        "/api/principal/students/",
-        `${apiBase}/api/principal/students/`,
-        "http://127.0.0.1:8000/api/principal/students/",
-      ];
-
-      let response: Response | null = null;
-      let lastError: Error | null = null;
-
-      for (const url of apiUrls) {
-        try {
-          response = await fetch(url, { headers, credentials: "include" });
-          if (response.ok) break;
-          lastError = new Error(`Server error: ${response.status}`);
-        } catch (fetchErr: any) {
-          lastError = fetchErr;
-        }
+      let response: Response;
+      try {
+        response = await fetch("/api/principal/students/", { headers, credentials: "include" });
+      } catch (fetchErr: any) {
+        throw new Error("Network error connecting to students API.");
       }
 
-      if (!response || !response.ok) {
-        throw new Error(lastError?.message || "Failed to load students.");
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
       }
       const json = await response.json();
 
@@ -890,7 +876,6 @@ export default function StudentsPage() {
                       <th>Department</th>
                       <th>Email</th>
                       <th>Username</th>
-                      <th>Password</th>
                       <th style={{ textAlign: "center" }}>Viewed Videos</th>
                       <th>Progress</th>
                       <th>Last View</th>
@@ -901,7 +886,7 @@ export default function StudentsPage() {
                   <tbody>
                     {paginatedStudents.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="empty-table-cell">
+                        <td colSpan={9} className="empty-table-cell">
                           {students.length === 0
                             ? "No students found in the database."
                             : "No students match the selected filter criteria."}
@@ -922,9 +907,6 @@ export default function StudentsPage() {
                           <td className="text-slate-600 font-medium">{student.email}</td>
                           <td>
                             <code className="corp-code-badge">{student.username}</code>
-                          </td>
-                          <td>
-                            <PasswordCell password={student.password} />
                           </td>
                           <td style={{ textAlign: "center", fontWeight: 600 }}>{student.viewedVideos}</td>
                           <td>
