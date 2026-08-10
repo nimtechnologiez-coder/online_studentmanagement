@@ -64,7 +64,7 @@ export default function StudentLoginPage() {
     setLoading(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
       const res = await fetch(`${apiBase}/api/student/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
