@@ -72,8 +72,8 @@ export default function StudentForgotPasswordPage() {
   };
 
   // Step 1: Send OTP Code
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setError("");
     setSuccessMsg("");
 
