@@ -276,7 +276,7 @@ export default function VideosPage() {
         if (parsed?.deptBreakdownRaw) setDeptBreakdownRaw(parsed.deptBreakdownRaw);
         setLoading(false);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     async function fetchVideos() {
       setError(null);
@@ -287,7 +287,7 @@ export default function VideosPage() {
             ? (localStorage.getItem("principal") || sessionStorage.getItem("principal"))
             : null;
           if (saved) principalId = JSON.parse(saved)?.id || "";
-        } catch {}
+        } catch { }
 
         const headers: Record<string, string> = {};
         if (principalId) headers["X-Principal-Id"] = String(principalId);
@@ -314,7 +314,7 @@ export default function VideosPage() {
           setDeptBreakdownRaw(deptBreak);
           try {
             sessionStorage.setItem("principal_video_reports_cache", JSON.stringify({ videos: normalized, deptBreakdownRaw: deptBreak }));
-          } catch (_) {}
+          } catch (_) { }
         } else {
           throw new Error(json.message || "Failed to load videos");
         }
@@ -431,11 +431,11 @@ export default function VideosPage() {
 
         <div className="principal-video-header-search">
           <Search size={17} strokeWidth={1.8} />
-          <input 
-            type="text" 
-            placeholder="Search Video" 
-            value={query} 
-            onChange={(e) => setQuery(e.target.value)} 
+          <input
+            type="text"
+            placeholder="Search Video"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
 
@@ -479,321 +479,321 @@ export default function VideosPage() {
           <>
             {/* Summary KPI Cards */}
             <section className="principal-video-stats-grid">
-          <div className="principal-video-stat-card">
-            <div className="principal-video-stat-icon principal-video-stat-icon-indigo">
-              <VideoIcon size={20} strokeWidth={1.8} />
-            </div>
-            <div className="principal-video-stat-body">
-              <span className="principal-video-stat-value">{videos.length}</span>
-              <span className="principal-video-stat-label">Total Videos</span>
-            </div>
-          </div>
-
-          <div className="principal-video-stat-card">
-            <div className="principal-video-stat-icon principal-video-stat-icon-amber">
-              <Eye size={20} strokeWidth={1.8} />
-            </div>
-            <div className="principal-video-stat-body">
-              <span className="principal-video-stat-value">{totalViews.toLocaleString()}</span>
-              <span className="principal-video-stat-label">Total Views</span>
-            </div>
-          </div>
-
-          <div className="principal-video-stat-card">
-            <div className="principal-video-stat-icon principal-video-stat-icon-teal">
-              <FolderOpen size={20} strokeWidth={1.8} />
-            </div>
-            <div className="principal-video-stat-body">
-              <span className="principal-video-stat-value">{categoryOptions.length > 1 ? categoryOptions.length - 1 : 0}</span>
-              <span className="principal-video-stat-label">Categories</span>
-            </div>
-          </div>
-
-          <div className="principal-video-stat-card">
-            <div className="principal-video-stat-icon principal-video-stat-icon-emerald">
-              <Star size={20} strokeWidth={1.8} />
-            </div>
-            <div className="principal-video-stat-body">
-              <span className="principal-video-stat-value principal-video-stat-value-text">{topVideo ? topVideo.title : "—"}</span>
-              <span className="principal-video-stat-label">Top Video</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Charts Analytics Grid */}
-        <section className="principal-video-charts-grid">
-          {/* ===== DEPARTMENT-WISE VIDEO DISTRIBUTION CARD (SCOPED UNIQUE UI) ===== */}
-          <div className="principal-video-chart-card light-department-video-card">
-            <div className="principal-video-chart-header light-department-video-header">
-              <div className="principal-video-chart-title light-department-video-title">
-                <PieChartIcon size={18} className="principal-video-chart-icon" />
-                <h3>Department-Wise Video Distribution & Views</h3>
-              </div>
-              <span className="principal-video-chart-badge light-department-video-badge">Institutional Audit</span>
-            </div>
-
-            <div className="principal-video-chart-body light-department-video-body">
-              {deptDonutData.length === 0 || totalDeptViewsFormatted === "0" ? (
-                <div className="light-department-video-empty">
-                  <div className="light-department-video-empty-icon">📊</div>
-                  <div className="light-department-video-empty-title">No Department Video Data</div>
-                  <div className="light-department-video-empty-sub">No department-wise video distribution data is available.</div>
-                  <div className="light-department-video-empty-hint">Charts will appear automatically when videos are uploaded.</div>
+              <div className="principal-video-stat-card">
+                <div className="principal-video-stat-icon principal-video-stat-icon-indigo">
+                  <VideoIcon size={20} strokeWidth={1.8} />
                 </div>
-              ) : (
-                <div className="light-department-video-wrapper">
-                  <div className="light-department-video-chart">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={deptDonutData}
-                          dataKey="value"
-                          nameKey="name"
-                          innerRadius={48}
-                          outerRadius={72}
-                          paddingAngle={3}
-                        >
-                          {deptDonutData.map((entry) => (
-                            <Cell key={`cell-${entry.name}`} fill={entry.color} stroke="var(--p-bg-card, #0f172a)" strokeWidth={2} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            background: "#0f172a",
-                            borderColor: "rgba(255,255,255,0.12)",
-                            borderRadius: "8px",
-                            color: "#fff",
-                            fontSize: "12px",
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="light-department-video-center-label">
-                      <span className="light-department-video-center-value">{totalDeptViewsFormatted}</span>
-                      <span className="light-department-video-center-sub">Views</span>
+                <div className="principal-video-stat-body">
+                  <span className="principal-video-stat-value">{videos.length}</span>
+                  <span className="principal-video-stat-label">Total Videos</span>
+                </div>
+              </div>
+
+              <div className="principal-video-stat-card">
+                <div className="principal-video-stat-icon principal-video-stat-icon-amber">
+                  <Eye size={20} strokeWidth={1.8} />
+                </div>
+                <div className="principal-video-stat-body">
+                  <span className="principal-video-stat-value">{totalViews.toLocaleString()}</span>
+                  <span className="principal-video-stat-label">Total Views</span>
+                </div>
+              </div>
+
+              <div className="principal-video-stat-card">
+                <div className="principal-video-stat-icon principal-video-stat-icon-teal">
+                  <FolderOpen size={20} strokeWidth={1.8} />
+                </div>
+                <div className="principal-video-stat-body">
+                  <span className="principal-video-stat-value">{categoryOptions.length > 1 ? categoryOptions.length - 1 : 0}</span>
+                  <span className="principal-video-stat-label">Categories</span>
+                </div>
+              </div>
+
+              <div className="principal-video-stat-card">
+                <div className="principal-video-stat-icon principal-video-stat-icon-emerald">
+                  <Star size={20} strokeWidth={1.8} />
+                </div>
+                <div className="principal-video-stat-body">
+                  <span className="principal-video-stat-value principal-video-stat-value-text">{topVideo ? topVideo.title : "—"}</span>
+                  <span className="principal-video-stat-label">Top Video</span>
+                </div>
+              </div>
+            </section>
+
+            {/* Charts Analytics Grid */}
+            <section className="principal-video-charts-grid">
+              {/* ===== DEPARTMENT-WISE VIDEO DISTRIBUTION CARD (SCOPED UNIQUE UI) ===== */}
+              <div className="principal-video-chart-card light-department-video-card">
+                <div className="principal-video-chart-header light-department-video-header">
+                  <div className="principal-video-chart-title light-department-video-title">
+                    <PieChartIcon size={18} className="principal-video-chart-icon" />
+                    <h3>Department-Wise Video Distribution & Views</h3>
+                  </div>
+                  <span className="principal-video-chart-badge light-department-video-badge">Institutional Audit</span>
+                </div>
+
+                <div className="principal-video-chart-body light-department-video-body">
+                  {deptDonutData.length === 0 || totalDeptViewsFormatted === "0" ? (
+                    <div className="light-department-video-empty">
+                      <div className="light-department-video-empty-icon">📊</div>
+                      <div className="light-department-video-empty-title">No Department Video Data</div>
+                      <div className="light-department-video-empty-sub">No department-wise video distribution data is available.</div>
+                      <div className="light-department-video-empty-hint">Charts will appear automatically when videos are uploaded.</div>
                     </div>
-                  </div>
-
-                  <div className="light-department-video-legend">
-                    {deptDonutData.map((item) => (
-                      <div key={item.name} className="light-department-video-legend-item" title={item.name}>
-                        <span className="light-department-video-legend-dot" style={{ background: item.color }} />
-                        <span className="light-department-video-legend-name">{item.name}</span>
-                        <span className="light-department-video-legend-val">{item.value.toLocaleString()} ({item.percentage}%)</span>
+                  ) : (
+                    <div className="light-department-video-wrapper">
+                      <div className="light-department-video-chart">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={deptDonutData}
+                              dataKey="value"
+                              nameKey="name"
+                              innerRadius={48}
+                              outerRadius={72}
+                              paddingAngle={3}
+                            >
+                              {deptDonutData.map((entry) => (
+                                <Cell key={`cell-${entry.name}`} fill={entry.color} stroke="var(--p-bg-card, #0f172a)" strokeWidth={2} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              contentStyle={{
+                                background: "#0f172a",
+                                borderColor: "rgba(255,255,255,0.12)",
+                                borderRadius: "8px",
+                                color: "#fff",
+                                fontSize: "12px",
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="light-department-video-center-label">
+                          <span className="light-department-video-center-value">{totalDeptViewsFormatted}</span>
+                          <span className="light-department-video-center-sub">Views</span>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* ===== CATEGORY-WISE VIDEO VIEWS BAR CHART (SCOPED UNIQUE UI) ===== */}
-          <div className="principal-video-chart-card light-category-video-card">
-            <div className="principal-video-chart-header light-category-video-header">
-              <div className="principal-video-chart-title light-category-video-title">
-                <BarChart3 size={18} className="principal-video-chart-icon text-teal" />
-                <h3>Category-Wise Total Video Views</h3>
+                      <div className="light-department-video-legend">
+                        {deptDonutData.map((item) => (
+                          <div key={item.name} className="light-department-video-legend-item" title={item.name}>
+                            <span className="light-department-video-legend-dot" style={{ background: item.color }} />
+                            <span className="light-department-video-legend-name">{item.name}</span>
+                            <span className="light-department-video-legend-val">{item.value.toLocaleString()} ({item.percentage}%)</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <span className="principal-video-chart-badge light-category-video-badge">Performance</span>
-            </div>
 
-            <div className="principal-video-chart-body light-category-video-body">
-              {categoryBarData.length === 0 || categoryBarData.every((d: any) => d.views === 0) ? (
-                <div className="light-category-video-empty">
-                  <div className="light-category-video-empty-icon">📊</div>
-                  <div className="light-category-video-empty-title">No Category Analytics Available</div>
-                  <div className="light-category-video-empty-sub">No category-wise video views have been recorded yet.</div>
-                  <div className="light-category-video-empty-hint">Analytics will appear automatically when videos receive views.</div>
+              {/* ===== CATEGORY-WISE VIDEO VIEWS BAR CHART (SCOPED UNIQUE UI) ===== */}
+              <div className="principal-video-chart-card light-category-video-card">
+                <div className="principal-video-chart-header light-category-video-header">
+                  <div className="principal-video-chart-title light-category-video-title">
+                    <BarChart3 size={18} className="principal-video-chart-icon text-teal" />
+                    <h3>Category-Wise Total Video Views</h3>
+                  </div>
+                  <span className="principal-video-chart-badge light-category-video-badge">Performance</span>
                 </div>
-              ) : (
-                <div className="light-category-video-chart">
-                  <ResponsiveContainer width="100%" height={240}>
-                    <BarChart
-                      data={categoryBarData}
-                      margin={{ top: 12, right: 12, left: -16, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table, #cbd5e1)" vertical={false} />
-                      <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--p-text-muted, #64748b)" }} axisLine={false} tickLine={false} />
-                      <YAxis 
-                        tick={{ fontSize: 11, fill: "var(--p-text-muted, #64748b)" }} 
-                        axisLine={false} 
-                        tickLine={false} 
-                        allowDecimals={false} 
-                        domain={[0, (dataMax: number) => (dataMax > 0 ? Math.ceil(dataMax * 1.1) : 100)]}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: "var(--p-bg-card, #ffffff)",
-                          borderColor: "#cbd5e1",
-                          borderRadius: "12px",
-                          color: "var(--p-text-primary, #0f172a)",
-                          fontSize: "12px",
-                          boxShadow: "0 10px 25px rgba(0, 0, 0, 0.12)",
-                        }}
-                      />
-                      <Bar dataKey="views" fill="#0d9488" radius={[6, 6, 0, 0]} maxBarSize={40} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
 
-        {/* Filters */}
-        <section className="principal-video-filters-bar">
-          <select
-            className="principal-video-filter-select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {categoryOptions.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className="principal-video-filter-select"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            {statuses.map((st) => (
-              <option key={st} value={st}>
-                {st}
-              </option>
-            ))}
-          </select>
-
-          <div className="principal-video-search-box video-report-search-box">
-            <Search size={15} strokeWidth={1.8} className="principal-video-search-icon" />
-            <input
-              type="text"
-              placeholder="Search Video..."
-              className="principal-video-search-input video-report-search-input"
-              style={{ background: "transparent", backgroundColor: "transparent" }}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
-        </section>
-
-        {/* Video Table Card */}
-        <section className="principal-video-table-card">
-          <div className="principal-video-table-wrap">
-            <table className="principal-video-table">
-              <colgroup>
-                <col className="col-thumb" />
-                <col className="col-title" />
-                <col className="col-category" />
-                <col className="col-duration" />
-                <col className="col-views" />
-                <col className="col-date" />
-                <col className="col-uploader" />
-                <col className="col-status" />
-                <col className="col-action" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th className="principal-video-th">Thumbnail</th>
-                  <th className="principal-video-th">Video Title</th>
-                  <th className="principal-video-th">Category</th>
-                  <th className="principal-video-th">Duration</th>
-                  <th className="principal-video-th">Views</th>
-                  <th className="principal-video-th">Uploaded Date</th>
-                  <th className="principal-video-th">Uploaded By</th>
-                  <th className="principal-video-th">Status</th>
-                  <th className="principal-video-th">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedVideos.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="principal-video-table-empty">
-                      No videos match these filters.
-                    </td>
-                  </tr>
-                ) : (
-                  paginatedVideos.map((vid) => (
-                    <tr key={vid.id}>
-                      <td className="principal-video-td">
-                        <ThumbnailBox label={vid.thumbnail || (vid.title ? vid.title.slice(0, 2).toUpperCase() : "VD")} />
-                      </td>
-                      <td className="principal-video-td principal-video-cell-title" title={vid.title}>
-                        {vid.title}
-                      </td>
-                      <td className="principal-video-td">
-                        <span className="principal-video-category-badge">{vid.category || "General"}</span>
-                      </td>
-                      <td className="principal-video-td">{vid.duration || "N/A"}</td>
-                      <td className="principal-video-td principal-video-cell-views">{(vid.views || 0).toLocaleString()}</td>
-                      <td className="principal-video-td">{vid.uploadedDate || "N/A"}</td>
-                      <td className="principal-video-td">
-                        <span className="principal-video-uploader-truncate" title={vid.uploadedBy || "System Admin"}>
-                          {vid.uploadedBy || "System Admin"}
-                        </span>
-                      </td>
-                      <td className="principal-video-td">
-                        <VideoStatusBadge status={vid.status || "Published"} />
-                      </td>
-                      <td className="principal-video-td">
-                        <button
-                          type="button"
-                          className="principal-video-action-btn"
-                          onClick={() => setSelectedVideo(vid)}
+                <div className="principal-video-chart-body light-category-video-body">
+                  {categoryBarData.length === 0 || categoryBarData.every((d: any) => d.views === 0) ? (
+                    <div className="light-category-video-empty">
+                      <div className="light-category-video-empty-icon">📊</div>
+                      <div className="light-category-video-empty-title">No Category Analytics Available</div>
+                      <div className="light-category-video-empty-sub">No category-wise video views have been recorded yet.</div>
+                      <div className="light-category-video-empty-hint">Analytics will appear automatically when videos receive views.</div>
+                    </div>
+                  ) : (
+                    <div className="light-category-video-chart">
+                      <ResponsiveContainer width="100%" height={240}>
+                        <BarChart
+                          data={categoryBarData}
+                          margin={{ top: 12, right: 12, left: -16, bottom: 0 }}
                         >
-                          View Details
-                        </button>
-                      </td>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table, #cbd5e1)" vertical={false} />
+                          <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--p-text-muted, #64748b)" }} axisLine={false} tickLine={false} />
+                          <YAxis
+                            tick={{ fontSize: 11, fill: "var(--p-text-muted, #64748b)" }}
+                            axisLine={false}
+                            tickLine={false}
+                            allowDecimals={false}
+                            domain={[0, (dataMax: number) => (dataMax > 0 ? Math.ceil(dataMax * 1.1) : 100)]}
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              background: "var(--p-bg-card, #ffffff)",
+                              borderColor: "#cbd5e1",
+                              borderRadius: "12px",
+                              color: "var(--p-text-primary, #0f172a)",
+                              fontSize: "12px",
+                              boxShadow: "0 10px 25px rgba(0, 0, 0, 0.12)",
+                            }}
+                          />
+                          <Bar dataKey="views" fill="#0d9488" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Filters */}
+            <section className="principal-video-filters-bar">
+              <select
+                className="principal-video-filter-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {categoryOptions.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                className="principal-video-filter-select"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                {statuses.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
+              </select>
+
+              <div className="principal-video-search-box video-report-search-box">
+                <Search size={15} strokeWidth={1.8} className="principal-video-search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search Video..."
+                  className="principal-video-search-input video-report-search-input"
+                  style={{ background: "transparent", backgroundColor: "transparent" }}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+            </section>
+
+            {/* Video Table Card */}
+            <section className="principal-video-table-card">
+              <div className="principal-video-table-wrap">
+                <table className="principal-video-table">
+                  <colgroup>
+                    <col className="col-thumb" />
+                    <col className="col-title" />
+                    <col className="col-category" />
+                    <col className="col-duration" />
+                    <col className="col-views" />
+                    <col className="col-date" />
+                    <col className="col-uploader" />
+                    <col className="col-status" />
+                    <col className="col-action" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th className="principal-video-th">Thumbnail</th>
+                      <th className="principal-video-th">Video Title</th>
+                      <th className="principal-video-th">Category</th>
+                      <th className="principal-video-th">Duration</th>
+                      <th className="principal-video-th">Views</th>
+                      <th className="principal-video-th">Uploaded Date</th>
+                      <th className="principal-video-th">Uploaded By</th>
+                      <th className="principal-video-th">Status</th>
+                      <th className="principal-video-th">Action</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  </thead>
+                  <tbody>
+                    {paginatedVideos.length === 0 ? (
+                      <tr>
+                        <td colSpan={9} className="principal-video-table-empty">
+                          No videos match these filters.
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedVideos.map((vid) => (
+                        <tr key={vid.id}>
+                          <td className="principal-video-td">
+                            <ThumbnailBox label={vid.thumbnail || (vid.title ? vid.title.slice(0, 2).toUpperCase() : "VD")} />
+                          </td>
+                          <td className="principal-video-td principal-video-cell-title" title={vid.title}>
+                            {vid.title}
+                          </td>
+                          <td className="principal-video-td">
+                            <span className="principal-video-category-badge">{vid.category || "General"}</span>
+                          </td>
+                          <td className="principal-video-td">{vid.duration || "N/A"}</td>
+                          <td className="principal-video-td principal-video-cell-views">{(vid.views || 0).toLocaleString()}</td>
+                          <td className="principal-video-td">{vid.uploadedDate || "N/A"}</td>
+                          <td className="principal-video-td">
+                            <span className="principal-video-uploader-truncate" title={vid.uploadedBy || "System Admin"}>
+                              {vid.uploadedBy || "System Admin"}
+                            </span>
+                          </td>
+                          <td className="principal-video-td">
+                            <VideoStatusBadge status={vid.status || "Published"} />
+                          </td>
+                          <td className="principal-video-td">
+                            <button
+                              type="button"
+                              className="principal-video-action-btn"
+                              onClick={() => setSelectedVideo(vid)}
+                            >
+                              View Details
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-          {/* Pagination Footer */}
-          <div className="principal-video-pagination-footer">
-            <span className="principal-video-pagination-info">
-              Showing {rangeStart} to {rangeEnd} of {filteredVideos.length} videos
-            </span>
+              {/* Pagination Footer */}
+              <div className="principal-video-pagination-footer">
+                <span className="principal-video-pagination-info">
+                  Showing {rangeStart} to {rangeEnd} of {filteredVideos.length} videos
+                </span>
 
-            <div className="principal-video-pagination-controls">
-              <button
-                type="button"
-                className="principal-video-page-btn"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                aria-label="Previous Page"
-              >
-                <ChevronLeft size={16} strokeWidth={2} />
-              </button>
+                <div className="principal-video-pagination-controls">
+                  <button
+                    type="button"
+                    className="principal-video-page-btn"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    aria-label="Previous Page"
+                  >
+                    <ChevronLeft size={16} strokeWidth={2} />
+                  </button>
 
-              {pageNumbers.map((pageNo) => (
-                <button
-                  key={pageNo}
-                  type="button"
-                  className={`principal-video-page-btn ${pageNo === currentPage ? "principal-video-page-btn-active" : ""}`}
-                  onClick={() => setCurrentPage(pageNo)}
-                >
-                  {pageNo}
-                </button>
-              ))}
+                  {pageNumbers.map((pageNo) => (
+                    <button
+                      key={pageNo}
+                      type="button"
+                      className={`principal-video-page-btn ${pageNo === currentPage ? "principal-video-page-btn-active" : ""}`}
+                      onClick={() => setCurrentPage(pageNo)}
+                    >
+                      {pageNo}
+                    </button>
+                  ))}
 
-              <button
-                type="button"
-                className="principal-video-page-btn"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                aria-label="Next Page"
-              >
-                <ChevronRight size={16} strokeWidth={2} />
-              </button>
-            </div>
-          </div>
-        </section>
+                  <button
+                    type="button"
+                    className="principal-video-page-btn"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    aria-label="Next Page"
+                  >
+                    <ChevronRight size={16} strokeWidth={2} />
+                  </button>
+                </div>
+              </div>
+            </section>
           </>
         )}
       </main>

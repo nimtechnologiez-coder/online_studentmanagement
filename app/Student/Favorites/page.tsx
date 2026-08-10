@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import "./favorites.css";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
 
 const INITIAL_FAVORITES = [
   {

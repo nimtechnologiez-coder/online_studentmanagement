@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { studentFetch } from "../../Student/studentFetch";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -52,11 +53,7 @@ export default function StudentSidebar() {
 
   async function fetchSidebarProgress() {
     try {
-      const saved = typeof window !== "undefined" ? localStorage.getItem("student") || sessionStorage.getItem("student") : null;
-      const studentId = saved ? JSON.parse(saved).id : 0;
-      const res = await fetch(`https://online-management-backend.onrender.com/api/student/dashboard/`, {
-        headers: studentId ? { "X-Student-Id": String(studentId) } : {},
-      });
+      const res = await studentFetch("/api/student/dashboard/");
       const data = await res.json();
       if (res.ok && data.status === "success" && data.stats) {
         const total = data.stats.totalVideos || 0;
@@ -207,7 +204,12 @@ export default function StudentSidebar() {
             <button
               className="menu-item logout-menu-item mt-1 w-full"
               title={collapsed && !mobileOpen ? "Logout" : undefined}
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  await studentFetch("/api/student/logout/", { method: "POST" });
+                } catch (e) {
+                  console.error("Backend logout error:", e);
+                }
                 try {
                   localStorage.removeItem("student");
                   localStorage.removeItem("student_token");

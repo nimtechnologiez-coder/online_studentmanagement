@@ -66,7 +66,7 @@ export default function StudentForgotPasswordPage() {
   const getApiBase = () => {
     if (process.env.NEXT_PUBLIC_API_BASE) return process.env.NEXT_PUBLIC_API_BASE;
     if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-      return "http://https://online-management-backend.onrender.com";
+      return "https://online-management-backend.onrender.com";
     }
     return "https://online-management-backend.onrender.com";
   };

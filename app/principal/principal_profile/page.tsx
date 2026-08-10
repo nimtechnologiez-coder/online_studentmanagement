@@ -79,7 +79,7 @@ export default function PrincipalProfile() {
         setEditBio(json.data.bio || "");
         try {
           sessionStorage.setItem("principal_profile_cache", JSON.stringify(json.data));
-        } catch (_) {}
+        } catch (_) { }
       }
     } catch (err) {
       console.error("Failed to load principal profile:", err);
@@ -99,7 +99,7 @@ export default function PrincipalProfile() {
         setEditBio(parsed.bio || "");
         setLoading(false);
       }
-    } catch (_) {}
+    } catch (_) { }
     fetchProfile();
   }, []);
 
@@ -244,179 +244,179 @@ export default function PrincipalProfile() {
         <>
           {/* Hero Header Card */}
           <div className="p-profile-hero-card">
-        <div
-          className="p-profile-cover-box"
-          style={{
-            background: profile?.cover_photo
-              ? `url(${profile.cover_photo}) center/cover no-repeat`
-              : coverBg
-          }}
-        >
-          <label className="p-profile-cover-btn" title="Change Cover Photo">
-            <Camera size={14} />
-            <span>Cover Photo</span>
-            <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
-          </label>
-        </div>
-
-        <div className="p-profile-info-body">
-          <div className="p-profile-avatar-row">
-            <div className="p-profile-avatar-wrapper">
-              <div className="p-profile-avatar-circle">
-                {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
-                  <img src={avatarSrc || profile?.avatar} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <span>
-                    {(() => {
-                      const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
-                      const parts = cleanName.split(" ").filter(Boolean);
-                      if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-                      return (cleanName[0] || "P").toUpperCase();
-                    })()}
-                  </span>
-                )}
-              </div>
-              <label className="p-profile-avatar-upload-icon" title="Upload Profile Picture">
+            <div
+              className="p-profile-cover-box"
+              style={{
+                background: profile?.cover_photo
+                  ? `url(${profile.cover_photo}) center/cover no-repeat`
+                  : coverBg
+              }}
+            >
+              <label className="p-profile-cover-btn" title="Change Cover Photo">
                 <Camera size={14} />
-                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                <span>Cover Photo</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
               </label>
             </div>
 
-            <div className="p-profile-meta">
-              <h1 className="p-profile-name">{name}</h1>
-              <div className="p-profile-sub-badges">
-                <span className="p-profile-badge-item"><Building2 size={15} /> Principal, {college}</span>
-                <span className="p-profile-badge-item"><MapPin size={15} /> India</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                setEditEmail(email);
-                setEditPhone(phone);
-                setEditBio(profile?.bio || "");
-                setIsEditModalOpen(true);
-              }}
-              className="p-profile-edit-trigger"
-            >
-              <Edit3 size={15} />
-              <span>Edit Profile</span>
-            </button>
-          </div>
-
-          <div className="p-profile-tabs">
-            <button className="p-profile-tab-active">Overview</button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="p-profile-grid-layout">
-        {/* Left Column Stack */}
-        <div className="p-profile-col-stack">
-          {/* Contact Information Card */}
-          <div className="p-profile-card">
-            <div className="p-profile-card-header">
-              <h3 className="p-profile-card-title">
-                <Mail size={18} className="p-profile-card-title-icon" />
-                Contact Information
-              </h3>
-            </div>
-            <div className="p-profile-rows-container">
-              <div className="p-profile-data-row">
-                <div className="p-profile-data-label-group">
-                  <div className="p-profile-row-icon-box" style={{ background: "rgba(37, 99, 235, 0.12)", color: "#2563eb" }}>
-                    <Mail size={16} />
+            <div className="p-profile-info-body">
+              <div className="p-profile-avatar-row">
+                <div className="p-profile-avatar-wrapper">
+                  <div className="p-profile-avatar-circle">
+                    {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
+                      <img src={avatarSrc || profile?.avatar} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>
+                        {(() => {
+                          const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
+                          const parts = cleanName.split(" ").filter(Boolean);
+                          if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                          return (cleanName[0] || "P").toUpperCase();
+                        })()}
+                      </span>
+                    )}
                   </div>
-                  <span className="p-profile-row-label">Email</span>
+                  <label className="p-profile-avatar-upload-icon" title="Upload Profile Picture">
+                    <Camera size={14} />
+                    <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                  </label>
                 </div>
-                <span className="p-profile-row-value">{email}</span>
-              </div>
 
-              <div className="p-profile-data-row">
-                <div className="p-profile-data-label-group">
-                  <div className="p-profile-row-icon-box" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
-                    <Phone size={16} />
+                <div className="p-profile-meta">
+                  <h1 className="p-profile-name">{name}</h1>
+                  <div className="p-profile-sub-badges">
+                    <span className="p-profile-badge-item"><Building2 size={15} /> Principal, {college}</span>
+                    <span className="p-profile-badge-item"><MapPin size={15} /> India</span>
                   </div>
-                  <span className="p-profile-row-label">Phone</span>
                 </div>
-                <span className="p-profile-row-value">{phone}</span>
+
+                <button
+                  onClick={() => {
+                    setEditEmail(email);
+                    setEditPhone(phone);
+                    setEditBio(profile?.bio || "");
+                    setIsEditModalOpen(true);
+                  }}
+                  className="p-profile-edit-trigger"
+                >
+                  <Edit3 size={15} />
+                  <span>Edit Profile</span>
+                </button>
               </div>
 
-              <div className="p-profile-data-row">
-                <div className="p-profile-data-label-group">
-                  <div className="p-profile-row-icon-box" style={{ background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b" }}>
-                    <Calendar size={16} />
+              <div className="p-profile-tabs">
+                <button className="p-profile-tab-active">Overview</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="p-profile-grid-layout">
+            {/* Left Column Stack */}
+            <div className="p-profile-col-stack">
+              {/* Contact Information Card */}
+              <div className="p-profile-card">
+                <div className="p-profile-card-header">
+                  <h3 className="p-profile-card-title">
+                    <Mail size={18} className="p-profile-card-title-icon" />
+                    Contact Information
+                  </h3>
+                </div>
+                <div className="p-profile-rows-container">
+                  <div className="p-profile-data-row">
+                    <div className="p-profile-data-label-group">
+                      <div className="p-profile-row-icon-box" style={{ background: "rgba(37, 99, 235, 0.12)", color: "#2563eb" }}>
+                        <Mail size={16} />
+                      </div>
+                      <span className="p-profile-row-label">Email</span>
+                    </div>
+                    <span className="p-profile-row-value">{email}</span>
                   </div>
-                  <span className="p-profile-row-label">Joined</span>
+
+                  <div className="p-profile-data-row">
+                    <div className="p-profile-data-label-group">
+                      <div className="p-profile-row-icon-box" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
+                        <Phone size={16} />
+                      </div>
+                      <span className="p-profile-row-label">Phone</span>
+                    </div>
+                    <span className="p-profile-row-value">{phone}</span>
+                  </div>
+
+                  <div className="p-profile-data-row">
+                    <div className="p-profile-data-label-group">
+                      <div className="p-profile-row-icon-box" style={{ background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b" }}>
+                        <Calendar size={16} />
+                      </div>
+                      <span className="p-profile-row-label">Joined</span>
+                    </div>
+                    <span className="p-profile-row-value">{joined}</span>
+                  </div>
                 </div>
-                <span className="p-profile-row-value">{joined}</span>
+              </div>
+
+              {/* Academic Biography Card */}
+              <div className="p-profile-card">
+                <div className="p-profile-card-header">
+                  <h3 className="p-profile-card-title">
+                    <GraduationCap size={18} className="p-profile-card-title-icon" />
+                    Academic Biography
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditEmail(email);
+                      setEditPhone(phone);
+                      setEditBio(profile?.bio || "");
+                      setIsEditModalOpen(true);
+                    }}
+                    className="p-profile-edit-trigger"
+                    style={{ fontSize: 12, padding: "4px 10px", borderRadius: 8 }}
+                  >
+                    <Edit3 size={13} />
+                    <span>Edit Bio</span>
+                  </button>
+                </div>
+                <p className="p-profile-bio-text">
+                  {profile?.bio || `${name} serves as the Principal at ${college}. With extensive leadership experience in higher education, institutional growth, academic governance, and educational innovation, ${name} oversees administrative operations and student engagement programs.`}
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column Stack */}
+            <div className="p-profile-col-stack">
+              {/* Account Details Card */}
+              <div className="p-profile-card">
+                <div className="p-profile-card-header">
+                  <h3 className="p-profile-card-title">
+                    <ShieldCheck size={18} className="p-profile-card-title-icon" />
+                    Account Details
+                  </h3>
+                </div>
+
+                <div className="p-profile-rows-container">
+                  <div className="p-profile-data-row">
+                    <span className="p-profile-row-label">Username</span>
+                    <span className="p-profile-row-value">{profile?.username || "principal"}</span>
+                  </div>
+
+                  <div className="p-profile-data-row">
+                    <span className="p-profile-row-label">Status</span>
+                    <span className="p-profile-status-pill">
+                      <span className="p-profile-status-dot" />
+                      {profile?.status || "Active"}
+                    </span>
+                  </div>
+
+                  <div className="p-profile-data-row">
+                    <span className="p-profile-row-label">Role</span>
+                    <span className="p-profile-row-value">Institutional Principal</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Academic Biography Card */}
-          <div className="p-profile-card">
-            <div className="p-profile-card-header">
-              <h3 className="p-profile-card-title">
-                <GraduationCap size={18} className="p-profile-card-title-icon" />
-                Academic Biography
-              </h3>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditEmail(email);
-                  setEditPhone(phone);
-                  setEditBio(profile?.bio || "");
-                  setIsEditModalOpen(true);
-                }}
-                className="p-profile-edit-trigger"
-                style={{ fontSize: 12, padding: "4px 10px", borderRadius: 8 }}
-              >
-                <Edit3 size={13} />
-                <span>Edit Bio</span>
-              </button>
-            </div>
-            <p className="p-profile-bio-text">
-              {profile?.bio || `${name} serves as the Principal at ${college}. With extensive leadership experience in higher education, institutional growth, academic governance, and educational innovation, ${name} oversees administrative operations and student engagement programs.`}
-            </p>
-          </div>
-        </div>
-
-        {/* Right Column Stack */}
-        <div className="p-profile-col-stack">
-          {/* Account Details Card */}
-          <div className="p-profile-card">
-            <div className="p-profile-card-header">
-              <h3 className="p-profile-card-title">
-                <ShieldCheck size={18} className="p-profile-card-title-icon" />
-                Account Details
-              </h3>
-            </div>
-
-            <div className="p-profile-rows-container">
-              <div className="p-profile-data-row">
-                <span className="p-profile-row-label">Username</span>
-                <span className="p-profile-row-value">{profile?.username || "principal"}</span>
-              </div>
-
-              <div className="p-profile-data-row">
-                <span className="p-profile-row-label">Status</span>
-                <span className="p-profile-status-pill">
-                  <span className="p-profile-status-dot" />
-                  {profile?.status || "Active"}
-                </span>
-              </div>
-
-              <div className="p-profile-data-row">
-                <span className="p-profile-row-label">Role</span>
-                <span className="p-profile-row-value">Institutional Principal</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </>
+        </>
       )}
 
       {/* Edit Profile Modal */}

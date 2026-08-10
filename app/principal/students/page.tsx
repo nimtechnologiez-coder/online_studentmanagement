@@ -348,7 +348,7 @@ export default function StudentsPage() {
         setStudents(JSON.parse(cached));
         setLoading(false);
       }
-    } catch (_) {}
+    } catch (_) { }
   }, []);
 
   const [department, setDepartment] = useState<string>(ALL_DEPTS);
@@ -424,7 +424,7 @@ export default function StudentsPage() {
         setStudents(mapped);
         try {
           sessionStorage.setItem("principal_students_cache", JSON.stringify(mapped));
-        } catch (_) {}
+        } catch (_) { }
       } else {
         throw new Error(json.message || "API error");
       }

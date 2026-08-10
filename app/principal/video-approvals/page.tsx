@@ -209,8 +209,8 @@ export default function AdminVideoApprovalPage() {
       {actionMessage && (
         <div
           className={`flex items-center gap-3 p-4 rounded-xl border text-sm font-semibold transition-all ${actionMessage.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-              : "bg-red-500/10 border-red-500/30 text-red-400"
+            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+            : "bg-red-500/10 border-red-500/30 text-red-400"
             }`}
         >
           {actionMessage.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
@@ -284,8 +284,8 @@ export default function AdminVideoApprovalPage() {
             <button
               onClick={() => setActiveStatusFilter("Pending")}
               className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "Pending"
-                  ? "bg-amber-500 text-slate-950 shadow"
-                  : "text-slate-400 hover:text-white"
+                ? "bg-amber-500 text-slate-950 shadow"
+                : "text-slate-400 hover:text-white"
                 }`}
             >
               Pending ({counts.pending})
@@ -293,8 +293,8 @@ export default function AdminVideoApprovalPage() {
             <button
               onClick={() => setActiveStatusFilter("Published")}
               className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "Published"
-                  ? "bg-emerald-500 text-slate-950 shadow"
-                  : "text-slate-400 hover:text-white"
+                ? "bg-emerald-500 text-slate-950 shadow"
+                : "text-slate-400 hover:text-white"
                 }`}
             >
               Approved ({counts.published})
@@ -302,8 +302,8 @@ export default function AdminVideoApprovalPage() {
             <button
               onClick={() => setActiveStatusFilter("Rejected")}
               className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "Rejected"
-                  ? "bg-red-500 text-white shadow"
-                  : "text-slate-400 hover:text-white"
+                ? "bg-red-500 text-white shadow"
+                : "text-slate-400 hover:text-white"
                 }`}
             >
               Rejected ({counts.rejected})
@@ -311,8 +311,8 @@ export default function AdminVideoApprovalPage() {
             <button
               onClick={() => setActiveStatusFilter("All")}
               className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeStatusFilter === "All"
-                  ? "bg-indigo-600 text-white shadow"
-                  : "text-slate-400 hover:text-white"
+                ? "bg-indigo-600 text-white shadow"
+                : "text-slate-400 hover:text-white"
                 }`}
             >
               All ({counts.total})
@@ -591,10 +591,10 @@ export default function AdminVideoApprovalPage() {
                   <span className="text-slate-400 block font-semibold uppercase text-[10px]">Status</span>
                   <span
                     className={`font-bold ${previewVideo.status === "Published"
-                        ? "text-emerald-400"
-                        : previewVideo.status === "Pending"
-                          ? "text-amber-400"
-                          : "text-red-400"
+                      ? "text-emerald-400"
+                      : previewVideo.status === "Pending"
+                        ? "text-amber-400"
+                        : "text-red-400"
                       }`}
                   >
                     {previewVideo.status}

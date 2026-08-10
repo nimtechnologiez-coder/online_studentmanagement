@@ -102,7 +102,7 @@ export default function DepartmentOverview() {
         setDepartments(JSON.parse(cached));
         setLoading(false);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     async function fetchDepartments() {
       setError(null);
@@ -134,7 +134,7 @@ export default function DepartmentOverview() {
           setDepartments(list);
           try {
             sessionStorage.setItem("principal_departments_cache", JSON.stringify(list));
-          } catch (_) {}
+          } catch (_) { }
         } else {
           setDepartments([]);
         }

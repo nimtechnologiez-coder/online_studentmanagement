@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { studentFetch } from "../studentFetch";
 import Link from "next/link";
 import {
   Video,
@@ -32,7 +33,7 @@ import {
 } from "lucide-react";
 import "./dashboard.css";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
 
 const CATEGORY_ICONS: Record<string, { icon: any; colorClass: string }> = {
   Mathematics: { icon: Sigma, colorClass: "cat-icon-emerald" },
@@ -86,9 +87,7 @@ export default function StudentDashboardPage() {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch(`${API_BASE}/api/student/dashboard/`, {
-        headers: { "X-Student-Id": String(studentId) },
-      });
+      const res = await studentFetch("/api/student/dashboard/");
       const data = await res.json();
       if (res.ok && data.status === "success") {
         if (data.student) {

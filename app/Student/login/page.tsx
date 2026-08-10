@@ -19,6 +19,8 @@ import {
   ArrowRight
 } from "lucide-react";
 
+import { studentFetch } from "../studentFetch";
+
 export default function StudentLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -64,10 +66,8 @@ export default function StudentLoginPage() {
     setLoading(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
-      const res = await fetch(`${apiBase}/api/student/login/`, {
+      const res = await studentFetch("/api/student/login/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 

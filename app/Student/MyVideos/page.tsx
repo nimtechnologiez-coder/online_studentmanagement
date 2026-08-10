@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { studentFetch } from "../studentFetch";
 import {
   Video,
   Play,
@@ -22,7 +23,7 @@ import {
 } from "lucide-react";
 import "./myvideos.css";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
 
 const GRADIENTS = [
   "from-slate-900 via-blue-950 to-slate-900",
@@ -150,14 +151,11 @@ export default function MyVideosPage() {
     try {
       setLoading(true);
       setError("");
-      const studentId = getStudentId();
       const params = new URLSearchParams();
       if (searchQ) params.set("search", searchQ);
       if (cat && cat !== "All") params.set("category", cat);
 
-      const res = await fetch(`${API_BASE}/api/student/videos/?${params}`, {
-        headers: studentId ? { "X-Student-Id": studentId } : {},
-      });
+      const res = await studentFetch(`/api/student/videos/?${params}`);
       const data = await res.json();
       if (data.status === "success") {
         setVideos(data.videos || []);
@@ -176,10 +174,8 @@ export default function MyVideosPage() {
   async function handlePlayVideo(video: any) {
     setActiveModalVideo(video);
     try {
-      const studentId = getStudentId();
-      const res = await fetch(`${API_BASE}/api/student/videos/${video.id}/watch/`, {
+      const res = await studentFetch(`/api/student/videos/${video.id}/watch/`, {
         method: "POST",
-        headers: studentId ? { "X-Student-Id": studentId } : {},
       });
       const data = await res.json();
       if (res.ok && data.status === "success") {
@@ -195,15 +191,9 @@ export default function MyVideosPage() {
   }
 
   async function saveProgress(videoId: number, currentTime: number) {
-    const studentId = getStudentId();
-    if (!studentId) return;
     try {
-      await fetch(`${API_BASE}/api/student/videos/${videoId}/progress/`, {
+      await studentFetch(`/api/student/videos/${videoId}/progress/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Student-Id": studentId,
-        },
         body: JSON.stringify({ watched_seconds: Math.floor(currentTime) }),
       });
     } catch (err) {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { studentFetch } from "../studentFetch";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -36,7 +37,7 @@ import {
 } from "recharts";
 import "./myprogress.css";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
 
 function getStudentData() {
   if (typeof window === "undefined") return null;
@@ -111,9 +112,7 @@ export default function MyProgressPage() {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch(`${API_BASE}/api/student/progress/`, {
-        headers: { "X-Student-Id": String(studentId) },
-      });
+      const res = await studentFetch("/api/student/progress/");
       const data = await res.json();
       if (data.status === "success") {
         if (data.student) {

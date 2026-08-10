@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { studentFetch } from "../studentFetch";
 import Link from "next/link";
 import {
   Play,
@@ -54,12 +55,9 @@ export default function ContinueWatchingPage() {
     try {
       setLoading(true);
       setError("");
-      const studentId = getStudentId();
 
       // 1. Fetch watched videos & active sessions
-      const vRes = await fetch(`${API_BASE}/api/student/videos/`, {
-        headers: studentId ? { "X-Student-Id": studentId } : {},
-      });
+      const vRes = await studentFetch("/api/student/videos/");
       const vData = await vRes.json();
 
       let vList: any[] = [];
@@ -78,9 +76,7 @@ export default function ContinueWatchingPage() {
       }
 
       // 2. Fetch live student watch statistics
-      const pRes = await fetch(`${API_BASE}/api/student/progress/`, {
-        headers: studentId ? { "X-Student-Id": studentId } : {},
-      });
+      const pRes = await studentFetch("/api/student/progress/");
       const pData = await pRes.json();
       if (pData.status === "success") {
         if (pData.stats) setWatchStats(pData.stats);
@@ -97,10 +93,8 @@ export default function ContinueWatchingPage() {
     setActiveVideo(item);
     setIsPlayingModalOpen(true);
     try {
-      const studentId = getStudentId();
-      await fetch(`${API_BASE}/api/student/videos/${item.id}/watch/`, {
+      await studentFetch(`/api/student/videos/${item.id}/watch/`, {
         method: "POST",
-        headers: studentId ? { "X-Student-Id": studentId } : {},
       });
     } catch (err) {
       console.error("Failed to update watch log:", err);
@@ -108,15 +102,9 @@ export default function ContinueWatchingPage() {
   }
 
   async function saveProgress(videoId: number, currentTime: number) {
-    const studentId = getStudentId();
-    if (!studentId) return;
     try {
-      await fetch(`${API_BASE}/api/student/videos/${videoId}/progress/`, {
+      await studentFetch(`/api/student/videos/${videoId}/progress/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Student-Id": studentId,
-        },
         body: JSON.stringify({ watched_seconds: Math.floor(currentTime) }),
       });
     } catch (err) {

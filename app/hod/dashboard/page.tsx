@@ -292,7 +292,7 @@ export default function HodDashboardPage() {
         setDashData(JSON.parse(cached));
         setLoading(false);
       }
-    } catch (_) {}
+    } catch (_) { }
   }, []);
 
   const fetchDashboardData = useCallback(async () => {
@@ -398,7 +398,7 @@ export default function HodDashboardPage() {
         setDashData(newData);
         try {
           sessionStorage.setItem("hod_dash_cache", JSON.stringify(newData));
-        } catch (_) {}
+        } catch (_) { }
 
         if (json.hod?.name) setHodDisplayName(json.hod.name);
         setLastUpdated(new Date());
