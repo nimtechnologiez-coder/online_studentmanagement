@@ -268,8 +268,17 @@ export default function VideosPage() {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://online-management-backend.onrender.com";
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("principal_video_reports_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.videos) setVideos(parsed.videos);
+        if (parsed?.deptBreakdownRaw) setDeptBreakdownRaw(parsed.deptBreakdownRaw);
+        setLoading(false);
+      }
+    } catch (_) {}
+
     async function fetchVideos() {
-      setLoading(true);
       setError(null);
       try {
         let principalId = "";
@@ -301,9 +310,11 @@ export default function VideosPage() {
               : "",
           }));
           setVideos(normalized);
-          if (Array.isArray(json.departmentBreakdown)) {
-            setDeptBreakdownRaw(json.departmentBreakdown);
-          }
+          const deptBreak = Array.isArray(json.departmentBreakdown) ? json.departmentBreakdown : [];
+          setDeptBreakdownRaw(deptBreak);
+          try {
+            sessionStorage.setItem("principal_video_reports_cache", JSON.stringify({ videos: normalized, deptBreakdownRaw: deptBreak }));
+          } catch (_) {}
         } else {
           throw new Error(json.message || "Failed to load videos");
         }
@@ -451,14 +462,23 @@ export default function VideosPage() {
         )}
 
         {/* Loading State */}
-        {loading && (
-          <div className="principal-video-loading">
-            Loading video analytics...
+        {loading ? (
+          <div className="dash-skeleton-wrapper">
+            <div className="dash-skeleton-kpi-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+              ))}
+            </div>
+            <div className="dash-skeleton-charts-row">
+              <div className="dash-skeleton-chart-large skeleton-shimmer" style={{ height: 260 }} />
+              <div className="dash-skeleton-chart-small skeleton-shimmer" style={{ height: 260 }} />
+            </div>
+            <div className="dash-skeleton-table-card skeleton-shimmer" style={{ height: 350 }} />
           </div>
-        )}
-
-        {/* Summary KPI Cards */}
-        <section className="principal-video-stats-grid">
+        ) : (
+          <>
+            {/* Summary KPI Cards */}
+            <section className="principal-video-stats-grid">
           <div className="principal-video-stat-card">
             <div className="principal-video-stat-icon principal-video-stat-icon-indigo">
               <VideoIcon size={20} strokeWidth={1.8} />
@@ -774,6 +794,8 @@ export default function VideosPage() {
             </div>
           </div>
         </section>
+          </>
+        )}
       </main>
 
       {/* Video Detail Modal */}

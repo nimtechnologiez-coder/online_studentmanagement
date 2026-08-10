@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Clock, Play, Trash2, Search, Calendar, CheckCircle2, Loader2, AlertCircle, Video, X, FileText } from "lucide-react";
 import "./watchhistory.css";
 
-const API_BASE = "https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
 
 function getStudentId(): string | null {
   if (typeof window === "undefined") return null;
@@ -193,12 +193,18 @@ export default function WatchHistoryPage() {
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading Skeleton - Principal Dashboard Style */}
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center gap-3 text-slate-400">
-            <Loader2 size={32} className="animate-spin text-blue-600" />
-            <span className="text-sm font-medium">Loading your watch history...</span>
+        <div className="dash-skeleton-wrapper my-6">
+          <div className="dash-skeleton-banner skeleton-shimmer" />
+          <div className="dash-skeleton-kpi-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" />
           </div>
         </div>
       )}

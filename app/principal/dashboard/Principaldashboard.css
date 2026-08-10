@@ -577,15 +577,95 @@ html.dark .hstat-amber {
   cursor: pointer;
 }
 
-.dash-loading-state {
-  padding: 80px 20px;
+/* ---------------------------------- SAAS SKELETON LOADING SCREEN ---------------------------------- */
+.dash-skeleton-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  animation: dashSkeletonFadeIn 0.3s ease-out forwards;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--p-bg-card, #ffffff) 0%,
+    var(--p-bg-subtle, #f1f5f9) 50%,
+    var(--p-bg-card, #ffffff) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 1.6s infinite linear;
+  border-radius: var(--p-radius-lg, 16px);
+  border: 1px solid var(--p-border, #cbd5e1);
+}
+
+html.dark .skeleton-shimmer,
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #161b22 0%,
+    #21262d 50%,
+    #161b22 100%
+  ) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dash-skeleton-banner {
+  height: 120px;
+  width: 100%;
+}
+
+.dash-skeleton-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: 16px;
-  color: var(--p-text-muted);
-  font-size: 14px;
+}
+
+.dash-skeleton-kpi-card {
+  height: 100px;
+  border-radius: var(--p-radius-md, 14px);
+}
+
+.dash-skeleton-charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-chart-large {
+  height: 320px;
+}
+
+.dash-skeleton-chart-small {
+  height: 320px;
+}
+
+.dash-skeleton-tables-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-table-card {
+  height: 280px;
+}
+
+@keyframes shimmerMove {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes dashSkeletonFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---------------------------------- POLISHED SAAS LAYOUT & COMPONENT STYLING ---------------------------------- */
@@ -787,13 +867,15 @@ html.dark .hstat-amber {
   display: grid;
   grid-template-columns: 1fr 1.3fr;
   gap: 20px;
-  align-items: stretch;
+  align-items: start !important;
   width: 100%;
 }
 
 .actions-card {
   display: flex;
   flex-direction: column;
+  align-self: start !important;
+  height: fit-content !important;
 }
 
 .quick-actions-buttons {
@@ -1724,15 +1806,20 @@ html.dark .hstat-amber {
 }
 
 .recent-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
-.recent-header-actions .card-header-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.recent-header-actions .card-header-link,
+.card-header-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
   margin: 0;
 }
 

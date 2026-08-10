@@ -38,6 +38,43 @@
   color: var(--card-text, #ffffff);
 }
 
+/* Dark mode toggle button — mobile header */
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.4rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  background-color: rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.5);
+  color: #60a5fa;
+}
+
+/* Light mode override for the mobile header toggle button */
+html:not(.dark) .theme-toggle-btn {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--card-border, #cbd5e1);
+  color: var(--muted-text, #475569);
+}
+
+html:not(.dark) .theme-toggle-btn:hover {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+
 /* Mobile Backdrop Overlay */
 .student-sidebar-backdrop {
   position: fixed;

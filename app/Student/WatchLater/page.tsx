@@ -52,6 +52,7 @@ export default function StudentWatchLaterPage() {
   const [watchLater, setWatchLater] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeVideo, setActiveVideo] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -62,8 +63,8 @@ export default function StudentWatchLaterPage() {
         setWatchLater([]);
         localStorage.setItem("student_watch_later", JSON.stringify([]));
       }
-    } catch (e) {
-      setWatchLater([]);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -96,17 +97,10 @@ export default function StudentWatchLaterPage() {
           </div>
           <div>
             <h1>Watch Later</h1>
-            <p>Saved course lectures to watch at your convenience</p>
+            <p>Saved lectures and bookmarked learning materials</p>
           </div>
         </div>
 
-        <span className="wl-count-chip">
-          {watchLater.length} Bookmarked {watchLater.length === 1 ? "Video" : "Videos"}
-        </span>
-      </header>
-
-      {/* Controls Bar */}
-      <div className="wl-controls-bar">
         <div className="wl-search-input-wrap">
           <Search size={16} className="wl-search-icon" />
           <input
@@ -116,10 +110,23 @@ export default function StudentWatchLaterPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </div>
+      </header>
 
-      {/* Main Grid View */}
-      {filteredList.length === 0 ? (
+      {/* Loading Skeleton - Principal Dashboard Style */}
+      {loading ? (
+        <div className="dash-skeleton-wrapper my-6">
+          <div className="dash-skeleton-banner skeleton-shimmer" />
+          <div className="dash-skeleton-kpi-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" />
+          </div>
+        </div>
+      ) : filteredList.length === 0 ? (
         <div className="wl-empty-box">
           <Bookmark size={48} opacity={0.3} className="text-amber-500" />
           <h3>No Watch Later Videos</h3>

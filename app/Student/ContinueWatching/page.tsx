@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import "./continuewatching.css";
 
-const API_BASE = "https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://online-management-backend.onrender.com";
 
 function getStudentId(): string | null {
   if (typeof window === "undefined") return null;
@@ -181,11 +181,19 @@ export default function ContinueWatchingPage() {
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading Skeleton - Principal Dashboard Style */}
       {loading && (
-        <div className="cw-loading-container">
-          <Loader2 size={36} className="animate-spin text-blue-500" />
-          <p>Loading your learning workspace...</p>
+        <div className="dash-skeleton-wrapper my-6">
+          <div className="dash-skeleton-banner skeleton-shimmer" />
+          <div className="dash-skeleton-kpi-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" />
+          </div>
         </div>
       )}
 

@@ -127,17 +127,8 @@ export default function HODLoginPage() {
 
   if (checkingAuth) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "#070913",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#64748b",
-        }}
-      >
-        <p>Verifying authentication...</p>
+      <div style={{ minHeight: "100vh", background: "#070913", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 420, height: 480, borderRadius: 24, background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)" }} className="skeleton-shimmer" />
       </div>
     );
   }

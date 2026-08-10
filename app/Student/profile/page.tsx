@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import "./profile.css";
 
-const API_BASE = "https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
 
 function getStudentData() {
     if (typeof window === "undefined") return null;
@@ -127,11 +127,19 @@ export default function StudentProfilePage() {
                 </div>
             )}
 
-            {/* Loading */}
+            {/* Loading Skeleton - Principal Dashboard Style */}
             {loading && (
-                <div className="flex items-center justify-center py-20">
-                    <Loader2 size={32} className="animate-spin text-blue-600" />
-                    <span className="ml-3 text-sm font-medium text-slate-400">Loading student profile...</span>
+                <div className="dash-skeleton-wrapper my-6">
+                    <div className="dash-skeleton-banner skeleton-shimmer" />
+                    <div className="dash-skeleton-kpi-grid">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+                        ))}
+                    </div>
+                    <div className="dash-skeleton-charts-row">
+                        <div className="dash-skeleton-chart-large skeleton-shimmer" />
+                        <div className="dash-skeleton-chart-small skeleton-shimmer" />
+                    </div>
                 </div>
             )}
 

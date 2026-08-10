@@ -341,6 +341,16 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("principal_students_cache");
+      if (cached) {
+        setStudents(JSON.parse(cached));
+        setLoading(false);
+      }
+    } catch (_) {}
+  }, []);
+
   const [department, setDepartment] = useState<string>(ALL_DEPTS);
   const [status, setStatus] = useState<string>(ALL_STATUS);
   const [perfTier, setPerfTier] = useState<string>(ALL_PERF);
@@ -357,7 +367,6 @@ export default function StudentsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchStudents = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
       let principalId = "";
@@ -413,6 +422,9 @@ export default function StudentsPage() {
           recentActivity: s.recentActivity || [],
         }));
         setStudents(mapped);
+        try {
+          sessionStorage.setItem("principal_students_cache", JSON.stringify(mapped));
+        } catch (_) {}
       } else {
         throw new Error(json.message || "API error");
       }
@@ -732,9 +744,14 @@ export default function StudentsPage() {
         )}
 
         {loading && !students.length ? (
-          <div className="dash-loading-state">
-            <RefreshCw size={32} className="animate-spin text-indigo-600" />
-            <p>Fetching real-time student data...</p>
+          <div className="dash-skeleton-wrapper">
+            <div className="dash-skeleton-banner skeleton-shimmer" />
+            <div className="dash-skeleton-kpi-grid">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+              ))}
+            </div>
+            <div className="dash-skeleton-table-card skeleton-shimmer" style={{ height: 420 }} />
           </div>
         ) : (
           <>

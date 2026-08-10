@@ -111,6 +111,12 @@
 }
 
 /* ================================ DARK THEME overrides ================================ */
+html.dark,
+html.dark body {
+  background-color: #0d1117 !important;
+  color: #e6edf3 !important;
+}
+
 html.dark {
   /* Page backgrounds */
   --p-bg-main:          #0d1117;

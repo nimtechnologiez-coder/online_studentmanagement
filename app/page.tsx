@@ -12,7 +12,13 @@ import {
   ArrowRight,
   CheckCircle2,
   Activity,
+  AlertCircle,
 } from "lucide-react";
+import {
+  getStoredPrincipal,
+  saveStoredPrincipal,
+  clearStoredPrincipal,
+} from "./utils/auth";
 import "./PrincipalLogin.css";
 
 export default function PrincipalLogin() {
@@ -24,25 +30,30 @@ export default function PrincipalLogin() {
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [expiredMessage, setExpiredMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved =
+    const searchParams =
       typeof window !== "undefined"
-        ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
+        ? new URLSearchParams(window.location.search)
         : null;
 
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed) {
-          router.replace("/dashboard");
-          return;
-        }
-      } catch (e) {
-        localStorage.removeItem("principal");
-        sessionStorage.removeItem("principal");
-      }
+    const isExpiredParam = searchParams?.get("expired") === "true";
+
+    const { expired, data } = getStoredPrincipal();
+
+    if (isExpiredParam || expired) {
+      clearStoredPrincipal();
+      setExpiredMessage("Session expired. Please login again.");
+      setCheckingAuth(false);
+      return;
     }
+
+    if (data) {
+      router.replace("/principal/dashboard");
+      return;
+    }
+
     setCheckingAuth(false);
   }, [router]);
 
@@ -93,28 +104,15 @@ export default function PrincipalLogin() {
       console.log("Login Response:", result);
 
       if (response.ok && result.status === "success") {
-
-        if (remember) {
-          localStorage.setItem(
-            "principal",
-            JSON.stringify(result.data)
-          );
-        } else {
-          sessionStorage.setItem(
-            "principal",
-            JSON.stringify(result.data)
-          );
-        }
-
+        saveStoredPrincipal(result.data, remember);
+        setExpiredMessage(null);
         alert("Login Successful");
 
-        // Redirect to Dashboard
-        router.push("/dashboard");
-
+        // Redirect to Principal Dashboard
+        router.push("/principal/dashboard");
       } else {
         alert(result.message || "Invalid Username or Password");
       }
-
     } catch (error) {
       console.error("Login Error:", error);
       alert("Unable to connect to server.");
@@ -125,8 +123,8 @@ export default function PrincipalLogin() {
 
   if (checkingAuth) {
     return (
-      <div style={{ minHeight: "100vh", background: "#070b14", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
-        <p>Verifying authentication...</p>
+      <div style={{ minHeight: "100vh", background: "#070b14", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 420, height: 480, borderRadius: 24, background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)" }} className="skeleton-shimmer" />
       </div>
     );
   }
@@ -220,6 +218,13 @@ export default function PrincipalLogin() {
                 Access your executive dashboard using your institutional credentials.
               </p>
             </div>
+
+            {expiredMessage && (
+              <div className="session-expired-alert">
+                <AlertCircle size={18} className="alert-icon" />
+                <span>{expiredMessage}</span>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="login-form">
 

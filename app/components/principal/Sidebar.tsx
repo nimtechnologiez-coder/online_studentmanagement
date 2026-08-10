@@ -50,33 +50,22 @@ const menuGroups = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [principalName, setPrincipalName] = useState("Principal");
   const [principalEmail, setPrincipalEmail] = useState("");
-  const [collegeName, setCollegeName] = useState("Institutional Portal");
+  const [collegeName, setCollegeName] = useState("");
 
   useEffect(() => {
+    setMounted(true);
     try {
-      const saved =
-        typeof window !== "undefined"
-          ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
-          : null;
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const name =
-          parsed?.principal_name ||
-          parsed?.name ||
-          parsed?.full_name ||
-          parsed?.username ||
-          "Principal";
-        const email =
-          parsed?.principal_email || parsed?.email || "";
-        const college =
-          parsed?.college ||
-          parsed?.college_name ||
-          parsed?.institution ||
-          "Institutional Portal";
+      const stored = localStorage.getItem("principal") || sessionStorage.getItem("principal");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const name = parsed.name || parsed.username || "Principal";
+        const email = parsed.email || "";
+        const college = parsed.college_name || parsed.college || "";
 
         setPrincipalName(name);
         setPrincipalEmail(email);
@@ -96,6 +85,8 @@ export default function Sidebar() {
   const closeMobileSidebar = () => {
     setMobileOpen(false);
   };
+
+  const isDarkTheme = mounted && theme === "dark";
 
   return (
     <>
@@ -117,7 +108,7 @@ export default function Sidebar() {
             onClick={toggleTheme}
             aria-label="Toggle theme"
           >
-            {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+            {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
           </button>
 
           <button
@@ -188,9 +179,9 @@ export default function Sidebar() {
             <div className="theme-toggle-row" onClick={toggleTheme}>
               <div className="theme-toggle-label">
                 <Sun size={16} className="theme-icon" />
-                <span>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
+                <span suppressHydrationWarning>{isDarkTheme ? "Dark Mode" : "Light Mode"}</span>
               </div>
-              <div className={`theme-switch-track ${theme === "dark" ? "switch-dark" : "switch-light"}`}>
+              <div className={`theme-switch-track ${isDarkTheme ? "switch-dark" : "switch-light"}`}>
                 <div className="theme-switch-thumb" />
               </div>
             </div>

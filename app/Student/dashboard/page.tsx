@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import "./dashboard.css";
 
-const API_BASE = "https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
 
 const CATEGORY_ICONS: Record<string, { icon: any; colorClass: string }> = {
   Mathematics: { icon: Sigma, colorClass: "cat-icon-emerald" },
@@ -129,11 +129,23 @@ export default function StudentDashboardPage() {
     <div className="sdb-wrapper">
       {/* Top Header Navbar */}
       <header className="sdb-header">
-        <div className="sdb-brand-info">
-          <div className="sdb-logo-box">SP</div>
-          <div>
-            <h1>Student Enterprise Portal</h1>
-            <p>{student?.department ? `${student.department} Department` : "Academic Department"}</p>
+        <div className="sdb-header-brand-user">
+          <div className="sdb-brand-info">
+            <div className="sdb-logo-box">SP</div>
+            <div>
+              <h1>Student Enterprise Portal</h1>
+              <p>{student?.department ? `${student.department} Department` : "Academic Department"}</p>
+            </div>
+          </div>
+
+          <div className="sdb-header-right">
+            <div className="sdb-user-pill" onClick={() => window.location.href = '/Student/profile'}>
+              <div className="sdb-user-avatar">{studentInitials}</div>
+              <div className="sdb-user-meta">
+                <span className="sdb-user-name">{student?.full_name || "Logged Student"} <ChevronDown size={12} /></span>
+                <span className="sdb-user-id"><ShieldCheck size={10} /> ID: {student?.student_id || student?.username || "STUDENT"}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -152,16 +164,6 @@ export default function StudentDashboardPage() {
           />
           <kbd className="sdb-kbd">⌘K</kbd>
         </div>
-
-        <div className="sdb-header-right">
-          <div className="sdb-user-pill" onClick={() => window.location.href = '/Student/profile'}>
-            <div className="sdb-user-avatar">{studentInitials}</div>
-            <div className="sdb-user-meta">
-              <span className="sdb-user-name">{student?.full_name || "Logged Student"} <ChevronDown size={12} /></span>
-              <span className="sdb-user-id"><ShieldCheck size={10} /> ID: {student?.student_id || student?.username || "STUDENT"}</span>
-            </div>
-          </div>
-        </div>
       </header>
 
       {/* Error Alert */}
@@ -173,15 +175,25 @@ export default function StudentDashboardPage() {
         </div>
       )}
 
-      {/* Loading Skeleton */}
-      {loading && (
-        <div className="sdb-loading-box">
-          <Loader2 size={36} className="animate-spin text-blue-500" />
-          <span>Loading student dashboard...</span>
+      {/* Loading Skeleton - Exact Principal Dashboard Skeleton Animation */}
+      {loading ? (
+        <div className="dash-skeleton-wrapper">
+          <div className="dash-skeleton-banner skeleton-shimmer" />
+          <div className="dash-skeleton-kpi-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" />
+          </div>
+          <div className="dash-skeleton-tables-row">
+            <div className="dash-skeleton-table-card skeleton-shimmer" />
+            <div className="dash-skeleton-table-card skeleton-shimmer" />
+          </div>
         </div>
-      )}
-
-      {!loading && (
+      ) : (
         <>
           {/* Hero Welcome Banner */}
           <div className="sdb-hero-banner mb-4">

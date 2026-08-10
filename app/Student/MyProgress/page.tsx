@@ -36,7 +36,7 @@ import {
 } from "recharts";
 import "./myprogress.css";
 
-const API_BASE = "https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
 
 function getStudentData() {
   if (typeof window === "undefined") return null;
@@ -206,11 +206,19 @@ export default function MyProgressPage() {
         </div>
       )}
 
-      {/* Loading */}
+      {/* Loading Skeleton - Principal Dashboard Style */}
       {loading && (
-        <div className="sp-loading-box">
-          <Loader2 size={32} className="animate-spin text-blue-600" />
-          <span>Loading your progress data...</span>
+        <div className="dash-skeleton-wrapper my-6">
+          <div className="dash-skeleton-banner skeleton-shimmer" />
+          <div className="dash-skeleton-kpi-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" />
+          </div>
         </div>
       )}
 

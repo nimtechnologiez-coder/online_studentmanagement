@@ -229,7 +229,10 @@ html.dark .meta-item svg {
     border: 1px solid #dbeafe;
     padding: 20px 24px;
     border-radius: 14px;
-    min-width: 300px;
+    min-width: 0;
+    width: 100%;
+    max-width: 380px;
+    flex-shrink: 0;
     transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
@@ -337,7 +340,7 @@ html.dark .icon-purple {
 /* Learning Stats Grid */
 .stats-2x2-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 }
 
@@ -451,6 +454,8 @@ html.dark .view-progress-link:hover {
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 6px;
+    justify-self: start;
+    width: fit-content;
 }
 
 html.dark .chip-active-sm {
@@ -579,7 +584,7 @@ html.dark .action-row-btn:hover .chevron-icon {
 
     .header-user-section {
         width: 100%;
-        justify-content: flex-end;
+        justify-content: flex-start;
     }
 
     .profile-hero-card {
@@ -587,9 +592,9 @@ html.dark .action-row-btn:hover .chevron-icon {
     }
 
     .hero-left {
-        flex-direction: column;
+        flex-direction: row;
         align-items: flex-start;
-        gap: 14px;
+        gap: 16px;
     }
 
     .avatar-wrapper {
@@ -659,3 +664,290 @@ html.dark .action-row-btn:hover .chevron-icon {
         font-size: 9px;
     }
 }
+
+/* ---------------------------------- SAAS SKELETON LOADING ANIMATION ---------------------------------- */
+.dash-skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  animation: dashSkeletonFadeIn 0.3s ease-out forwards;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--card-bg, #ffffff) 0%,
+    var(--table-head-bg, #f1f5f9) 50%,
+    var(--card-bg, #ffffff) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 1.6s infinite linear;
+  border-radius: 16px;
+  border: 1px solid var(--card-border, #cbd5e1);
+}
+
+html.dark .skeleton-shimmer,
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #161b22 0%,
+    #21262d 50%,
+    #161b22 100%
+  ) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dash-skeleton-banner {
+  height: 120px;
+  width: 100%;
+}
+
+.dash-skeleton-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+.dash-skeleton-kpi-card {
+  height: 100px;
+  border-radius: 14px;
+}
+
+.dash-skeleton-charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-chart-large {
+  height: 320px;
+}
+
+.dash-skeleton-chart-small {
+  height: 320px;
+}
+
+.dash-skeleton-tables-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-table-card {
+  height: 280px;
+}
+
+@keyframes shimmerMove {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes dashSkeletonFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dash-skeleton-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .dash-skeleton-charts-row,
+  .dash-skeleton-tables-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-skeleton-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE FIXES — Mobile & Tablet
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .header-user-section {
+    display: none;
+  }
+
+  .profile-hero-card {
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .hero-right {
+    max-width: 100%;
+    width: 100%;
+    padding: 18px;
+  }
+
+  .grid-three-columns {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Academic Details: Proper 3-Column Grid Layout */
+  .academic-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .acad-label {
+    width: 100%;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted-text, #64748b);
+  }
+
+  .colon {
+    display: none;
+  }
+
+  .acad-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--card-text, #0f172a);
+    word-break: break-word;
+  }
+
+  /* Account Info Details: Proper Stacking Layout */
+  .info-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .info-label {
+    width: 100%;
+    font-size: 11px;
+    color: var(--muted-text, #64748b);
+  }
+
+  .info-colon {
+    display: none;
+  }
+
+  .info-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--card-text, #0f172a);
+    word-break: break-all;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .profile-hero-card {
+    padding: 16px;
+  }
+
+  /* Proper 2x2 Grid UI for Learning Stats on Mobile */
+  .stats-2x2-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat-box {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .stat-icon-wrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .stat-number {
+    font-size: 16px;
+  }
+
+  .stat-text {
+    font-size: 10px;
+  }
+
+  .profile-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-hero-card {
+    padding: 14px;
+  }
+
+  .hero-left {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .avatar-large {
+    width: 72px;
+    height: 72px;
+    font-size: 28px;
+  }
+
+  .name-status-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .contact-meta-list {
+    align-items: flex-start;
+  }
+
+  .meta-item {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  /* Extra compact 2x2 grid spacing for very small screens */
+  .stats-2x2-grid {
+    gap: 8px;
+  }
+
+  .stat-box {
+    padding: 8px;
+    gap: 6px;
+  }
+}
+

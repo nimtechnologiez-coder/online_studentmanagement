@@ -285,9 +285,18 @@ export default function HodDashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("hod_dash_cache");
+      if (cached) {
+        setDashData(JSON.parse(cached));
+        setLoading(false);
+      }
+    } catch (_) {}
+  }, []);
+
   const fetchDashboardData = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
 
       const savedHod = typeof window !== "undefined"
@@ -364,7 +373,7 @@ export default function HodDashboardPage() {
           badge: a.icon === "check" ? "Completed" : "Watched",
         }));
 
-        setDashData({
+        const newData: HodDashboardData = {
           summaryCards: {
             students: json.stats?.totalStudents ?? 0,
             videos: json.stats?.totalVideos ?? 0,
@@ -384,7 +393,12 @@ export default function HodDashboardPage() {
           departmentName: json.hod?.department || "",
           collegeName: json.hod?.college || "",
           hodName: json.hod?.name || hodDisplayName || "",
-        });
+        };
+
+        setDashData(newData);
+        try {
+          sessionStorage.setItem("hod_dash_cache", JSON.stringify(newData));
+        } catch (_) {}
 
         if (json.hod?.name) setHodDisplayName(json.hod.name);
         setLastUpdated(new Date());
@@ -420,6 +434,7 @@ export default function HodDashboardPage() {
   const engagement = s.engagementRate ?? (s.students > 0 ? Math.round(((s.activeStudents || 0) / s.students) * 100) : 0);
 
   const weeklyViews = useMemo(() => buildWeeklyData(dailyViews), [dailyViews]);
+  const totalMonthlyViews = useMemo(() => weeklyViews.reduce((sum, w) => sum + (w.views || 0), 0), [weeklyViews]);
   const studentDonut = useMemo(() => buildStudentDonut(yearDistribution ?? [], studentPerformance ?? []), [yearDistribution, studentPerformance]);
   const totalDonutStudents = studentDonut.reduce((sum, d) => sum + d.value, 0);
 
@@ -549,70 +564,89 @@ export default function HodDashboardPage() {
       {/* ===== MAIN BODY ===== */}
       <main className="dash-corp-body">
 
-        {/* Welcome Banner */}
-        <section className="dash-welcome-banner">
-          <div className="banner-content">
-            <div className="banner-badge">
-              <ShieldCheck size={14} />
-              <span>Department Management Portal</span>
-            </div>
-            <h2>Welcome back, {hodDisplayName} 👋</h2>
-            <p>{departmentName ? `Managing ${departmentName} — ${collegeName}` : "Here's what's happening in your department today."}</p>
-          </div>
-          <div className="banner-date-pill">
-            <span className="banner-date-icon">📅</span>
-            <div>
-              <span className="banner-date-value">
-                {new Date().toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}
-              </span>
-              <span className="banner-date-day">
-                {new Date().toLocaleDateString("en-US", { weekday: "long" })}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== KPI CARDS ===== */}
-        <section className="kpi-cards-grid">
-          {kpiCards.map((card) => {
-            const Icon = card.icon;
-            return (
-              <div className={`kpi-card kpi-${card.tone}`} key={card.label}>
-                <div className="kpi-card-top">
-                  <div className={`kpi-icon-box kpi-icon-${card.tone}`}>
-                    <Icon size={22} />
-                  </div>
-                  {card.trend && (
-                    <span className="kpi-trend-pill">
-                      <ArrowUpRight size={11} />{card.trend}
-                    </span>
-                  )}
-                </div>
-                <div className="kpi-card-body">
-                  <div className="kpi-card-value">{card.value}</div>
-                  <div className="kpi-card-label">{card.label}</div>
-                  <div className="kpi-card-sub">{card.subtext}</div>
-                </div>
-              </div>
-            );
-          })}
-        </section>
-
-        {error && (
-          <div className="dash-error-banner">
-            <AlertCircle size={18} />
-            <span>{error}</span>
-            <button onClick={fetchDashboardData}>Try Again</button>
-          </div>
-        )}
-
         {loading && !lastUpdated ? (
-          <div className="dash-loading-state">
-            <RefreshCw size={32} className="animate-spin" style={{ color: "var(--p-indigo)" }} />
-            <p>Loading department analytics...</p>
+          <div className="dash-skeleton-wrapper">
+            {/* Skeleton Banner */}
+            <div className="dash-skeleton-banner skeleton-shimmer" />
+
+            {/* Skeleton KPI Grid */}
+            <div className="dash-skeleton-kpi-grid">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+              ))}
+            </div>
+
+            {/* Skeleton Charts Row */}
+            <div className="dash-skeleton-charts-row">
+              <div className="dash-skeleton-chart-large skeleton-shimmer" />
+              <div className="dash-skeleton-chart-small skeleton-shimmer" />
+            </div>
+
+            {/* Skeleton Tables Row */}
+            <div className="dash-skeleton-tables-row">
+              <div className="dash-skeleton-table-card skeleton-shimmer" />
+              <div className="dash-skeleton-table-card skeleton-shimmer" />
+            </div>
           </div>
         ) : (
           <>
+            {/* Welcome Banner */}
+            <section className="dash-welcome-banner">
+              <div className="banner-content">
+                <div className="banner-badge">
+                  <ShieldCheck size={14} />
+                  <span>Department Management Portal</span>
+                </div>
+                <h2>Welcome back, {hodDisplayName} 👋</h2>
+                <p>{departmentName ? `Managing ${departmentName} — ${collegeName}` : "Here's what's happening in your department today."}</p>
+              </div>
+              <div className="banner-date-pill">
+                <span className="banner-date-icon">📅</span>
+                <div>
+                  <span className="banner-date-value">
+                    {new Date().toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}
+                  </span>
+                  <span className="banner-date-day">
+                    {new Date().toLocaleDateString("en-US", { weekday: "long" })}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            {/* ===== KPI CARDS ===== */}
+            <section className="kpi-cards-grid">
+              {kpiCards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <div className={`kpi-card kpi-${card.tone}`} key={card.label}>
+                    <div className="kpi-card-top">
+                      <div className={`kpi-icon-box kpi-icon-${card.tone}`}>
+                        <Icon size={22} />
+                      </div>
+                      {card.trend && (
+                        <span className="kpi-trend-pill">
+                          <ArrowUpRight size={11} />{card.trend}
+                        </span>
+                      )}
+                    </div>
+                    <div className="kpi-card-body">
+                      <div className="kpi-card-value">{card.value}</div>
+                      <div className="kpi-card-label">{card.label}</div>
+                      <div className="kpi-card-sub">{card.subtext}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+
+            {error && (
+              <div className="dash-error-banner">
+                <AlertCircle size={18} />
+                <span>{error}</span>
+                <button onClick={fetchDashboardData}>Try Again</button>
+              </div>
+            )}
+
             {/* ===== CHARTS ROW 1 ===== */}
             <section className="dash-charts-row">
 
@@ -626,8 +660,13 @@ export default function HodDashboardPage() {
                   <span className="chart-badge">7 Days</span>
                 </div>
                 <div className="chart-container">
-                  {dailyViews.length === 0 ? (
-                    <div className="chart-empty-state">No engagement data available.</div>
+                  {dailyViews.length === 0 || dailyViews.every(d => (d.views || 0) === 0) ? (
+                    <div className="light-students-year-empty">
+                      <div className="light-students-year-empty-icon">📈</div>
+                      <div className="light-students-year-empty-title">No Engagement Data Available</div>
+                      <div className="light-students-year-empty-sub">No video watch activity recorded in the last 7 days.</div>
+                      <div className="light-students-year-empty-hint">Activity will appear automatically when students watch videos.</div>
+                    </div>
                   ) : (
                     <ResponsiveContainer width="100%" height={220}>
                       <AreaChart data={dailyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
@@ -711,8 +750,13 @@ export default function HodDashboardPage() {
                   <span className="chart-badge" style={{ whiteSpace: "nowrap", flexShrink: 0, padding: "4px 12px" }}>This Month</span>
                 </div>
                 <div className="chart-container">
-                  {weeklyViews.length === 0 ? (
-                    <div className="chart-empty-state">No view data available.</div>
+                  {weeklyViews.length === 0 || totalMonthlyViews === 0 ? (
+                    <div className="light-students-year-empty">
+                      <div className="light-students-year-empty-icon">📊</div>
+                      <div className="light-students-year-empty-title">No Video View Data Available</div>
+                      <div className="light-students-year-empty-sub">No monthly video views have been recorded yet.</div>
+                      <div className="light-students-year-empty-hint">The chart will appear automatically when students watch videos.</div>
+                    </div>
                   ) : (
                     <ResponsiveContainer width="100%" height={220}>
                       <BarChart data={weeklyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
@@ -728,8 +772,9 @@ export default function HodDashboardPage() {
               </div>
             </section>
 
-            {/* ===== QUICK ACTIONS + LIVE ACTIVITY ===== */}
+            {/* ===== QUICK ACTIONS + LIVE ACTIVITY STREAM ===== */}
             <section className="dash-insights-grid">
+              {/* Quick Actions Card */}
               <div className="corp-card actions-card">
                 <div className="corp-card-header">
                   <h3><Zap size={18} className="header-icon" style={{ color: "#f59e0b" }} /> Quick Actions</h3>
@@ -751,7 +796,7 @@ export default function HodDashboardPage() {
                 </div>
               </div>
 
-              {/* ===== REAL-TIME ACTIVITY STREAM CARD (SCOPED UNIQUE UI) ===== */}
+              {/* Real-time Activity Stream Card */}
               <div className="corp-card live-activity-card light-activity-card">
                 <div className="corp-card-header light-activity-header">
                   <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time Activity Stream</h3>
@@ -783,51 +828,9 @@ export default function HodDashboardPage() {
               </div>
             </section>
 
-            {/* ===== STUDENT PERFORMANCE MATRIX ===== */}
-            {filteredStudentPerformance.length > 0 && (
-              <section className="corp-card dept-matrix-card">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><Star size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Student Performance Matrix</h3>
-                    <p className="card-subtitle">Video completion progress for department students.</p>
-                  </div>
-                  <a href="/hod/students" className="card-header-link">
-                    View All Students <ArrowUpRight size={14} />
-                  </a>
-                </div>
-                <div className="dept-matrix-grid">
-                  {filteredStudentPerformance
-                    .slice(0, 5)
-                    .map((student) => (
-                      <div className="dept-matrix-item" key={student.name}>
-                        <div className="dept-item-top">
-                          <div>
-                            <span className="dept-code-pill">{student.year} Year</span>
-                            <h4 className="dept-title">{student.name}</h4>
-                          </div>
-                          <span className="dept-rate-text">{student.score}% Score</span>
-                        </div>
-
-                        <div className="dept-progress-track">
-                          <div
-                            className="dept-progress-fill"
-                            style={{ width: `${Math.min(100, student.score)}%` }}
-                          />
-                        </div>
-
-                        <div className="dept-item-bottom">
-                          <span><GraduationCap size={12} /> {student.year} Year</span>
-                          <span><Eye size={12} /> {student.score}% Completion</span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </section>
-            )}
-
             {/* ===== TABLES GRID ROW ===== */}
             <section className="dash-tables-grid">
-              {/* ===== RECENT ACTIVITY TABLE CARD (SCOPED UNIQUE UI) ===== */}
+              {/* Recent Activity Table Card */}
               <div className="corp-card table-card-corp light-recent-activity-card">
                 <div className="corp-card-header light-recent-activity-header">
                   <div>
@@ -882,7 +885,7 @@ export default function HodDashboardPage() {
                 )}
               </div>
 
-              {/* ===== LATEST PUBLISHED VIDEOS TABLE CARD (SCOPED UNIQUE UI) ===== */}
+              {/* Latest Published Videos Table Card */}
               <div className="corp-card table-card-corp light-latest-videos-card">
                 <div className="corp-card-header light-latest-videos-header">
                   <div>
@@ -896,8 +899,6 @@ export default function HodDashboardPage() {
                   <div className="light-latest-videos-empty">
                     <div className="light-latest-videos-empty-icon">📹</div>
                     <div className="light-latest-videos-empty-title">No Videos Available</div>
-                    <div className="light-latest-videos-empty-sub">No published videos match your filter.</div>
-                    <div className="light-latest-videos-empty-hint">Uploaded videos will appear here automatically.</div>
                   </div>
                 ) : (
                   <div className="corp-table-wrap light-latest-videos-table-wrap">

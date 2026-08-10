@@ -15,13 +15,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle("dark", savedTheme === "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    try {
+      const savedTheme = localStorage.getItem("theme") as Theme | null;
+      const isDark = savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      const activeTheme = isDark ? "dark" : "light";
+      setTheme(activeTheme);
+      document.documentElement.classList.toggle("dark", isDark);
+    } catch (_) {}
   }, []);
 
   const toggleTheme = () => {

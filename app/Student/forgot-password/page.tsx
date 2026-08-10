@@ -63,21 +63,30 @@ export default function StudentForgotPasswordPage() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  // Step 1: Send OTP to Registered Email
-  const handleSendOtp = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const getApiBase = () => {
+    if (process.env.NEXT_PUBLIC_API_BASE) return process.env.NEXT_PUBLIC_API_BASE;
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+      return "http://https://online-management-backend.onrender.com";
+    }
+    return "https://online-management-backend.onrender.com";
+  };
+
+  // Step 1: Send OTP Code
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError("");
     setSuccessMsg("");
 
-    if (!email) {
-      setError("Please enter your registered email address.");
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/student/forgot-password/send-otp/", {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/student/forgot-password/send-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -86,7 +95,7 @@ export default function StudentForgotPasswordPage() {
       const data = await res.json();
 
       if (res.ok && data.status === "success") {
-        setSuccessMsg(data.message || `OTP verification code sent to ${email}.`);
+        setSuccessMsg(data.message || `OTP verification code sent to ${email}. Please check your inbox.`);
         setActiveStep(2);
         setTimer(60); // 60 seconds countdown for resend
       } else {
@@ -113,7 +122,8 @@ export default function StudentForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/student/forgot-password/verify-otp/", {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/student/forgot-password/verify-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp_code: otpCode }),
@@ -128,22 +138,17 @@ export default function StudentForgotPasswordPage() {
         setError(data.message || "Invalid OTP code provided. Please check your inbox and try again.");
       }
     } catch (err) {
-      setError("Failed to verify OTP code. Please try again.");
+      setError("Failed to verify OTP code.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 3: Create New Password
+  // Step 3: Reset Password
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccessMsg("");
-
-    if (!newPassword || !confirmPassword) {
-      setError("Please enter and confirm your new password.");
-      return;
-    }
 
     if (newPassword !== confirmPassword) {
       setError("New Password and Confirm Password do not match.");
@@ -158,7 +163,8 @@ export default function StudentForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/student/forgot-password/reset/", {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/student/forgot-password/reset/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -252,10 +258,10 @@ export default function StudentForgotPasswordPage() {
               {/* Step 1 */}
               <div className="flex items-center gap-1.5">
                 <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${activeStep === 1
-                    ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
-                    : activeStep > 1
-                      ? "bg-emerald-500 text-white"
-                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
+                  : activeStep > 1
+                    ? "bg-emerald-500 text-white"
+                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
                   }`}>
                   {activeStep > 1 ? <CheckCircle2 className="w-3.5 h-3.5" /> : "1"}
                 </div>
@@ -269,10 +275,10 @@ export default function StudentForgotPasswordPage() {
               {/* Step 2 */}
               <div className="flex items-center gap-1.5">
                 <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${activeStep === 2
-                    ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
-                    : activeStep > 2
-                      ? "bg-emerald-500 text-white"
-                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
+                  : activeStep > 2
+                    ? "bg-emerald-500 text-white"
+                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
                   }`}>
                   {activeStep > 2 ? <CheckCircle2 className="w-3.5 h-3.5" /> : "2"}
                 </div>
@@ -286,8 +292,8 @@ export default function StudentForgotPasswordPage() {
               {/* Step 3 */}
               <div className="flex items-center gap-1.5">
                 <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs transition duration-300 ${activeStep === 3
-                    ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
-                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
+                  : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
                   }`}>
                   3
                 </div>

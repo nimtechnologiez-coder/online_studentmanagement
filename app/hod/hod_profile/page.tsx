@@ -218,15 +218,15 @@ export default function HodProfilePage() {
         <div className="corp-card overflow-hidden mb-8" style={{ padding: 0 }}>
           {/* Cover Photo */}
           <div
-            className="relative h-48 transition-all"
+            className="relative h-36 md:h-48 transition-all"
             style={{ background: coverBg }}
           >
-            <div className="absolute right-4 top-4 z-10">
+            <div className="absolute right-3 top-3 md:right-4 md:top-4 z-10">
               <label
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all"
+                className="inline-flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-md text-slate-800 dark:text-white border border-white/40 dark:border-slate-700/60 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all"
                 title="Change Background Cover"
               >
-                <Camera size={15} />
+                <Camera size={14} className="shrink-0" />
                 <span>Cover Photo</span>
                 <input
                   type="file"
@@ -239,11 +239,11 @@ export default function HodProfilePage() {
           </div>
 
           {/* Profile Info Area */}
-          <div className="px-8 pb-8 relative">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
+          <div className="px-4 pb-6 md:px-8 md:pb-8 relative">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-6 -mt-12 md:-mt-16">
               {/* Avatar */}
-              <div className="relative group">
-                <div className="w-32 h-32 rounded-full border-4 border-white bg-indigo-600 text-white flex items-center justify-center overflow-hidden shadow-lg">
+              <div className="relative group shrink-0">
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white bg-indigo-600 text-white flex items-center justify-center overflow-hidden shadow-lg">
                   {avatarSrc || (profile?.avatar && !profile.avatar.includes("dicebear")) ? (
                     <img
                       src={avatarSrc || profile?.avatar}
@@ -251,7 +251,7 @@ export default function HodProfilePage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="font-extrabold text-4xl select-none tracking-wider">
+                    <span className="font-extrabold text-2xl md:text-4xl select-none tracking-wider">
                       {(() => {
                         const cleanName = name.replace(/^Dr\.\s*/i, '').trim();
                         const parts = cleanName.split(" ").filter(Boolean);
@@ -264,10 +264,10 @@ export default function HodProfilePage() {
                   )}
                 </div>
                 <label
-                  className="absolute bottom-1 right-1 p-2 bg-white border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
+                  className="absolute bottom-0 right-0 md:bottom-1 md:right-1 p-1.5 md:p-2 bg-white border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
                   title="Upload Profile Picture"
                 >
-                  <Camera size={15} />
+                  <Camera size={14} className="shrink-0" />
                   <input
                     type="file"
                     accept="image/*"
@@ -278,12 +278,12 @@ export default function HodProfilePage() {
               </div>
 
               {/* Name & Basic Info */}
-              <div className="flex-1 text-center md:text-left mt-2">
-                <h1 className="text-3xl font-bold" style={{ color: "var(--p-text-primary)" }}>{name}</h1>
-                <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-2 text-sm" style={{ color: "var(--p-text-muted)" }}>
-                  <span className="flex items-center gap-1.5"><BookOpen size={16} /> HOD, {department}</span>
-                  <span className="flex items-center gap-1.5"><Building2 size={16} /> {college}</span>
-                  <span className="flex items-center gap-1.5"><MapPin size={16} /> India</span>
+              <div className="flex-1 text-center md:text-left mt-1 md:mt-2 w-full">
+                <h1 className="text-xl md:text-3xl font-bold" style={{ color: "var(--p-text-primary)" }}>{name}</h1>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 md:gap-4 mt-2 text-xs md:text-sm" style={{ color: "var(--p-text-muted)" }}>
+                  <span className="inline-flex items-center gap-1.5 shrink-0 text-center"><BookOpen size={15} className="shrink-0" /> HOD, {department}</span>
+                  <span className="inline-flex items-center justify-center gap-1.5 text-center leading-tight"><Building2 size={15} className="shrink-0" /> {college}</span>
+                  <span className="inline-flex items-center gap-1.5 shrink-0 text-center"><MapPin size={15} className="shrink-0" /> India</span>
                 </div>
               </div>
 
@@ -294,9 +294,9 @@ export default function HodProfilePage() {
                   setEditBio(profile?.bio || "");
                   setIsEditModalOpen(true);
                 }}
-                className="dash-action-btn btn-export"
+                className="dash-action-btn btn-export shrink-0"
               >
-                <Edit3 size={15} />
+                <Edit3 size={15} className="shrink-0" />
                 <span className="btn-text">Edit Profile</span>
               </button>
             </div>
@@ -388,129 +388,147 @@ export default function HodProfilePage() {
 
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsEditModalOpen(false)}>
-          <div className="modal-panel max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="flex items-center gap-2">
-                <Edit3 size={18} style={{ color: "var(--p-indigo)" }} />
-                <h3>Edit HOD Profile</h3>
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto"
+          onClick={() => setIsEditModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-lg max-h-[calc(100vh-32px)] md:max-h-[85vh] flex flex-col bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto"
+            style={{ background: "var(--p-bg-card, #0f172a)", borderColor: "var(--p-border, #1e293b)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header (Fixed at top) */}
+            <div
+              className="flex items-center justify-between px-5 py-4 border-b shrink-0"
+              style={{ borderColor: "var(--p-border-table, #1e293b)", background: "var(--p-bg-card, #0f172a)" }}
+            >
+              <div className="flex items-center gap-2.5">
+                <Edit3 size={18} style={{ color: "var(--p-indigo, #4f46e5)" }} />
+                <h3 className="font-bold text-base md:text-lg" style={{ color: "var(--p-text-primary, #ffffff)" }}>
+                  Edit HOD Profile
+                </h3>
               </div>
               <button
                 type="button"
-                className="password-toggle-btn"
+                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                 onClick={() => setIsEditModalOpen(false)}
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="modal-body">
-              {/* HOD Name - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  HOD Name (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
+            {/* Modal Form Content (Scrollable) */}
+            <form onSubmit={handleSaveProfile} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {/* HOD Name - Fixed/Readonly */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
+                    HOD Name (Fixed)
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    disabled
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
+                    style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
+                  />
+                </div>
+
+                {/* Department Name - Fixed/Readonly */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
+                    Department (Fixed)
+                  </label>
+                  <input
+                    type="text"
+                    value={department}
+                    disabled
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
+                    style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
+                  />
+                </div>
+
+                {/* College Name - Fixed/Readonly */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
+                    College Name (Fixed)
+                  </label>
+                  <input
+                    type="text"
+                    value={college}
+                    disabled
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
+                    style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
+                  />
+                </div>
+
+                {/* Join Date - Fixed/Readonly */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
+                    Join Date (Fixed)
+                  </label>
+                  <input
+                    type="text"
+                    value={joined}
+                    disabled
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
+                    style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
+                  />
+                </div>
+
+                {/* Email Address - Editable */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    placeholder="Enter email address"
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
+                    style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
+                  />
+                </div>
+
+                {/* Mobile Phone - Editable */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
+                    Mobile Phone
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder="Enter phone number"
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
+                    style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
+                  />
+                </div>
+
+                {/* Academic Biography - Editable */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
+                    Academic Biography
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                    placeholder="Write academic biography..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none resize-none"
+                    style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
+                  />
+                </div>
               </div>
 
-              {/* Department Name - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  Department (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={department}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
-              </div>
-
-              {/* College Name - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  College Name (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={college}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
-              </div>
-
-              {/* Join Date - Fixed/Readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-muted)" }}>
-                  Join Date (Fixed)
-                </label>
-                <input
-                  type="text"
-                  value={joined}
-                  disabled
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm"
-                  style={{ background: "var(--p-bg-subtle)", color: "var(--p-text-muted)", cursor: "not-allowed", borderColor: "var(--p-border-table)" }}
-                />
-              </div>
-
-              {/* Email Address - Editable */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={editEmail}
-                  onChange={(e) => setEditEmail(e.target.value)}
-                  placeholder="Enter email address"
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
-                  style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
-                />
-              </div>
-
-              {/* Mobile Phone - Editable */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Mobile Phone
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editPhone}
-                  onChange={(e) => setEditPhone(e.target.value)}
-                  placeholder="Enter phone number"
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
-                  style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
-                />
-              </div>
-
-              {/* Academic Biography - Editable */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase" style={{ color: "var(--p-text-primary)" }}>
-                  Academic Biography
-                </label>
-                <textarea
-                  rows={4}
-                  value={editBio}
-                  onChange={(e) => setEditBio(e.target.value)}
-                  placeholder="Write academic biography..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none resize-none"
-                  style={{ background: "var(--p-bg-card)", color: "var(--p-text-primary)", borderColor: "var(--p-indigo)" }}
-                />
-              </div>
-
-
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t" style={{ borderColor: "var(--p-border-table)" }}>
+              {/* Modal Footer (Fixed at bottom) */}
+              <div
+                className="flex items-center justify-end gap-3 px-5 py-4 border-t shrink-0"
+                style={{ borderColor: "var(--p-border-table, #1e293b)", background: "var(--p-bg-card, #0f172a)" }}
+              >
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}

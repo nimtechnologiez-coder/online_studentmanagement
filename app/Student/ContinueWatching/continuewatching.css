@@ -1096,3 +1096,197 @@ html.dark .cw-empty-desc {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------------------------------- SAAS SKELETON LOADING ANIMATION ---------------------------------- */
+.dash-skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  animation: dashSkeletonFadeIn 0.3s ease-out forwards;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--card-bg, #ffffff) 0%,
+    var(--table-head-bg, #f1f5f9) 50%,
+    var(--card-bg, #ffffff) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 1.6s infinite linear;
+  border-radius: 16px;
+  border: 1px solid var(--card-border, #cbd5e1);
+}
+
+html.dark .skeleton-shimmer,
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #161b22 0%,
+    #21262d 50%,
+    #161b22 100%
+  ) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dash-skeleton-banner {
+  height: 120px;
+  width: 100%;
+}
+
+.dash-skeleton-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+.dash-skeleton-kpi-card {
+  height: 100px;
+  border-radius: 14px;
+}
+
+.dash-skeleton-charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-chart-large {
+  height: 320px;
+}
+
+.dash-skeleton-chart-small {
+  height: 320px;
+}
+
+.dash-skeleton-tables-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-table-card {
+  height: 280px;
+}
+
+@keyframes shimmerMove {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes dashSkeletonFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dash-skeleton-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .dash-skeleton-charts-row,
+  .dash-skeleton-tables-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-skeleton-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE FIXES — Mobile & Tablet
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .cw-main-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cw-active-pill {
+    align-self: flex-start;
+  }
+
+  .cw-banner-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cw-btn-blue,
+  .cw-btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cw-modal-video-wrap {
+    height: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cw-page-wrapper {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .cw-hero-main-card {
+    padding: 16px;
+  }
+
+  .cw-hero-side-card {
+    padding: 16px;
+  }
+
+  .cw-card-box {
+    padding: 14px;
+  }
+
+  .cw-banner-body h2 {
+    font-size: 16px;
+  }
+
+  /* Modal bottom-sheet style on phones */
+  .cw-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .cw-modal-card {
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+  }
+
+  .cw-modal-video-wrap {
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cw-stats-2x2 {
+    grid-template-columns: 1fr;
+  }
+
+  .cw-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cw-side-time-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

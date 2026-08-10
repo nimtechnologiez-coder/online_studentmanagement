@@ -670,3 +670,36 @@
     padding: 1.5rem 1rem;
   }
 }
+
+/* Session Expired Alert */
+.session-expired-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
+  animation: alertFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.session-expired-alert .alert-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+@keyframes alertFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

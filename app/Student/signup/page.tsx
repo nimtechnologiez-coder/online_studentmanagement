@@ -103,9 +103,18 @@ export default function StudentSignupPage() {
     };
   }, [router]);
 
+  const getApiBase = () => {
+    if (process.env.NEXT_PUBLIC_API_BASE) return process.env.NEXT_PUBLIC_API_BASE;
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+      return "http://https://online-management-backend.onrender.com";
+    }
+    return "https://online-management-backend.onrender.com";
+  };
+
   const fetchCollegesAndDepartments = async () => {
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/get-colleges/");
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/get-colleges/`);
       const data = await res.json();
       if (data.status === "success") {
         setColleges(data.colleges || []);
@@ -130,7 +139,8 @@ export default function StudentSignupPage() {
     setFilteredDepartments(depts);
 
     try {
-      const res = await fetch(`https://online-management-backend.onrender.com/api/get-principal-by-college/${selectedId}/`);
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/get-principal-by-college/${selectedId}/`);
       const data = await res.json();
       if (data.status === "success") {
         setPrincipalInfo({
@@ -156,7 +166,8 @@ export default function StudentSignupPage() {
     setSendingOtp(true);
 
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/student/send-otp/", {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/student/send-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -193,7 +204,8 @@ export default function StudentSignupPage() {
     setVerifyingOtp(true);
 
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/student/verify-otp/", {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/student/verify-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim().toLowerCase(), otp_code: otpCode.trim() }),
@@ -254,7 +266,8 @@ export default function StudentSignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://online-management-backend.onrender.com/api/student/create-account/", {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/student/create-account/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -354,10 +367,10 @@ export default function StudentSignupPage() {
                 className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
               >
                 <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${activeStep === 1
-                    ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
-                    : activeStep > 1
-                      ? "bg-emerald-500 text-white"
-                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
+                  : activeStep > 1
+                    ? "bg-emerald-500 text-white"
+                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
                   }`}>
                   {activeStep > 1 ? <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : "1"}
                 </div>
@@ -377,10 +390,10 @@ export default function StudentSignupPage() {
                 className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
               >
                 <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${activeStep === 2
-                    ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
-                    : activeStep > 2
-                      ? "bg-emerald-500 text-white"
-                      : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
+                  : activeStep > 2
+                    ? "bg-emerald-500 text-white"
+                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
                   }`}>
                   {activeStep > 2 ? <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : "2"}
                 </div>
@@ -400,8 +413,8 @@ export default function StudentSignupPage() {
                 className="flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
               >
                 <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-[11px] sm:text-xs transition duration-300 ${activeStep === 3
-                    ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
-                    : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
+                  ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-md shadow-[#4F46E5]/30 scale-105"
+                  : "bg-[#F1F5F9] text-[#64748B] border border-slate-200"
                   }`}>
                   3
                 </div>

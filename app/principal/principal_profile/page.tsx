@@ -64,7 +64,6 @@ export default function PrincipalProfile() {
   // Fetch real profile data from Django API
   const fetchProfile = async () => {
     try {
-      setLoading(true);
       const headers = getAuthHeaders();
       let res: Response;
       try {
@@ -78,6 +77,9 @@ export default function PrincipalProfile() {
         setEditEmail(json.data.email || "");
         setEditPhone(json.data.phone || "");
         setEditBio(json.data.bio || "");
+        try {
+          sessionStorage.setItem("principal_profile_cache", JSON.stringify(json.data));
+        } catch (_) {}
       }
     } catch (err) {
       console.error("Failed to load principal profile:", err);
@@ -87,6 +89,17 @@ export default function PrincipalProfile() {
   };
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("principal_profile_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setProfile(parsed);
+        setEditEmail(parsed.email || "");
+        setEditPhone(parsed.phone || "");
+        setEditBio(parsed.bio || "");
+        setLoading(false);
+      }
+    } catch (_) {}
     fetchProfile();
   }, []);
 
@@ -219,8 +232,18 @@ export default function PrincipalProfile() {
         <p className="p-profile-banner-desc">Institutional leadership credentials and account configuration.</p>
       </div>
 
-      {/* Hero Header Card */}
-      <div className="p-profile-hero-card">
+      {loading ? (
+        <div className="dash-skeleton-wrapper" style={{ padding: "30px 0" }}>
+          <div className="dash-skeleton-banner skeleton-shimmer" style={{ height: 160 }} />
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" style={{ height: 380 }} />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" style={{ height: 380 }} />
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Hero Header Card */}
+          <div className="p-profile-hero-card">
         <div
           className="p-profile-cover-box"
           style={{
@@ -393,6 +416,8 @@ export default function PrincipalProfile() {
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* Edit Profile Modal */}
       {isEditModalOpen && (

@@ -249,4 +249,91 @@
     gap: 12px;
     padding: 16px;
   }
+}
+
+/* ---------------------------------- Loading State ---------------------------------- */
+.dept-loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  text-align: center;
+  width: 100%;
+  animation: deptFadeIn 0.35s ease-out forwards;
+}
+
+.dept-dots-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.dept-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--p-indigo, #4f46e5);
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.6);
+  animation: deptBounce 1.4s infinite ease-in-out both;
+}
+
+.dept-dot.dot-1 {
+  animation-delay: -0.32s;
+  background: #6366f1;
+}
+
+.dept-dot.dot-2 {
+  animation-delay: -0.16s;
+  background: #0d9488;
+  box-shadow: 0 0 12px rgba(13, 148, 136, 0.6);
+}
+
+.dept-dot.dot-3 {
+  animation-delay: 0s;
+  background: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}
+
+.dept-loading-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--p-text-primary, #ffffff);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.9;
+  animation: deptPulse 2s ease-in-out infinite;
+}
+
+@keyframes deptBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes deptPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes deptFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

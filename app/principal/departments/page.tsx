@@ -96,8 +96,15 @@ export default function DepartmentOverview() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("principal_departments_cache");
+      if (cached) {
+        setDepartments(JSON.parse(cached));
+        setLoading(false);
+      }
+    } catch (_) {}
+
     async function fetchDepartments() {
-      setLoading(true);
       setError(null);
       try {
         let principalId = "";
@@ -123,9 +130,13 @@ export default function DepartmentOverview() {
         const json = await res.json();
 
         if (json.status === "success" && Array.isArray(json.data)) {
-          setDepartments(json.data.length > 0 ? json.data : departmentsData);
+          const list = json.data.length > 0 ? json.data : [];
+          setDepartments(list);
+          try {
+            sessionStorage.setItem("principal_departments_cache", JSON.stringify(list));
+          } catch (_) {}
         } else {
-          setDepartments(departmentsData);
+          setDepartments([]);
         }
       } catch (err: any) {
         console.error("Departments fetch error:", err);
@@ -153,7 +164,13 @@ export default function DepartmentOverview() {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "var(--muted-text, #64748b)" }}>Loading departments...</div>
+        <div className="dash-skeleton-wrapper">
+          <div className="dash-skeleton-kpi-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" style={{ height: 180 }} />
+            ))}
+          </div>
+        </div>
       ) : (
         /* Stats Grid */
         <div className="dept-grid">

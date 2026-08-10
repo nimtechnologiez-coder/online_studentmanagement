@@ -352,86 +352,78 @@ function VideoTable({
             </tr>
           </thead>
 
-          <tbody>
-            {pageItems.map((video, index) => (
-              <tr key={video.id} className={isMyVideos ? "light-my-videos-row" : ""}>
-                <td data-label="S.No" className="col-sno">
-                  {(safePage - 1) * perPage + index + 1}
-                </td>
+          {pageItems.length > 0 && (
+            <tbody>
+              {pageItems.map((video, index) => (
+                <tr key={video.id} className={isMyVideos ? "light-my-videos-row" : ""}>
+                  <td data-label="S.No" className="col-sno">
+                    {(safePage - 1) * perPage + index + 1}
+                  </td>
 
-                <td data-label="Thumbnail">
-                  <img
-                    src={video.thumbnail || DEFAULT_THUMBNAIL}
-                    alt={video.title}
-                    className="thumb"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = DEFAULT_THUMBNAIL;
-                    }}
-                  />
-                </td>
+                  <td data-label="Thumbnail">
+                    <img
+                      src={video.thumbnail || DEFAULT_THUMBNAIL}
+                      alt={video.title}
+                      className="thumb"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = DEFAULT_THUMBNAIL;
+                      }}
+                    />
+                  </td>
 
-                <td data-label="Video title">
-                  <span className="video-title">{video.title}</span>
-                </td>
+                  <td data-label="Video title">
+                    <span className="video-title">{video.title}</span>
+                  </td>
 
-                <td data-label="Video Category">
-                  <span className="category-pill">{video.category}</span>
-                </td>
+                  <td data-label="Video Category">
+                    <span className="category-pill">{video.category}</span>
+                  </td>
 
-                <td data-label="Duration">
-                  <span className="duration-badge">{video.duration}</span>
-                </td>
+                  <td data-label="Duration">
+                    <span className="duration-badge">{video.duration}</span>
+                  </td>
 
-                <td data-label="Description" className="desc-cell">
-                  <span className="desc-text">{video.description}</span>
-                </td>
+                  <td data-label="Description" className="desc-cell">
+                    <span className="desc-text">{video.description}</span>
+                  </td>
 
-                <td data-label="date" className="desc-cel">
-                  <span className="uploadDate">{video.uploadDate}</span>
-                </td>
+                  <td data-label="date" className="desc-cel">
+                    <span className="uploadDate">{video.uploadDate}</span>
+                  </td>
 
-                <td data-label="Status">
-                  {video.status === "Pending" && (
-                    <span style={{ background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
-                      Pending Approval
-                    </span>
-                  )}
-                  {video.status === "Published" && (
-                    <span style={{ background: "rgba(34, 197, 94, 0.15)", color: "#4ade80", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
-                      Published
-                    </span>
-                  )}
-                  {video.status === "Rejected" && (
-                    <span style={{ background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
-                      Rejected
-                    </span>
-                  )}
-                </td>
+                  <td data-label="Status">
+                    {video.status === "Pending" && (
+                      <span style={{ background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                        Pending Approval
+                      </span>
+                    )}
+                    {video.status === "Published" && (
+                      <span style={{ background: "rgba(34, 197, 94, 0.15)", color: "#4ade80", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                        Published
+                      </span>
+                    )}
+                    {video.status === "Rejected" && (
+                      <span style={{ background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5", padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                        Rejected
+                      </span>
+                    )}
+                  </td>
 
-                <td data-label="Action" className="col-action">
-                  <div className="action-group">{renderActions(video)}</div>
-                </td>
-              </tr>
-            ))}
-
-            {pageItems.length === 0 && (
-              <tr>
-                <td colSpan={9} className={isMyVideos ? "empty-row light-my-videos-empty-cell" : "empty-row"}>
-                  {isMyVideos ? (
-                    <div className="light-my-videos-empty">
-                      <div className="light-my-videos-empty-icon">📹</div>
-                      <div className="light-my-videos-empty-title">No Videos Available</div>
-                      <div className="light-my-videos-empty-sub">You haven't uploaded any videos yet.</div>
-                      <div className="light-my-videos-empty-hint">Click the "Upload Video" button to add your first video.</div>
-                    </div>
-                  ) : (
-                    "No videos found."
-                  )}
-                </td>
-              </tr>
-            )}
-          </tbody>
+                  <td data-label="Action" className="col-action">
+                    <div className="action-group">{renderActions(video)}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
+
+        {pageItems.length === 0 && (
+          <div className="light-my-videos-empty" style={{ width: "100%", padding: "20px 16px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+            <div className="light-my-videos-empty-icon" style={{ fontSize: 24, marginBottom: 4, lineHeight: 1 }}>📹</div>
+            <div className="light-my-videos-empty-title" style={{ fontSize: 14, fontWeight: 700, color: "var(--p-text-primary, #ffffff)", margin: 0 }}>No Videos Available</div>
+          </div>
+        )}
       </div>
 
       <div className={footerClass}>

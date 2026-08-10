@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { getStoredPrincipal, clearStoredPrincipal } from "../../utils/auth";
 import {
   GraduationCap,
   Video,
@@ -186,12 +188,13 @@ function buildDeptDonut(depts: DeptPerformance[]) {
 /* --------------------------------- COMPONENT -------------------------------- */
 
 export default function PrincipalDashboard() {
+  const router = useRouter();
   const [profileOpen, setProfileOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [principalName, setPrincipalName] = useState<string>("Principal");
+  const [storedCollegeName, setStoredCollegeName] = useState<string>("");
 
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -217,21 +220,19 @@ export default function PrincipalDashboard() {
   }, []);
 
   useEffect(() => {
-    try {
-      const savedPrincipal =
-        typeof window !== "undefined"
-          ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
-          : null;
-      if (savedPrincipal) {
-        const parsed = JSON.parse(savedPrincipal);
-        if (parsed?.name || parsed?.full_name || parsed?.username) {
-          setPrincipalName(parsed.name || parsed.full_name || parsed.username);
-        }
-      }
-    } catch (e) {
-      console.error("Error reading principal name:", e);
+    const { expired, data } = getStoredPrincipal();
+    if (expired) {
+      clearStoredPrincipal();
+      router.replace("/principal/login?expired=true");
+      return;
     }
-  }, []);
+    if (data?.name || data?.principal_name || data?.username) {
+      setPrincipalName(data.name || data.principal_name || data.username);
+    }
+    if (data?.college_name || data?.college) {
+      setStoredCollegeName(data.college_name || data.college);
+    }
+  }, [router]);
 
   const [dashData, setDashData] = useState<DashboardData>({
     summaryCards: {
@@ -252,26 +253,32 @@ export default function PrincipalDashboard() {
     collegeName: "",
   });
 
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("principal_dash_cache");
+      if (cached) {
+        setDashData(JSON.parse(cached));
+        setLoading(false);
+      }
+    } catch (_) {}
+  }, []);
+
   const fetchDashboardData = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
-      let principalId = "";
-      try {
-        const savedPrincipal =
-          typeof window !== "undefined"
-            ? localStorage.getItem("principal") || sessionStorage.getItem("principal")
-            : null;
-        if (savedPrincipal) {
-          const parsed = JSON.parse(savedPrincipal);
-          principalId = parsed?.id || "";
-        }
-      } catch (e) {
-        console.error("Error reading saved principal:", e);
+      const { expired, data } = getStoredPrincipal();
+      if (expired) {
+        clearStoredPrincipal();
+        router.replace("/principal/login?expired=true");
+        return;
       }
 
+      const principalId = data?.id ? String(data.id) : "";
       const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (principalId) headers["X-Principal-Id"] = String(principalId);
+      if (principalId) headers["X-Principal-Id"] = principalId;
+      if (data?.token) headers["Authorization"] = `Bearer ${data.token}`;
 
       let response: Response;
       try {
@@ -284,18 +291,28 @@ export default function PrincipalDashboard() {
         throw new Error("Network error connecting to dashboard API.");
       }
 
+      if (response.status === 401) {
+        clearStoredPrincipal();
+        router.replace("/principal/login?expired=true");
+        return;
+      }
+
       if (!response.ok) {
         let errMessage = `Server error: ${response.status}`;
         try {
           const errJson = await response.json();
           if (errJson?.message) errMessage = errJson.message;
-        } catch (_) {}
+        } catch (_) { }
         throw new Error(errMessage);
       }
       const json = await response.json();
 
       if (json.status === "success" && json.data) {
         setDashData(json.data);
+        try {
+          sessionStorage.setItem("principal_dash_cache", JSON.stringify(json.data));
+        } catch (_) {}
+
         if (json.data.principalName) {
           setPrincipalName(json.data.principalName);
         }
@@ -309,7 +326,7 @@ export default function PrincipalDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -402,15 +419,15 @@ export default function PrincipalDashboard() {
 
   return (
     <div className="dash-corp-main">
-      {/* ===== TOP HEADER ===== */}
+      {/* ===== TOP HEADER (Renders immediately with Principal details, no skeleton) ===== */}
       <header className="dash-corp-header">
         {/* Brand */}
         <div className="dash-header-brand">
           <div className="dash-corp-logo">CP</div>
           <div>
             <h1 className="dash-header-title">College Dashboard</h1>
-            <span className="dash-header-subtitle">
-              {collegeName ? `${collegeName}` : "Principal Analytics Portal"}
+            <span className="dash-header-subtitle" suppressHydrationWarning>
+              {collegeName || storedCollegeName ? `${collegeName || storedCollegeName}` : "Principal Analytics Portal"}
             </span>
           </div>
         </div>
@@ -438,7 +455,7 @@ export default function PrincipalDashboard() {
             >
               <div className="dash-profile-avatar"><User size={15} /></div>
               <div className="dash-profile-info">
-                <span className="profile-name">{principalName}</span>
+                <span className="profile-name" suppressHydrationWarning>{principalName}</span>
                 <span className="profile-role">Administrator</span>
               </div>
               <ChevronDown size={13} className={`profile-arrow ${profileOpen ? "rotate-180" : ""}`} />
@@ -457,24 +474,42 @@ export default function PrincipalDashboard() {
 
       {/* ===== MAIN BODY ===== */}
       <main className="dash-corp-body">
-
-        {/* Welcome Banner */}
-        <section className="dash-welcome-banner">
+        {loading && !lastUpdated ? (
+          <div className="dash-skeleton-wrapper">
+            <div className="dash-skeleton-banner skeleton-shimmer" />
+            <div className="dash-skeleton-kpi-grid">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+              ))}
+            </div>
+            <div className="dash-skeleton-charts-row">
+              <div className="dash-skeleton-chart-large skeleton-shimmer" />
+              <div className="dash-skeleton-chart-small skeleton-shimmer" />
+            </div>
+            <div className="dash-skeleton-tables-row">
+              <div className="dash-skeleton-table-card skeleton-shimmer" />
+              <div className="dash-skeleton-table-card skeleton-shimmer" />
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Welcome Banner */}
+            <section className="dash-welcome-banner">
           <div className="banner-content">
             <div className="banner-badge">
               <ShieldCheck size={14} />
               <span>Verified Institutional System</span>
             </div>
-            <h2>Welcome back, {principalName} 👋</h2>
-            <p>{collegeName || "Here's what's happening in your institution today."}</p>
+            <h2 suppressHydrationWarning>Welcome back, {principalName} 👋</h2>
+            <p suppressHydrationWarning>{collegeName || "Here's what's happening in your institution today."}</p>
           </div>
           <div className="banner-date-pill">
             <span className="banner-date-icon">📅</span>
             <div>
-              <span className="banner-date-value">
+              <span className="banner-date-value" suppressHydrationWarning>
                 {new Date().toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}
               </span>
-              <span className="banner-date-day">
+              <span className="banner-date-day" suppressHydrationWarning>
                 {new Date().toLocaleDateString("en-US", { weekday: "long" })}
               </span>
             </div>
@@ -513,316 +548,309 @@ export default function PrincipalDashboard() {
           </div>
         )}
 
-        {loading && !lastUpdated ? (
-          <div className="dash-loading-state">
-            <RefreshCw size={32} className="animate-spin" style={{ color: "var(--p-indigo)" }} />
-            <p>Loading dashboard analytics...</p>
+        {/* ===== CHARTS ROW 1 — Student Engagement + Students by Dept + Video Views Bar ===== */}
+        <section className="dash-charts-row">
+
+          {/* Student Engagement Overview Area Chart */}
+          <div className="corp-card chart-card chart-wide">
+            <div className="corp-card-header">
+              <div>
+                <h3><TrendingUp size={17} className="header-icon" style={{ color: "#4f46e5" }} /> Student Engagement Overview</h3>
+                <p className="card-subtitle">Video watch activity (Last 7 Days)</p>
+              </div>
+              <span className="chart-badge">7 Days</span>
+            </div>
+            <div className="chart-container">
+              {dailyViews.length === 0 ? (
+                <div className="chart-empty-state">No engagement data available.</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={dailyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="engageGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip content={<ViewsTooltip />} />
+                    <Area type="monotone" dataKey="views" stroke="#4f46e5" strokeWidth={2.5} fillOpacity={1} fill="url(#engageGrad)"
+                      dot={{ r: 4, fill: "#4f46e5", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </div>
-        ) : (
-          <>
-            {/* ===== CHARTS ROW 1 — Student Engagement + Students by Dept + Video Views Bar ===== */}
-            <section className="dash-charts-row">
 
-              {/* Student Engagement Overview Area Chart */}
-              <div className="corp-card chart-card chart-wide">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><TrendingUp size={17} className="header-icon" style={{ color: "#4f46e5" }} /> Student Engagement Overview</h3>
-                    <p className="card-subtitle">Video watch activity (Last 7 Days)</p>
-                  </div>
-                  <span className="chart-badge">7 Days</span>
-                </div>
-                <div className="chart-container">
-                  {dailyViews.length === 0 ? (
-                    <div className="chart-empty-state">No engagement data available.</div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height={220}>
-                      <AreaChart data={dailyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="engageGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                        <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <Tooltip content={<ViewsTooltip />} />
-                        <Area type="monotone" dataKey="views" stroke="#4f46e5" strokeWidth={2.5} fillOpacity={1} fill="url(#engageGrad)"
-                          dot={{ r: 4, fill: "#4f46e5", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
+          {/* Students by Department Donut */}
+          <div className="corp-card chart-card">
+            <div className="corp-card-header">
+              <div>
+                <h3><Users size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Students by Department</h3>
               </div>
-
-              {/* Students by Department Donut */}
-              <div className="corp-card chart-card">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><Users size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Students by Department</h3>
-                  </div>
-                </div>
-                <div className="chart-container donut-chart-box" style={{ position: "relative" }}>
-                  {deptDonut.length === 0 ? (
-                    <div className="chart-empty-state">No department data.</div>
-                  ) : (
-                    <>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: 220 }}>
-                        <div style={{ position: "relative", width: 140, height: 140, flexShrink: 0 }}>
-                          <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                              <Pie data={deptDonut} dataKey="value" nameKey="name" innerRadius={42} outerRadius={68} paddingAngle={3}>
-                                {deptDonut.map((entry) => (
-                                  <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
-                                ))}
-                              </Pie>
-                              <Tooltip content={<CategoryTooltip />} />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="donut-center-label">
-                            <span className="donut-center-value">{totalDeptStudents.toLocaleString()}</span>
-                            <span className="donut-center-sub">Students</span>
-                          </div>
-                        </div>
-                        <div className="donut-custom-legend">
-                          {deptDonut.map((d) => {
-                            const pct = totalDeptStudents > 0 ? Math.round((d.value / totalDeptStudents) * 100) : 0;
-                            return (
-                              <div className="legend-row-item" key={d.name}>
-                                <span className="legend-dot" style={{ background: d.color }} />
-                                <span className="legend-name">{d.name}</span>
-                                <span className="legend-val">{pct}% ({d.value})</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Video Views Bar Chart (Weekly) */}
-              <div className="corp-card chart-card">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><BarChart3 size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Video Views (This Month)</h3>
-                  </div>
-                  <span className="chart-badge">This Month</span>
-                </div>
-                <div className="chart-container">
-                  {weeklyViews.length === 0 ? (
-                    <div className="chart-empty-state">No view data available.</div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height={220}>
-                      <BarChart data={weeklyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                        <XAxis dataKey="week" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} />
-                        <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={52} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {/* ===== QUICK ACTIONS + LIVE ACTIVITY ===== */}
-            <section className="dash-insights-grid">
-              <div className="corp-card actions-card">
-                <div className="corp-card-header">
-                  <h3><Zap size={18} className="header-icon" style={{ color: "#f59e0b" }} /> Executive Quick Actions</h3>
-                  <span className="header-badge">Shortcuts</span>
-                </div>
-                <div className="quick-actions-buttons">
-                  <a href="/principal/students" className="quick-btn btn-indigo">
-                    <GraduationCap size={16} /><span>Manage Students</span>
-                  </a>
-                  <a href="/principal/departments" className="quick-btn btn-teal">
-                    <Building2 size={16} /><span>Department Audit</span>
-                  </a>
-                  <a href="/principal/video_report" className="quick-btn btn-violet">
-                    <Video size={16} /><span>Video Analytics</span>
-                  </a>
-                </div>
-              </div>
-
-              <div className="corp-card live-activity-card">
-                <div className="corp-card-header">
-                  <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time System Audit Stream</h3>
-                  <span className="header-badge live-dot-badge"><span className="pulse-dot" /> Live</span>
-                </div>
-                <div className="activity-feed-list">
-                  {liveActivities.length === 0 ? (
-                    <div className="empty-feed">No recent system activity logged.</div>
-                  ) : (
-                    liveActivities.slice(0, 4).map((act) => (
-                      <div key={act.id} className="feed-item">
-                        <div className="feed-icon-dot"><CheckCircle2 size={14} /></div>
-                        <div className="feed-body">
-                          <div className="feed-title">{act.description}</div>
-                          <div className="feed-meta">
-                            <span className="feed-badge">{act.badge}</span>
-                            <span className="feed-time">{act.time}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {/* ===== DEPARTMENT MATRIX ===== */}
-            {departmentPerformance.length > 0 && (
-              <section className="corp-card dept-matrix-card">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><Building2 size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Department Learning Performance Matrix</h3>
-                    <p className="card-subtitle">Comparative breakdown of students, total video views, and video completion progress.</p>
-                  </div>
-                  <a href="/principal/departments" className="card-header-link">
-                    View All Departments <ArrowUpRight size={14} />
-                  </a>
-                </div>
-                <div className="dept-matrix-grid">
-                  {filteredDeptPerformance.map((dept) => (
-                    <div className="dept-matrix-item" key={dept.name}>
-                      <div className="dept-item-top">
-                        <div>
-                          <span className="dept-code-pill">{dept.code || "DEPT"}</span>
-                          <h4 className="dept-title">{dept.name}</h4>
-                        </div>
-                        <span className="dept-rate-text">{dept.completionRate}% Done</span>
-                      </div>
-                      <div className="dept-progress-track">
-                        <div className="dept-progress-fill" style={{ width: `${Math.min(100, dept.completionRate)}%` }} />
-                      </div>
-                      <div className="dept-item-bottom">
-                        <span><Users size={12} /> {dept.students} Students</span>
-                        <span><Eye size={12} /> {dept.views} Views</span>
+            </div>
+            <div className="chart-container donut-chart-box" style={{ position: "relative" }}>
+              {deptDonut.length === 0 ? (
+                <div className="chart-empty-state">No department data.</div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: 220 }}>
+                    <div style={{ position: "relative", width: 140, height: 140, flexShrink: 0 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie data={deptDonut} dataKey="value" nameKey="name" innerRadius={42} outerRadius={68} paddingAngle={3}>
+                            {deptDonut.map((entry) => (
+                              <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<CategoryTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="donut-center-label">
+                        <span className="donut-center-value">{totalDeptStudents.toLocaleString()}</span>
+                        <span className="donut-center-sub">Students</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ===== TABLES GRID ROW — Recent Activity + Latest Published Videos ===== */}
-            <section className="dash-tables-grid">
-              {/* =====  TABLE ===== */}
-              <div className="corp-card table-card-corp">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><Activity size={18} className="header-icon" style={{ color: "#0d9488" }} /> Recent Activity</h3>
-                    <p className="card-subtitle">Real-time log of student video watch sessions</p>
+                    <div className="donut-custom-legend">
+                      {deptDonut.map((d) => {
+                        const pct = totalDeptStudents > 0 ? Math.round((d.value / totalDeptStudents) * 100) : 0;
+                        return (
+                          <div className="legend-row-item" key={d.name}>
+                            <span className="legend-dot" style={{ background: d.color }} />
+                            <span className="legend-name">{d.name}</span>
+                            <span className="legend-val">{pct}% ({d.value})</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="recent-header-actions">
-                    <span className="table-count-badge">
-                      {Math.min(filteredRecentViews.length, 4)} Logged
-                    </span>
+                </>
+              )}
+            </div>
+          </div>
 
-                    <a href="/principal/video_report" className="card-header-link">
-                      View All <ArrowUpRight size={13} />
-                    </a>
-                  </div>
-                </div>
-                <div className="corp-table-wrap">
-                  <table className="corp-table">
-                    <thead>
-                      <tr>
-                        <th>Student Name</th>
-                        <th>Dept</th>
-                        <th>Activity</th>
-                        <th>Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredRecentViews.length === 0 ? (
-                        <tr><td colSpan={4} className="empty-table-cell">No recent student activity found.</td></tr>
-                      ) : (
-                        filteredRecentViews.slice(0, 4).map((row, idx) => (
-                          <tr key={`${row.student}-${idx}`}>
-                            <td>
-                              <div className="student-cell-profile">
-                                <div className="avatar-circle">
-                                  {row.student.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()}
-                                </div>
-                                <span style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{row.student}</span>
-                              </div>
-                            </td>
-                            <td><span className="table-dept-pill">{row.department}</span></td>
-                            <td className="table-activity-cell" style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
-                            <td style={{ color: "var(--p-text-muted)", fontSize: 12.5 }}>{row.lastViewed}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+          {/* Video Views Bar Chart (Weekly) */}
+          <div className="corp-card chart-card">
+            <div className="corp-card-header">
+              <div>
+                <h3><BarChart3 size={17} className="header-icon" style={{ color: "#3b82f6" }} /> Video Views (This Month)</h3>
               </div>
+              <span className="chart-badge">This Month</span>
+            </div>
+            <div className="chart-container">
+              {weeklyViews.length === 0 ? (
+                <div className="chart-empty-state">No view data available.</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={weeklyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
+                    <XAxis dataKey="week" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} />
+                    <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={52} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+        </section>
 
-              {/* ===== LATEST VIDEOS TABLE ===== */}
-              <div className="corp-card table-card-corp">
-                <div className="corp-card-header">
-                  <div>
-                    <h3><PlayCircle size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Latest Published Videos</h3>
-                    <p className="card-subtitle">Recently uploaded educational videos</p>
+        {/* ===== QUICK ACTIONS + LIVE ACTIVITY ===== */}
+        <section className="dash-insights-grid">
+          <div className="corp-card actions-card">
+            <div className="corp-card-header">
+              <h3><Zap size={18} className="header-icon" style={{ color: "#f59e0b" }} /> Executive Quick Actions</h3>
+              <span className="header-badge">Shortcuts</span>
+            </div>
+            <div className="quick-actions-buttons">
+              <a href="/principal/students" className="quick-btn btn-indigo">
+                <GraduationCap size={16} /><span>Manage Students</span>
+              </a>
+              <a href="/principal/departments" className="quick-btn btn-teal">
+                <Building2 size={16} /><span>Department Audit</span>
+              </a>
+              <a href="/principal/video_report" className="quick-btn btn-violet">
+                <Video size={16} /><span>Video Analytics</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="corp-card live-activity-card">
+            <div className="corp-card-header">
+              <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time System Audit Stream</h3>
+              <span className="header-badge live-dot-badge"><span className="pulse-dot" /> Live</span>
+            </div>
+            <div className="activity-feed-list">
+              {liveActivities.length === 0 ? (
+                <div className="empty-feed">No recent system activity logged.</div>
+              ) : (
+                liveActivities.slice(0, 4).map((act) => (
+                  <div key={act.id} className="feed-item">
+                    <div className="feed-icon-dot"><CheckCircle2 size={14} /></div>
+                    <div className="feed-body">
+                      <div className="feed-title">{act.description}</div>
+                      <div className="feed-meta">
+                        <span className="feed-badge">{act.badge}</span>
+                        <span className="feed-time">{act.time}</span>
+                      </div>
+                    </div>
                   </div>
-                  <span className="table-count-badge">{filteredLatestVideos.length} Videos</span>
-                </div>
-                <div className="corp-table-wrap">
-                  <table className="corp-table">
-                    <thead>
-                      <tr>
-                        <th>Media</th>
-                        <th>Video Title</th>
-                        <th>Category</th>
-                        <th>Duration</th>
-                        <th>Views</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredLatestVideos.length === 0 ? (
-                        <tr><td colSpan={5} className="empty-table-cell">No videos match your filter.</td></tr>
-                      ) : (
-                        filteredLatestVideos.slice(0, 4).map((video, idx) => (
-                          <tr key={`${video.title}-${idx}`}>
-                            <td>
-                              <div className="table-media-thumb">
-                                {video.thumbnail ? (
-                                  <img
-                                    src={video.thumbnail}
-                                    alt={video.title}
-                                    className="table-media-img"
-                                    onError={(e) => {
-                                      (e.target as HTMLElement).style.display = "none";
-                                      (e.target as HTMLElement).nextElementSibling?.removeAttribute("style");
-                                    }}
-                                  />
-                                ) : null}
-                                <div
-                                  className="table-media-fallback"
-                                  style={{ display: video.thumbnail ? "none" : "flex" }}
-                                >
-                                  <PlayCircle size={18} />
-                                </div>
-                              </div>
-                            </td>
-                            <td style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{video.title}</td>
-                            <td><span className="table-cat-badge">{video.category}</span></td>
-                            <td><span className="table-dur-badge">{video.duration}</span></td>
-                            <td style={{ fontWeight: 600 }}>{video.views.toLocaleString()}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== DEPARTMENT MATRIX ===== */}
+        {departmentPerformance.length > 0 && (
+          <section className="corp-card dept-matrix-card">
+            <div className="corp-card-header">
+              <div>
+                <h3><Building2 size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Department Learning Performance Matrix</h3>
+                <p className="card-subtitle">Comparative breakdown of students, total video views, and video completion progress.</p>
               </div>
-            </section>
+              <a href="/principal/departments" className="card-header-link">
+                View All Departments <ArrowUpRight size={14} />
+              </a>
+            </div>
+            <div className="dept-matrix-grid">
+              {filteredDeptPerformance.map((dept) => (
+                <div className="dept-matrix-item" key={dept.name}>
+                  <div className="dept-item-top">
+                    <div>
+                      <span className="dept-code-pill">{dept.code || "DEPT"}</span>
+                      <h4 className="dept-title">{dept.name}</h4>
+                    </div>
+                    <span className="dept-rate-text">{dept.completionRate}% Done</span>
+                  </div>
+                  <div className="dept-progress-track">
+                    <div className="dept-progress-fill" style={{ width: `${Math.min(100, dept.completionRate)}%` }} />
+                  </div>
+                  <div className="dept-item-bottom">
+                    <span><Users size={12} /> {dept.students} Students</span>
+                    <span><Eye size={12} /> {dept.views} Views</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===== TABLES GRID ROW — Recent Activity + Latest Published Videos ===== */}
+        <section className="dash-tables-grid">
+          {/* =====  TABLE ===== */}
+          <div className="corp-card table-card-corp">
+            <div className="corp-card-header">
+              <div>
+                <h3><Activity size={18} className="header-icon" style={{ color: "#0d9488" }} /> Recent Activity</h3>
+                <p className="card-subtitle">Real-time log of student video watch sessions</p>
+              </div>
+              <div className="recent-header-actions">
+                <span className="table-count-badge">
+                  {Math.min(filteredRecentViews.length, 4)} Logged
+                </span>
+
+                <a href="/principal/video_report" className="card-header-link">
+                  View All <ArrowUpRight size={13} />
+                </a>
+              </div>
+            </div>
+            <div className="corp-table-wrap">
+              <table className="corp-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Dept</th>
+                    <th>Activity</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRecentViews.length === 0 ? (
+                    <tr><td colSpan={4} className="empty-table-cell">No recent student activity found.</td></tr>
+                  ) : (
+                    filteredRecentViews.slice(0, 4).map((row, idx) => (
+                      <tr key={`${row.student}-${idx}`}>
+                        <td>
+                          <div className="student-cell-profile">
+                            <div className="avatar-circle">
+                              {row.student.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()}
+                            </div>
+                            <span style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{row.student}</span>
+                          </div>
+                        </td>
+                        <td><span className="table-dept-pill">{row.department}</span></td>
+                        <td className="table-activity-cell" style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
+                        <td style={{ color: "var(--p-text-muted)", fontSize: 12.5 }}>{row.lastViewed}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ===== LATEST VIDEOS TABLE ===== */}
+          <div className="corp-card table-card-corp">
+            <div className="corp-card-header">
+              <div>
+                <h3><PlayCircle size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Latest Published Videos</h3>
+                <p className="card-subtitle">Recently uploaded educational videos</p>
+              </div>
+              <span className="table-count-badge">{filteredLatestVideos.length} Videos</span>
+            </div>
+            <div className="corp-table-wrap">
+              <table className="corp-table">
+                <thead>
+                  <tr>
+                    <th>Media</th>
+                    <th>Video Title</th>
+                    <th>Category</th>
+                    <th>Duration</th>
+                    <th>Views</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredLatestVideos.length === 0 ? (
+                    <tr><td colSpan={5} className="empty-table-cell">No videos match your filter.</td></tr>
+                  ) : (
+                    filteredLatestVideos.slice(0, 4).map((video, idx) => (
+                      <tr key={`${video.title}-${idx}`}>
+                        <td>
+                          <div className="table-media-thumb">
+                            {video.thumbnail ? (
+                              <img
+                                src={video.thumbnail}
+                                alt={video.title}
+                                className="table-media-img"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = "none";
+                                  (e.target as HTMLElement).nextElementSibling?.removeAttribute("style");
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              className="table-media-fallback"
+                              style={{ display: video.thumbnail ? "none" : "flex" }}
+                            >
+                              <PlayCircle size={18} />
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{video.title}</td>
+                        <td><span className="table-cat-badge">{video.category}</span></td>
+                        <td><span className="table-dur-badge">{video.duration}</span></td>
+                        <td style={{ fontWeight: 600 }}>{video.views.toLocaleString()}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
           </>
         )}
       </main>

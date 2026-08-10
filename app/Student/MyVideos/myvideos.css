@@ -358,18 +358,18 @@ video::-webkit-media-controls-enclosure {
 }
 
 .modal-close-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--muted-text, #94a3b8);
+  background: var(--table-head-bg, #f8fafc);
+  border: 1px solid var(--card-border, #cbd5e1);
+  color: var(--muted-text, #64748b);
   cursor: pointer;
   padding: 0.4rem;
   border-radius: 0.5rem;
-  transition: color 0.2s, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
 }
 
 .modal-close-btn:hover {
-  color: #ffffff;
-  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.4);
 }
 
@@ -382,5 +382,176 @@ video::-webkit-media-controls-enclosure {
 @media (min-width: 640px) {
   .video-player-wrapper {
     height: 460px;
+  }
+}
+
+/* ---------------------------------- SAAS SKELETON LOADING ANIMATION ---------------------------------- */
+.dash-skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  animation: dashSkeletonFadeIn 0.3s ease-out forwards;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--card-bg, #ffffff) 0%,
+    var(--table-head-bg, #f1f5f9) 50%,
+    var(--card-bg, #ffffff) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 1.6s infinite linear;
+  border-radius: 16px;
+  border: 1px solid var(--card-border, #cbd5e1);
+}
+
+html.dark .skeleton-shimmer,
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #161b22 0%,
+    #21262d 50%,
+    #161b22 100%
+  ) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dash-skeleton-banner {
+  height: 120px;
+  width: 100%;
+}
+
+.dash-skeleton-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+.dash-skeleton-kpi-card {
+  height: 100px;
+  border-radius: 14px;
+}
+
+.dash-skeleton-charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-chart-large {
+  height: 320px;
+}
+
+.dash-skeleton-chart-small {
+  height: 320px;
+}
+
+.dash-skeleton-tables-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dash-skeleton-table-card {
+  height: 280px;
+}
+
+@keyframes shimmerMove {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes dashSkeletonFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dash-skeleton-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .dash-skeleton-charts-row,
+  .dash-skeleton-tables-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-skeleton-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE FIXES — Mobile & Tablet
+   ============================================================ */
+
+/* Reduce page padding on small screens */
+@media (max-width: 640px) {
+  .my-videos-container {
+    padding: 1rem;
+  }
+
+  .header-title-area h1 {
+    font-size: 1.25rem;
+  }
+
+  .controls-card {
+    padding: 0.875rem 1rem;
+  }
+
+  .videos-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Modal: full-width on mobile */
+  .video-modal-backdrop {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .video-modal-container {
+    border-radius: 1rem 1rem 0 0;
+    max-width: 100%;
+  }
+
+  .video-player-wrapper {
+    height: 220px;
+  }
+
+  .video-modal-header {
+    padding: 1rem;
+  }
+
+  /* Category tags scroll on mobile */
+  .category-tags {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .category-tags::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-wrapper {
+    height: 160px;
   }
 }

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import "./favorites.css";
 
-const API_BASE = "https://online-management-backend.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://https://online-management-backend.onrender.com";
 
 const INITIAL_FAVORITES = [
   {
@@ -82,6 +82,7 @@ export default function StudentFavoritesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeVideo, setActiveVideo] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -102,8 +103,8 @@ export default function StudentFavoritesPage() {
         localStorage.setItem(studentKey, JSON.stringify([]));
         localStorage.setItem("student_favorites", JSON.stringify([]));
       }
-    } catch (e) {
-      setFavorites([]);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -125,15 +126,15 @@ export default function StudentFavoritesPage() {
   };
 
   const clearAllFavorites = () => {
-    if (confirm("Are you sure you want to remove all favorite videos?")) {
+    if (confirm("Are you sure you want to clear all bookmarked favorite lectures?")) {
       saveFavoritesToStorage([]);
     }
   };
 
-  const categories = ["All", ...Array.from(new Set(favorites.map((f) => f.category || "General")))];
+  const categories = ["All", ...Array.from(new Set(favorites.map((f) => f.category || "General").filter(Boolean)))];
 
   const filteredFavorites = favorites.filter((item) => {
-    const matchesCat = selectedCategory === "All" || item.category === selectedCategory;
+    const matchesCat = selectedCategory === "All" || (item.category || "General") === selectedCategory;
     const matchesSearch =
       !searchQuery.trim() ||
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -143,20 +144,20 @@ export default function StudentFavoritesPage() {
 
   return (
     <div className="fav-page-wrapper">
-      {/* Top Header Bar */}
+      {/* Header Bar */}
       <header className="fav-header-bar">
         <div className="fav-title-area">
           <div className="fav-icon-box">
-            <Heart size={22} fill="#ec4899" color="#ec4899" />
+            <Heart size={22} fill="#ef4444" color="#ef4444" />
           </div>
           <div>
-            <h1>My Favorite Lectures</h1>
-            <p>Your saved video lectures for quick revision & reference</p>
+            <h1>Favorite Videos</h1>
+            <p>Your saved and bookmarked favorite video lectures</p>
           </div>
         </div>
 
         <span className="fav-count-chip">
-          {favorites.length} Saved {favorites.length === 1 ? "Video" : "Videos"}
+          {favorites.length} Favorite {favorites.length === 1 ? "Video" : "Videos"}
         </span>
       </header>
 
@@ -191,8 +192,21 @@ export default function StudentFavoritesPage() {
         )}
       </div>
 
-      {/* Main Grid View */}
-      {filteredFavorites.length === 0 ? (
+      {/* Loading Skeleton - Principal Dashboard Style */}
+      {loading ? (
+        <div className="dash-skeleton-wrapper my-6">
+          <div className="dash-skeleton-banner skeleton-shimmer" />
+          <div className="dash-skeleton-kpi-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="dash-skeleton-kpi-card skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="dash-skeleton-charts-row">
+            <div className="dash-skeleton-chart-large skeleton-shimmer" />
+            <div className="dash-skeleton-chart-small skeleton-shimmer" />
+          </div>
+        </div>
+      ) : filteredFavorites.length === 0 ? (
         <div className="fav-empty-box">
           <Heart size={48} opacity={0.3} className="text-pink-500" />
           <h3>No Favorite Videos Found</h3>
