@@ -202,7 +202,7 @@ export default function StudentDashboardPage() {
               </span>
               <h2>Welcome Back, {studentName}! 👋</h2>
               <p>
-                You've watched {stats?.watchHours || "0h"} of content so far.<br />
+                You've watched {stats?.watchHours !== undefined && stats?.watchHours !== null ? `${stats.watchHours}h` : "0h"} of content so far.<br />
                 {stats?.completed === 0 ? "Start watching your first video lectures!" : "Keep it up and stay consistent!"}
               </p>
 
@@ -266,7 +266,7 @@ export default function StudentDashboardPage() {
                 <TrendingUp size={20} />
               </div>
               <span className="sdb-stat-title">WATCH HOURS</span>
-              <span className="sdb-stat-val">{stats?.watchHours || "0h"}</span>
+              <span className="sdb-stat-val">{stats?.watchHours !== undefined && stats?.watchHours !== null ? `${stats.watchHours}h` : "0h"}</span>
               <span className="sdb-stat-sub text-slate-400">Total time spent</span>
               <div className="sdb-sparkline spark-purple"></div>
             </div>
