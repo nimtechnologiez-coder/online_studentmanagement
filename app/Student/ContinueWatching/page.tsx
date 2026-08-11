@@ -440,14 +440,18 @@ export default function ContinueWatchingPage() {
             </div>
 
             <div className="cw-modal-video-wrap">
-              {activeVideo.video_url ? (
+              {activeVideo.id ? (
                 <video
                   controls
                   autoPlay
                   controlsList="nodownload"
                   disablePictureInPicture
                   onContextMenu={(e) => e.preventDefault()}
-                  src={`${API_BASE}/api/student/videos/${activeVideo.id}/stream/`}
+                  src={
+                    activeVideo.video_url && activeVideo.video_url.startsWith("http")
+                      ? activeVideo.video_url
+                      : `${API_BASE}/api/student/videos/${activeVideo.id}/stream/`
+                  }
                   onTimeUpdate={(e) => handleTimeUpdate(e, activeVideo.id)}
                   onEnded={(e) => handleVideoEnded(activeVideo.id, e.currentTarget.duration)}
                 />

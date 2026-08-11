@@ -280,7 +280,7 @@ export default function WatchHistoryPage() {
             </div>
 
             <div className="video-player-wrapper">
-              {activeVideo.video_url ? (
+              {activeVideo.video_id ? (
                 <video
                   controls
                   autoPlay
@@ -288,7 +288,11 @@ export default function WatchHistoryPage() {
                   disablePictureInPicture
                   onContextMenu={(e) => e.preventDefault()}
                   className="w-full h-full object-cover"
-                  src={`${API_BASE}/api/student/videos/${activeVideo.video_id}/stream/`}
+                  src={
+                    activeVideo.video_url && activeVideo.video_url.startsWith("http")
+                      ? activeVideo.video_url
+                      : `${API_BASE}/api/student/videos/${activeVideo.video_id}/stream/`
+                  }
                   onTimeUpdate={(e) => handleTimeUpdate(e, activeVideo.video_id)}
                   onEnded={(e) => handleVideoEnded(activeVideo.video_id, e.currentTarget.duration)}
                 >

@@ -276,8 +276,16 @@ export default function StudentFavoritesPage() {
             </div>
 
             <div className="fav-modal-video">
-              {activeVideo.video_url ? (
-                <video src={activeVideo.video_url} controls autoPlay />
+              {activeVideo.id ? (
+                <video
+                  src={
+                    activeVideo.video_url && activeVideo.video_url.startsWith("http")
+                      ? activeVideo.video_url
+                      : `${API_BASE}/api/student/videos/${activeVideo.id}/stream/`
+                  }
+                  controls
+                  autoPlay
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-3">
                   <Video size={40} className="text-blue-500 animate-pulse" />
