@@ -43,7 +43,10 @@ export default function StudentLoginPage() {
       }
 
       const saved = localStorage.getItem("student") || sessionStorage.getItem("student");
-      if (saved) {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get("expired") === "true") {
+        setError("Your session has expired. Please log in again.");
+      } else if (saved) {
         router.push("/Student/dashboard");
       }
     }

@@ -35,5 +35,14 @@ export async function studentFetch(path: string, options: RequestInit = {}): Pro
     res = await fetch(`${API_BASE}${relativeUrl}`, finalOptions);
   }
 
+  if (res.status === 401 && typeof window !== "undefined") {
+    const pathname = window.location.pathname;
+    if (pathname !== "/Student/login" && pathname !== "/Student/signup") {
+      localStorage.removeItem("student");
+      sessionStorage.removeItem("student");
+      window.location.href = "/Student/login?expired=true";
+    }
+  }
+
   return res;
 }
