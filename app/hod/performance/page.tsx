@@ -434,7 +434,7 @@ export default function HodPerformancePage() {
                         </Pie>
                         <Tooltip
                           content={<DonutTooltip />}
-                          allowEscapeViewBox
+                          allowEscapeViewBox={{ x: true, y: true }}
                           position={{ y: -65 }}
                           wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
                         />
