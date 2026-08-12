@@ -3,8 +3,13 @@ import "./globals.css";
 import ClientThemeProviderWrapper from "./ClientThemeProviderWrapper";
 
 export const metadata: Metadata = {
-  title: "Online Student Management",
+  title: "Online Management",
   description: "Academic Administration & Management Portal",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
