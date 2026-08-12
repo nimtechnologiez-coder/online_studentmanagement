@@ -44,11 +44,27 @@ export default function StudentSidebar() {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [overallProgress, setOverallProgress] = useState<number>(0);
+  const [monthlyProgress, setMonthlyProgress] = useState<number>(0);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     fetchSidebarProgress();
+
+    const handleUpdate = () => {
+      fetchSidebarProgress();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("student_progress_updated", handleUpdate);
+      window.addEventListener("focus", handleUpdate);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("student_progress_updated", handleUpdate);
+        window.removeEventListener("focus", handleUpdate);
+      }
+    };
   }, []);
 
   async function fetchSidebarProgress() {
@@ -56,15 +72,12 @@ export default function StudentSidebar() {
       const res = await studentFetch("/api/student/dashboard/");
       const data = await res.json();
       if (res.ok && data.status === "success" && data.stats) {
-        const total = data.stats.totalVideos || 0;
-        const completed = data.stats.completed || 0;
-        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-        setOverallProgress(pct);
+        setMonthlyProgress(data.stats.monthlyProgress ?? 0);
       } else {
-        setOverallProgress(0);
+        setMonthlyProgress(0);
       }
     } catch (e) {
-      setOverallProgress(0);
+      setMonthlyProgress(0);
     }
   }
 
@@ -162,12 +175,12 @@ export default function StudentSidebar() {
                 <div
                   className="sp-promo-ring-circle"
                   style={{
-                    background: `conic-gradient(#2563eb ${overallProgress * 3.6}deg, var(--card-border, #1e293b) 0deg)`,
+                    background: `conic-gradient(#2563eb ${Math.min(100, Math.max(0, monthlyProgress)) * 3.6}deg, var(--card-border, #1e293b) 0deg)`,
                   }}
                 >
                   <div className="sp-promo-ring-inner">
-                    <span className="sp-promo-val">{overallProgress}%</span>
-                    <span className="sp-promo-lbl">Overall</span>
+                    <span className="sp-promo-val">{monthlyProgress}%</span>
+                    <span className="sp-promo-lbl">This Month</span>
                   </div>
                 </div>
               </div>

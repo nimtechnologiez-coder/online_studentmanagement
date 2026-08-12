@@ -542,11 +542,18 @@ html.dark .sdb-user-id {
 
 .sdb-stat-bar-track {
   width: 100%;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.1);
+  height: 6px;
+  background-color: #f8fafc;
+  border: 1px solid #94a3b8;
+  box-sizing: border-box;
   border-radius: 4px;
   margin-top: 8px;
   overflow: hidden;
+}
+
+html.dark .sdb-stat-bar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
 }
 
 .sdb-stat-bar-fill {
@@ -1117,7 +1124,7 @@ html.dark .sdb-user-id {
 /* Row 4: Top Categories (5 Horizontal Cards Grid at Bottom) */
 .sdb-cat-horizontal-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   width: 100%;
 }
@@ -1160,16 +1167,18 @@ html.dark .sdb-user-id {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
 .sdb-cat-info h5 {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--card-text, #ffffff);
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  word-break: break-word;
+  white-space: normal;
+  overflow: visible;
 }
 
 .sdb-cat-info span {

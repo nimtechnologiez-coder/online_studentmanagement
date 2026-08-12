@@ -110,10 +110,34 @@ export default function StudentDashboardPage() {
     }
   }
 
+  function formatWatchTime(totalSeconds?: number, watchHours?: number) {
+    if (totalSeconds !== undefined && totalSeconds !== null && totalSeconds >= 0) {
+      if (totalSeconds === 0) return "0m";
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      if (h > 0) {
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+      }
+      if (m > 0) {
+        return `${m}m`;
+      }
+      return `${s}s`;
+    }
+    if (watchHours !== undefined && watchHours !== null) {
+      return watchHours > 0 ? `${watchHours}h` : "0m";
+    }
+    return "0m";
+  }
+
   const completionPct =
-    stats && stats.totalVideos > 0
-      ? Math.round((stats.completed / stats.totalVideos) * 100)
-      : 0;
+    stats?.completionRate !== undefined && stats?.completionRate !== null
+      ? stats.completionRate
+      : (stats && stats.totalVideos > 0
+          ? Math.round((stats.completed / stats.totalVideos) * 100)
+          : 0);
+
+  const formattedWatchTime = formatWatchTime(stats?.totalWatchSeconds, stats?.watchHours);
 
   const studentName = typeof student?.full_name === "string" && student.full_name.trim()
     ? student.full_name.trim().split(" ")[0]
@@ -202,7 +226,7 @@ export default function StudentDashboardPage() {
               </span>
               <h2>Welcome Back, {studentName}! 👋</h2>
               <p>
-                You've watched {stats?.watchHours !== undefined && stats?.watchHours !== null ? `${stats.watchHours}h` : "0h"} of content so far.<br />
+                You've watched {formattedWatchTime} of content so far.<br />
                 {stats?.completed === 0 ? "Start watching your first video lectures!" : "Keep it up and stay consistent!"}
               </p>
 
@@ -266,8 +290,8 @@ export default function StudentDashboardPage() {
                 <TrendingUp size={20} />
               </div>
               <span className="sdb-stat-title">WATCH HOURS</span>
-              <span className="sdb-stat-val">{stats?.watchHours !== undefined && stats?.watchHours !== null ? `${stats.watchHours}h` : "0h"}</span>
-              <span className="sdb-stat-sub text-slate-400">Total time spent</span>
+              <span className="sdb-stat-val">{formattedWatchTime}</span>
+              <span className="sdb-stat-sub text-slate-400">Total actual time watched</span>
               <div className="sdb-sparkline spark-purple"></div>
             </div>
           </div>
@@ -310,7 +334,7 @@ export default function StudentDashboardPage() {
 
               {topCategories.length > 0 ? (
                 <div className="sdb-cat-horizontal-grid">
-                  {topCategories.slice(0, 4).map((cat, i) => {
+                  {topCategories.slice(0, 5).map((cat, i) => {
                     const CatConfig = CATEGORY_ICONS[cat.name] || { icon: BookOpen, colorClass: "cat-icon-blue" };
                     const CatIcon = CatConfig.icon;
                     return (
@@ -319,7 +343,7 @@ export default function StudentDashboardPage() {
                           <CatIcon size={18} />
                         </div>
                         <div className="sdb-cat-info">
-                          <h5>{cat.name}</h5>
+                          <h5 title={cat.name}>{cat.name}</h5>
                           <span>{cat.count}</span>
                         </div>
                       </div>

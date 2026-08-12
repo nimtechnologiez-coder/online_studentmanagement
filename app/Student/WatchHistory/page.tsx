@@ -215,9 +215,17 @@ export default function WatchHistoryPage() {
                       <span className="history-meta-item">
                         <Clock size={14} /> {item.duration}
                       </span>
-                      {item.completed && (
+                      {item.completed ? (
                         <span className="text-emerald-600 flex items-center gap-1 font-semibold">
-                          <CheckCircle2 size={14} /> Completed
+                          <CheckCircle2 size={14} /> Watched (100%)
+                        </span>
+                      ) : item.progress && item.progress > 0 ? (
+                        <span className="text-blue-600 flex items-center gap-1 font-semibold">
+                          <Clock size={14} /> In Progress ({item.progress}%)
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 flex items-center gap-1 font-medium">
+                          Not Started
                         </span>
                       )}
                     </div>

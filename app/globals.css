@@ -810,7 +810,8 @@ html.dark .sp-completion-bar-card {
 }
 
 html.dark .sp-big-progress-track {
-  background-color: var(--progress-track) !important;
+  background-color: var(--progress-track, rgba(255, 255, 255, 0.08)) !important;
+  border: none !important;
 }
 
 html.dark .sp-legend-item {

@@ -441,7 +441,7 @@ export default function MyProgressPage() {
                       <div
                         className="sp-bar-fill"
                         style={{
-                          width: `${cat.percent}%`,
+                          width: `${Math.min(100, Math.max(0, cat.percent || 0))}%`,
                           background: getCategoryColor(cat.category),
                         }}
                       />

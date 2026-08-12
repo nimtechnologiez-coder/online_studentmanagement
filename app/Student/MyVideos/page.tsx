@@ -190,12 +190,55 @@ export default function MyVideosPage() {
     }
   }
 
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  function parseDurationToSeconds(durStr: any): number {
+    if (!durStr) return 0;
+    const s = String(durStr).trim();
+    const parts = s.split(":");
+    if (parts.length === 2) {
+      const m = parseInt(parts[0], 10);
+      const sec = parseInt(parts[1], 10);
+      if (!isNaN(m) && !isNaN(sec)) return m * 60 + sec;
+    } else if (parts.length === 3) {
+      const h = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const sec = parseInt(parts[2], 10);
+      if (!isNaN(h) && !isNaN(m) && !isNaN(sec)) return h * 3600 + m * 60 + sec;
+    }
+    const digits = s.match(/(\d+)/);
+    return digits ? parseInt(digits[1], 10) * 60 : 0;
+  }
+
   async function saveProgress(videoId: number, currentTime: number) {
     try {
-      await studentFetch(`/api/student/videos/${videoId}/progress/`, {
+      const watchedSecs = Math.floor(currentTime);
+      if (watchedSecs < 0) return;
+      const res = await studentFetch(`/api/student/videos/${videoId}/progress/`, {
         method: "POST",
-        body: JSON.stringify({ watched_seconds: Math.floor(currentTime) }),
+        body: JSON.stringify({ watched_seconds: watchedSecs }),
       });
+      const data = await res.json();
+      if (res.ok && data.status === "success") {
+        setVideos((prev) =>
+          prev.map((v) => {
+            if (v.id !== videoId) return v;
+            const durSecs = parseDurationToSeconds(v.duration);
+            const calcPct = durSecs > 0 ? Number(((watchedSecs / durSecs) * 100).toFixed(1)) : (data.progress ?? v.progress ?? 0);
+            const isCompleted = data.completed ?? (calcPct >= 95.0);
+            return {
+              ...v,
+              watched_seconds: data.watched_seconds ?? watchedSecs,
+              progress: calcPct,
+              watched: isCompleted,
+              status: isCompleted ? "Watched" : (watchedSecs > 0 ? "In Progress" : "Not Started"),
+            };
+          })
+        );
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("student_progress_updated"));
+        }
+      }
     } catch (err) {
       console.error("Failed to save progress:", err);
     }
@@ -206,8 +249,17 @@ export default function MyVideosPage() {
     if (!progressTimerRef.current) {
       progressTimerRef.current = setTimeout(() => {
         progressTimerRef.current = null;
-        saveProgress(videoId, video.currentTime);
-      }, 5000);
+        if (video && !video.paused) {
+          saveProgress(videoId, video.currentTime);
+        }
+      }, 2500);
+    }
+  }
+
+  function handleVideoLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>, savedSeconds: number) {
+    const video = e.currentTarget;
+    if (savedSeconds > 0 && video.duration && savedSeconds < video.duration * 0.95) {
+      video.currentTime = savedSeconds; // Resume playback from saved position!
     }
   }
 
@@ -220,6 +272,9 @@ export default function MyVideosPage() {
   }
 
   function handleCloseModal() {
+    if (activeModalVideo && videoRef.current) {
+      saveProgress(activeModalVideo.id, videoRef.current.currentTime);
+    }
     if (progressTimerRef.current) {
       clearTimeout(progressTimerRef.current);
       progressTimerRef.current = null;
@@ -371,7 +426,11 @@ export default function MyVideosPage() {
                         <span>
                           {video.watched ? (
                             <span className="text-emerald-600 font-bold flex items-center gap-1">
-                              <CheckCircle2 size={13} /> Watched
+                              <CheckCircle2 size={13} /> Watched (100%)
+                            </span>
+                          ) : video.progress && video.progress > 0 ? (
+                            <span className="text-blue-600 font-bold flex items-center gap-1">
+                              <Clock size={13} /> In Progress ({video.progress}%)
                             </span>
                           ) : (
                             <span className="text-slate-400 font-medium">Not watched</span>
@@ -382,7 +441,7 @@ export default function MyVideosPage() {
                         <div
                           className="progress-fill"
                           style={{
-                            width: video.watched ? "100%" : "0%",
+                            width: `${Math.min(100, Math.max(0, video.watched ? 100 : (video.progress || 0)))}%`,
                             backgroundColor: video.watched ? "#10b981" : "#2563eb",
                           }}
                         ></div>
@@ -395,7 +454,7 @@ export default function MyVideosPage() {
                       onClick={() => handlePlayVideo(video)}
                     >
                       <Play size={16} fill="white" />
-                      {video.watched ? "Rewatch Lecture" : "Start Watching"}
+                      {video.watched ? "Rewatch Lecture" : (video.progress && video.progress > 0 ? "Resume Watching" : "Start Watching")}
                     </button>
                   </div>
                 </div>
@@ -431,6 +490,7 @@ export default function MyVideosPage() {
             {/* HTML5 Video Player */}
             <div className="video-player-wrapper">
               <video
+                ref={videoRef}
                 controls
                 autoPlay
                 controlsList="nodownload"
@@ -442,6 +502,7 @@ export default function MyVideosPage() {
                     ? activeModalVideo.video_url
                     : `${API_BASE}/api/student/videos/${activeModalVideo.id}/stream/`
                 }
+                onLoadedMetadata={(e) => handleVideoLoadedMetadata(e, activeModalVideo.watched_seconds || 0)}
                 onTimeUpdate={(e) => handleTimeUpdate(e, activeModalVideo.id)}
                 onEnded={(e) => handleVideoEnded(activeModalVideo.id, e.currentTarget.duration)}
               >
