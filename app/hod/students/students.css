@@ -869,7 +869,11 @@ html.dark .stu-select:hover {
 }
 
 .light-student-table-row:nth-child(even) {
-  background: rgba(248, 250, 252, 0.6);
+  background: var(--p-bg-subtle, rgba(248, 250, 252, 0.6));
+}
+
+html.dark .light-student-table-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02) !important;
 }
 
 .light-student-table-row:hover {

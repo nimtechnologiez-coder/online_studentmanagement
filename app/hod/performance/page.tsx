@@ -66,6 +66,7 @@ type StudentRow = {
   videosWatched: number;
   videosTotal: number;
   watchTimeMinutes: number;
+  watchTimeSeconds: number;
   completion: number;
   lastActivity: string;
 };
@@ -90,10 +91,20 @@ const avatarColor = (id: number) => AVATAR_COLORS[id % AVATAR_COLORS.length];
 const initials = (name: string) =>
   name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 
-function formatWatchTime(totalMinutes: number) {
-  const h = Math.floor(totalMinutes / 60);
-  const m = totalMinutes % 60;
-  return h > 0 ? `${h}h ${String(m).padStart(2, "0")}m` : `${m}m`;
+function formatWatchTime(totalSeconds: number, totalMinutes: number = 0) {
+  const secs = totalSeconds > 0 ? totalSeconds : totalMinutes * 60;
+  if (!secs || secs <= 0) return "0m";
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+
+  if (h > 0) {
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+  if (m > 0) {
+    return s > 0 && m < 5 ? `${m}m ${s}s` : `${m}m`;
+  }
+  return `${s}s`;
 }
 
 /* Custom Tooltips */
@@ -130,13 +141,35 @@ function ActiveStudentsTooltip({ active, payload, label }: any) {
 function DonutTooltip({ active, payload }: any) {
   if (active && payload && payload.length) {
     const data = payload[0];
+    const name = data.name || data.payload?.name || "Video";
+    const views = data.payload?.value ?? data.value ?? 0;
+    const percent = data.payload?.percent ?? 0;
+    const color = data.payload?.color || "#3b82f6";
+
     return (
-      <div className="chart-tooltip-glass">
-        <p className="chart-tooltip-title">{data.name}</p>
-        <p className="chart-tooltip-row">
-          <span className="chart-tooltip-dot" style={{ background: data.payload.color }} />
-          <span>Views: <strong>{data.value.toLocaleString()}</strong> ({data.payload.percent}%)</span>
-        </p>
+      <div
+        className="light-most-watched-tooltip-glass"
+        style={{
+          background: "var(--p-bg-card, #0f172a)",
+          border: "1px solid var(--p-border, rgba(255, 255, 255, 0.15))",
+          padding: "8px 12px",
+          borderRadius: "10px",
+          boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)",
+          backdropFilter: "blur(12px)",
+          color: "var(--p-text-primary, #ffffff)",
+          fontSize: "12px",
+          maxWidth: "220px",
+          pointerEvents: "none",
+          zIndex: 9999,
+        }}
+      >
+        <div style={{ fontWeight: 700, marginBottom: "4px", color: "var(--p-text-primary, #ffffff)", wordBreak: "break-word" }}>
+          {name}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--p-text-muted, #94a3b8)" }}>
+          <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: color, flexShrink: 0 }} />
+          <span>Views: <strong style={{ color: "var(--p-text-primary, #ffffff)" }}>{views.toLocaleString()}</strong> ({percent}%)</span>
+        </div>
       </div>
     );
   }
@@ -227,21 +260,20 @@ export default function HodPerformancePage() {
     videosWatched: s.videosWatched ?? 0,
     videosTotal: s.videosTotal ?? 0,
     watchTimeMinutes: s.watchTimeMinutes ?? 0,
+    watchTimeSeconds: s.watchTimeSeconds ?? ((s.watchTimeMinutes ?? 0) * 60),
     completion: s.completion ?? 0,
     lastActivity: s.lastActivity || "No activity",
   }));
 
   const rawMostWatched = payload?.mostWatchedVideos ?? [];
-  const totalWatchedViews = rawMostWatched.reduce((sum: number, v: any) => sum + (v.value ?? 0), 0) || 1;
-
-  const palette = ["#4f46e5", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
+  const palette = ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#ec4899"];
   const mostWatchedVideos: VideoSlice[] = rawMostWatched.map((v: any, i: number) => {
     const val = v.value ?? 0;
-    const pct = v.percent ?? Math.round((val / totalWatchedViews) * 100);
+    const calcPct = stats.totalViews > 0 ? Math.round((val / stats.totalViews) * 100) : (v.percent ?? 0);
     return {
-      name: v.name ?? v.title ?? "Video",
+      name: (v.name ?? v.title ?? "Video").trim(),
       value: val,
-      percent: pct,
+      percent: calcPct,
       color: v.color || palette[i % palette.length],
     };
   });
@@ -374,7 +406,7 @@ export default function HodPerformancePage() {
             </div>
 
             <div className="light-most-watched-chart-container">
-              {mostWatchedVideos.length === 0 || stats.totalViews === 0 ? (
+              {mostWatchedVideos.length === 0 ? (
                 <div className="light-most-watched-empty">
                   <div className="light-most-watched-empty-icon">📊</div>
                   <div className="light-most-watched-empty-title">No Data Available</div>
@@ -385,12 +417,27 @@ export default function HodPerformancePage() {
                   <div className="light-most-watched-chart">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={mostWatchedVideos} dataKey="value" nameKey="name" innerRadius={44} outerRadius={68} paddingAngle={4}>
+                        <Pie
+                          data={mostWatchedVideos.map((v) => ({
+                            ...v,
+                            chartValue: stats.totalViews > 0 ? (v.value > 0 ? v.value : 0.0001) : 1,
+                          }))}
+                          dataKey="chartValue"
+                          nameKey="name"
+                          innerRadius={44}
+                          outerRadius={68}
+                          paddingAngle={4}
+                        >
                           {mostWatchedVideos.map((entry) => (
                             <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
                           ))}
                         </Pie>
-                        <Tooltip content={<DonutTooltip />} />
+                        <Tooltip
+                          content={<DonutTooltip />}
+                          allowEscapeViewBox
+                          position={{ y: -65 }}
+                          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="light-most-watched-center-label">
@@ -404,40 +451,11 @@ export default function HodPerformancePage() {
                       <div className="light-most-watched-legend-item" key={d.name} title={d.name}>
                         <span className="light-most-watched-legend-dot" style={{ background: d.color }} />
                         <span className="light-most-watched-legend-name">{d.name}</span>
-                        <span className="light-most-watched-legend-val">{d.percent}%</span>
+                        <span className="light-most-watched-legend-val">{d.value.toLocaleString()} views · {d.percent}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* ===== WEEKLY ACTIVE LEARNERS CARD (SCOPED UNIQUE UI) ===== */}
-          <div className="corp-card chart-card light-weekly-active-card">
-            <div className="corp-card-header light-weekly-active-header">
-              <div>
-                <h3><BarChart3 size={17} className="header-icon" style={{ color: "#0d9488" }} /> Weekly Active Learners</h3>
-                <p className="card-subtitle">Active student participation</p>
-              </div>
-            </div>
-            <div className="light-weekly-active-chart">
-              {weeklyActiveStudents.length === 0 || weeklyActiveStudents.every((d: any) => d.value === 0) ? (
-                <div className="light-weekly-active-empty">
-                  <div className="light-weekly-active-empty-icon">📊</div>
-                  <div className="light-weekly-active-empty-title">No Data Available</div>
-                  <div className="light-weekly-active-empty-sub">No student activity logged for this week.</div>
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={240}>
-                  <BarChart data={weeklyActiveStudents} margin={{ top: 12, right: 12, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} allowDecimals={false} />
-                    <Tooltip content={<ActiveStudentsTooltip />} cursor={{ fill: "rgba(13, 148, 136, 0.12)" }} />
-                    <Bar dataKey="value" fill="#0d9488" radius={[6, 6, 0, 0]} maxBarSize={40} />
-                  </BarChart>
-                </ResponsiveContainer>
               )}
             </div>
           </div>
@@ -515,7 +533,7 @@ export default function HodPerformancePage() {
                       </td>
                       <td>
                         <span style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>
-                          {formatWatchTime(s.watchTimeMinutes)}
+                          {formatWatchTime(s.watchTimeSeconds, s.watchTimeMinutes)}
                         </span>
                       </td>
                       <td style={{ width: 180 }}>

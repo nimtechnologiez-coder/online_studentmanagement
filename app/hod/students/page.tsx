@@ -100,21 +100,28 @@ export default function HodStudentsPage() {
       }
 
       if (json && json.status === "success" && Array.isArray(json.students)) {
-        const studentData: Student[] = json.students.map((student: any) => ({
-          id: student.id,
-          name: student.name,
-          username: student.username,
-          password: student.password || "",
-          email: student.email,
-          year: student.year || "I",
-          joinDate: student.joinDate || "N/A",
-          status: (student.status || "").toLowerCase() === "active" ? "Active" : "Inactive",
-          phone: student.phone || "N/A",
-          section: "A",
-          completionRate: student.completionRate || 0,
-          videosWatched: student.videosWatched || 0,
-          videosTotal: student.videosTotal ?? student.totalVideos ?? 0,
-        }));
+        const studentData: Student[] = json.students.map((student: any) => {
+          const watched = student.videosWatched ?? 0;
+          const total = student.videosTotal ?? student.totalVideos ?? 0;
+          const rate = student.completionRate !== undefined && student.completionRate !== null
+            ? student.completionRate
+            : (total > 0 ? Math.min(100, Math.round((watched / total) * 100)) : 0);
+          return {
+            id: student.id,
+            name: student.name,
+            username: student.username,
+            password: student.password || "",
+            email: student.email,
+            year: student.year || "I",
+            joinDate: student.joinDate || "N/A",
+            status: (student.status || "").toLowerCase() === "active" ? "Active" : "Inactive",
+            phone: student.phone || "N/A",
+            section: "A",
+            completionRate: rate,
+            videosWatched: watched,
+            videosTotal: total,
+          };
+        });
         setStudents(studentData);
       } else {
         setStudents([]);
@@ -265,7 +272,6 @@ export default function HodStudentsPage() {
                   <th>#</th>
                   <th>Student Name</th>
                   <th>Username</th>
-                  <th>Password</th>
                   <th>Email</th>
                   <th>Year</th>
                   <th>Join Date</th>
@@ -276,13 +282,13 @@ export default function HodStudentsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="stu-empty light-student-table-empty-cell">
+                    <td colSpan={8} className="stu-empty light-student-table-empty-cell">
                       Loading students...
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={9} className="stu-empty light-student-table-empty-cell">
+                    <td colSpan={8} className="stu-empty light-student-table-empty-cell">
                       {error}
                     </td>
                   </tr>
@@ -306,13 +312,6 @@ export default function HodStudentsPage() {
 
                       {/* Username */}
                       <td className="stu-td-strong">{s.username}</td>
-
-                      {/* Password */}
-                      <td>
-                        <span className="stu-password">
-                          {s.password || "—"}
-                        </span>
-                      </td>
 
                       {/* Email */}
                       <td className="stu-td-strong">{s.email}</td>
@@ -344,7 +343,7 @@ export default function HodStudentsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={9} className="stu-empty light-student-table-empty-cell">
+                    <td colSpan={8} className="stu-empty light-student-table-empty-cell">
                       <div className="light-student-table-empty">
                         <div className="light-student-table-empty-icon">👨‍🎓</div>
                         <div className="light-student-table-empty-title">No Students Available</div>
@@ -519,14 +518,14 @@ export default function HodStudentsPage() {
                   </div>
                   <div className="stu-modal-field">
                     <span className="stu-modal-field-label">Videos Watched</span>
-                    <div className="stu-modal-field-val">{modal.videosWatched} / {modal.videosTotal !== undefined ? modal.videosTotal : (modal.videosWatched > 0 ? modal.videosWatched : 0)} Videos</div>
+                    <div className="stu-modal-field-val">{modal.videosWatched} / {modal.videosTotal} Videos</div>
                   </div>
                   <div className="stu-modal-field stu-modal-field-full">
                     <span className="stu-modal-field-label">Completion Rate</span>
                     <div className="stu-completion-wrap">
                       <div className="stu-completion-row">
                         <span className="stu-completion-pct">{modal.completionRate}%</span>
-                        <span style={{ fontSize: '11.5px', color: 'var(--stu-text-muted)' }}>{modal.videosWatched} of {modal.videosTotal !== undefined ? modal.videosTotal : (modal.videosWatched > 0 ? modal.videosWatched : 0)} videos</span>
+                        <span style={{ fontSize: '11.5px', color: 'var(--stu-text-muted)' }}>{modal.videosWatched} of {modal.videosTotal} videos</span>
                       </div>
                       <div className="stu-completion-bar-bg">
                         <div

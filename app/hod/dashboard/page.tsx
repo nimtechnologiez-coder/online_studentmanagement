@@ -39,6 +39,7 @@ import {
   Cell,
   BarChart,
   Bar,
+  LabelList,
 } from "recharts";
 import "./Hoddashboard.css";
 
@@ -106,6 +107,7 @@ interface HodDashboardData {
     engagementRate?: number;
   };
   dailyViews: DailyView[];
+  monthlyViews?: { week: string; views: number }[];
   topCategories: CategorySlice[];
   latestVideos: UploadedVideo[];
   recentViews: RecentView[];
@@ -117,7 +119,21 @@ interface HodDashboardData {
   hodName?: string;
 }
 
-/* --------------------------------- HELPERS --------------------------------- */
+function formatCompactNumber(num: number): string {
+  if (num >= 1_000_000_000) {
+    const formatted = (num / 1_000_000_000).toFixed(1);
+    return (formatted.endsWith(".0") ? formatted.slice(0, -2) : formatted) + "B";
+  }
+  if (num >= 1_000_000) {
+    const formatted = (num / 1_000_000).toFixed(1);
+    return (formatted.endsWith(".0") ? formatted.slice(0, -2) : formatted) + "M";
+  }
+  if (num >= 1_000) {
+    const formatted = (num / 1_000).toFixed(1);
+    return (formatted.endsWith(".0") ? formatted.slice(0, -2) : formatted) + "K";
+  }
+  return String(num);
+}
 
 function ViewsTooltip(props: any) {
   const { active, payload, label } = props;
@@ -137,9 +153,12 @@ function ViewsTooltip(props: any) {
 function BarTooltip(props: any) {
   const { active, payload, label } = props;
   if (!active || !payload || !payload.length) return null;
+  const fullLabel = String(label).startsWith("W") && !String(label).startsWith("Week")
+    ? `Week ${String(label).slice(1)}`
+    : label;
   return (
     <div className="chart-tooltip-glass">
-      <p className="chart-tooltip-title">{label}</p>
+      <p className="chart-tooltip-title">{fullLabel}</p>
       <p className="chart-tooltip-row">
         <span className="chart-tooltip-dot" style={{ background: "#3b82f6" }} />
         Views: <strong>{Number(payload[0]?.value ?? 0).toLocaleString()}</strong>
@@ -180,42 +199,56 @@ function DonutTooltip(props: any) {
 
 function buildWeeklyData(dailyViews: DailyView[] = []) {
   if (!dailyViews || !dailyViews.length) return [];
-  const weeks: { week: string; views: number }[] = [];
-  const chunkSize = Math.max(1, Math.ceil(dailyViews.length / 5));
-  for (let i = 0; i < 5; i++) {
-    const chunk = dailyViews.slice(i * chunkSize, (i + 1) * chunkSize);
-    if (chunk.length > 0) {
-      weeks.push({
-        week: `Week ${i + 1}`,
-        views: chunk.reduce((sum, d) => sum + (d?.views || 0), 0),
-      });
-    }
-  }
-  return weeks;
+  const totalViews = dailyViews.reduce((sum, d) => sum + (d?.views || 0), 0);
+  return [
+    { week: "Week 1", views: 0 },
+    { week: "Week 2", views: 0 },
+    { week: "Week 3", views: totalViews },
+    { week: "Week 4", views: 0 },
+  ];
 }
 
 function buildStudentDonut(yearDist: YearDistItem[] = [], students: StudentPerformance[] = []) {
+  const defaultYears = [
+    { label: "I Year", key: "I", color: "#4f6cf7" },
+    { label: "II Year", key: "II", color: "#22c55e" },
+    { label: "III Year", key: "III", color: "#f97316" },
+    { label: "IV Year", key: "IV", color: "#06b6d4" },
+  ];
+
   if (yearDist && yearDist.length > 0) {
-    return yearDist.map((y) => ({
-      name: y.label,
-      fullName: y.label,
-      value: y.count,
-      color: y.color || "#4f6cf7",
+    return defaultYears.map((dy) => {
+      const found = yearDist.find(
+        (y) => y.label === dy.label || y.label === `${dy.key} Year` || y.label.startsWith(dy.key)
+      );
+      return {
+        name: dy.label,
+        value: found ? found.count : 0,
+        color: found?.color || dy.color,
+      };
+    });
+  }
+
+  if (students && students.length > 0) {
+    const yearGroups: Record<string, number> = {};
+    students.forEach((s) => {
+      if (s && s.year) {
+        const normalizedKey = s.year.trim();
+        yearGroups[normalizedKey] = (yearGroups[normalizedKey] || 0) + 1;
+      }
+    });
+
+    return defaultYears.map((dy) => ({
+      name: dy.label,
+      value: yearGroups[dy.key] || yearGroups[dy.label] || 0,
+      color: dy.color,
     }));
   }
-  if (!students || !students.length) return [];
-  const palette = ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#94a3b8"];
-  const yearGroups: Record<string, number> = {};
-  students.forEach((s) => {
-    if (s && s.year) {
-      yearGroups[s.year] = (yearGroups[s.year] || 0) + 1;
-    }
-  });
-  return Object.entries(yearGroups).map(([year, count], i) => ({
-    name: year,
-    fullName: `Year ${year}`,
-    value: count,
-    color: palette[i % palette.length] ?? "#94a3b8",
+
+  return defaultYears.map((dy) => ({
+    name: dy.label,
+    value: 0,
+    color: dy.color,
   }));
 }
 
@@ -232,6 +265,7 @@ const INITIAL_DASHBOARD_DATA: HodDashboardData = {
     engagementRate: 0,
   },
   dailyViews: [],
+  monthlyViews: [],
   topCategories: [],
   latestVideos: [],
   recentViews: [],
@@ -334,11 +368,13 @@ export default function HodDashboardPage() {
 
       if (response.ok && json && json.status === "success") {
         const eng = Array.isArray(json.engagementData) ? json.engagementData : [];
+        const mViews = Array.isArray(json.monthlyViews) ? json.monthlyViews : [];
         const vids = Array.isArray(json.recentVideos) ? json.recentVideos : [];
         const acts = Array.isArray(json.recentActivities) ? json.recentActivities : [];
         const topSt = Array.isArray(json.topStudents) ? json.topStudents : [];
 
         const dailyViews: DailyView[] = eng.map((e: any) => ({ day: e.day, views: e.value ?? 0 }));
+        const monthlyViews = mViews.map((m: any) => ({ week: m.week || m.day || "", views: m.views ?? m.value ?? 0 }));
 
         const recentViews: RecentView[] = acts.map((a: any) => ({
           student: a.name || "",
@@ -384,6 +420,7 @@ export default function HodDashboardPage() {
             engagementRate: json.stats?.totalStudents ? Math.round(((json.stats?.activeStudents || 0) / json.stats.totalStudents) * 100) : 0,
           },
           dailyViews,
+          monthlyViews,
           topCategories: [],
           latestVideos,
           recentViews,
@@ -422,6 +459,7 @@ export default function HodDashboardPage() {
       watchTime: "0 Hours", activeStudents: 0, engagementRate: 0,
     },
     dailyViews = [],
+    monthlyViews = [],
     latestVideos = [],
     recentViews = [],
     studentPerformance = [],
@@ -433,7 +471,10 @@ export default function HodDashboardPage() {
 
   const engagement = s.engagementRate ?? (s.students > 0 ? Math.round(((s.activeStudents || 0) / s.students) * 100) : 0);
 
-  const weeklyViews = useMemo(() => buildWeeklyData(dailyViews), [dailyViews]);
+  const weeklyViews = useMemo(() => {
+    if (monthlyViews && monthlyViews.length > 0) return monthlyViews;
+    return buildWeeklyData(dailyViews);
+  }, [monthlyViews, dailyViews]);
   const totalMonthlyViews = useMemo(() => weeklyViews.reduce((sum, w) => sum + (w.views || 0), 0), [weeklyViews]);
   const studentDonut = useMemo(() => buildStudentDonut(yearDistribution ?? [], studentPerformance ?? []), [yearDistribution, studentPerformance]);
   const totalDonutStudents = studentDonut.reduce((sum, d) => sum + d.value, 0);
@@ -669,19 +710,53 @@ export default function HodDashboardPage() {
                     </div>
                   ) : (
                     <ResponsiveContainer width="100%" height={220}>
-                      <AreaChart data={dailyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                      <AreaChart data={dailyViews} margin={{ top: 32, right: 32, left: 6, bottom: 6 }}>
                         <defs>
                           <linearGradient id="hodEngageGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
+                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.35} />
+                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                        <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <Tooltip content={<ViewsTooltip />} />
-                        <Area type="monotone" dataKey="views" stroke="#4f46e5" strokeWidth={2.5} fillOpacity={1} fill="url(#hodEngageGrad)"
-                          dot={{ r: 4, fill: "#4f46e5", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                        <XAxis
+                          dataKey="day"
+                          interval={0}
+                          tick={{ fontSize: 11, fill: "var(--p-text-muted)" }}
+                          axisLine={false}
+                          tickLine={false}
+                          dy={6}
+                        />
+                        <YAxis
+                          domain={[0, (dataMax: number) => (dataMax > 0 ? Math.ceil(dataMax * 1.2) : "auto")]}
+                          tickFormatter={formatCompactNumber}
+                          tick={{ fontSize: 11, fill: "var(--p-text-muted)" }}
+                          axisLine={false}
+                          tickLine={false}
+                          allowDecimals={false}
+                          width={44}
+                          dx={-4}
+                        />
+                        <Tooltip content={<ViewsTooltip />} allowEscapeViewBox={{ x: false, y: false }} />
+                        <Area
+                          type="monotone"
+                          dataKey="views"
+                          stroke="#4f46e5"
+                          strokeWidth={2.5}
+                          fillOpacity={1}
+                          fill="url(#hodEngageGrad)"
+                          dot={{ r: 4, fill: "#4f46e5", stroke: "#ffffff", strokeWidth: 2 }}
+                          activeDot={{ r: 6, fill: "#6366f1", stroke: "#ffffff", strokeWidth: 2 }}
+                        >
+                          <LabelList
+                            dataKey="views"
+                            position="top"
+                            offset={10}
+                            fill="var(--p-text-primary)"
+                            fontSize={11}
+                            fontWeight={700}
+                            formatter={(val: any) => (Number(val) > 0 ? formatCompactNumber(Number(val)) : "")}
+                          />
+                        </Area>
                       </AreaChart>
                     </ResponsiveContainer>
                   )}
@@ -709,26 +784,34 @@ export default function HodDashboardPage() {
                       <div className="light-students-year-chart">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
-                            <Pie data={studentDonut} dataKey="value" nameKey="name" innerRadius={42} outerRadius={68} paddingAngle={3}>
-                              {studentDonut.map((entry) => (
+                            <Pie
+                              data={studentDonut.filter((d) => d.value > 0)}
+                              dataKey="value"
+                              nameKey="name"
+                              innerRadius={42}
+                              outerRadius={68}
+                              paddingAngle={3}
+                            >
+                              {studentDonut.filter((d) => d.value > 0).map((entry) => (
                                 <Cell key={entry.name} fill={entry.color} stroke="var(--p-bg-card)" strokeWidth={2} />
                               ))}
                             </Pie>
-                            <Tooltip content={<CategoryTooltip />} />
+                            <Tooltip content={<CategoryTooltip />} allowEscapeViewBox={{ x: true, y: true }} wrapperStyle={{ zIndex: 1000 }} />
                           </PieChart>
                         </ResponsiveContainer>
                         <div className="light-students-year-center-label">
-                          <span className="light-students-year-center-value">{totalDonutStudents.toLocaleString()}</span>
+                          <span className="light-students-year-center-value">{(s.students || totalDonutStudents).toLocaleString()}</span>
                           <span className="light-students-year-center-sub">Students</span>
                         </div>
                       </div>
                       <div className="light-students-year-legend">
                         {studentDonut.map((d) => {
-                          const pct = totalDonutStudents > 0 ? Math.round((d.value / totalDonutStudents) * 100) : 0;
+                          const total = s.students || totalDonutStudents;
+                          const pct = total > 0 ? Math.round((d.value / total) * 100) : 0;
                           return (
-                            <div className="light-students-year-legend-item" key={d.name} title={`${d.name} Year`}>
+                            <div className="light-students-year-legend-item" key={d.name} title={`${d.name}`}>
                               <span className="light-students-year-legend-dot" style={{ background: d.color }} />
-                              <span className="light-students-year-legend-name">{d.name} Year</span>
+                              <span className="light-students-year-legend-name">{d.name}</span>
                               <span className="light-students-year-legend-val">{pct}% ({d.value})</span>
                             </div>
                           );
@@ -750,7 +833,7 @@ export default function HodDashboardPage() {
                   <span className="chart-badge" style={{ whiteSpace: "nowrap", flexShrink: 0, padding: "4px 12px" }}>This Month</span>
                 </div>
                 <div className="chart-container">
-                  {weeklyViews.length === 0 || totalMonthlyViews === 0 ? (
+                  {weeklyViews.length === 0 ? (
                     <div className="light-students-year-empty">
                       <div className="light-students-year-empty-icon">📊</div>
                       <div className="light-students-year-empty-title">No Video View Data Available</div>
@@ -759,12 +842,39 @@ export default function HodDashboardPage() {
                     </div>
                   ) : (
                     <ResponsiveContainer width="100%" height={220}>
-                      <BarChart data={weeklyViews} margin={{ top: 8, right: 12, left: -24, bottom: 0 }}>
+                      <BarChart data={weeklyViews} margin={{ top: 28, right: 16, left: -12, bottom: 4 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--p-border-table)" vertical={false} />
-                        <XAxis dataKey="week" tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "var(--p-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} />
-                        <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={52} />
+                        <XAxis
+                          dataKey="week"
+                          interval={0}
+                          tickFormatter={(val: string) => (val.startsWith("Week ") ? `W${val.replace("Week ", "")}` : val)}
+                          tick={{ fontSize: 11, fontWeight: 600, fill: "var(--p-text-muted)" }}
+                          axisLine={false}
+                          tickLine={false}
+                          dy={4}
+                        />
+                        <YAxis
+                          domain={[0, (dataMax: number) => (dataMax > 0 ? Math.ceil(dataMax * 1.2) : "auto")]}
+                          tickFormatter={formatCompactNumber}
+                          tick={{ fontSize: 11, fill: "var(--p-text-muted)" }}
+                          axisLine={false}
+                          tickLine={false}
+                          allowDecimals={false}
+                          width={40}
+                          dx={-4}
+                        />
+                        <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--p-indigo-soft)" }} allowEscapeViewBox={{ x: false, y: false }} />
+                        <Bar dataKey="views" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={44}>
+                          <LabelList
+                            dataKey="views"
+                            position="top"
+                            offset={8}
+                            fill="var(--p-text-primary)"
+                            fontSize={11}
+                            fontWeight={700}
+                            formatter={(val: any) => formatCompactNumber(Number(val))}
+                          />
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   )}
@@ -772,34 +882,12 @@ export default function HodDashboardPage() {
               </div>
             </section>
 
-            {/* ===== QUICK ACTIONS + LIVE ACTIVITY STREAM ===== */}
-            <section className="dash-insights-grid">
-              {/* Quick Actions Card */}
-              <div className="corp-card actions-card">
-                <div className="corp-card-header">
-                  <h3><Zap size={18} className="header-icon" style={{ color: "#f59e0b" }} /> Quick Actions</h3>
-                  <span className="header-badge">Shortcuts</span>
-                </div>
-                <div className="quick-actions-buttons">
-                  <a href="/hod/students" className="quick-btn btn-indigo">
-                    <GraduationCap size={16} /><span>Manage Students</span>
-                  </a>
-                  <a href="/hod/videos" className="quick-btn btn-teal">
-                    <Video size={16} /><span>Video Library</span>
-                  </a>
-                  <a href="/hod/performance" className="quick-btn btn-violet">
-                    <Award size={16} /><span>Performance</span>
-                  </a>
-                  <a href="/hod/hod_profile" className="quick-btn btn-amber">
-                    <User size={16} /><span>HOD Profile</span>
-                  </a>
-                </div>
-              </div>
-
+            {/* ===== ACTIVITY & TABLES GRID ===== */}
+            <section className="dash-tables-grid">
               {/* Real-time Activity Stream Card */}
               <div className="corp-card live-activity-card light-activity-card">
                 <div className="corp-card-header light-activity-header">
-                  <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Real-time Activity Stream</h3>
+                  <h3><Activity size={18} className="header-icon" style={{ color: "#4f46e5" }} /> Activity Stream</h3>
                   <span className="header-badge live-dot-badge light-activity-live-badge"><span className="pulse-dot" /> Live</span>
                 </div>
                 <div className="activity-feed-list light-activity-list">
@@ -826,65 +914,6 @@ export default function HodDashboardPage() {
                   )}
                 </div>
               </div>
-            </section>
-
-            {/* ===== TABLES GRID ROW ===== */}
-            <section className="dash-tables-grid">
-              {/* Recent Activity Table Card */}
-              <div className="corp-card table-card-corp light-recent-activity-card">
-                <div className="corp-card-header light-recent-activity-header">
-                  <div>
-                    <h3><Activity size={18} className="header-icon" style={{ color: "#0d9488" }} /> Recent Activity</h3>
-                    <p className="card-subtitle">Real-time log of student video watch sessions</p>
-                  </div>
-                  <div className="recent-header-actions light-recent-activity-actions">
-                    <span className="table-count-badge light-recent-activity-badge">
-                      {Math.min(filteredRecentViews.length, 4)} Logged
-                    </span>
-                    <a href="/hod/students" className="card-header-link light-recent-activity-link">
-                      View All <ArrowUpRight size={13} />
-                    </a>
-                  </div>
-                </div>
-
-                {filteredRecentViews.length === 0 ? (
-                  <div className="light-recent-activity-empty">
-                    <div className="light-recent-activity-empty-icon">📈</div>
-                    <div className="light-recent-activity-empty-title">No Recent Activity</div>
-                    <div className="light-recent-activity-empty-sub">No student activity has been recorded yet.</div>
-                    <div className="light-recent-activity-empty-hint">Activity will appear here automatically when students start watching videos.</div>
-                  </div>
-                ) : (
-                  <div className="corp-table-wrap light-recent-activity-table-wrap">
-                    <table className="corp-table light-recent-activity-table">
-                      <thead>
-                        <tr>
-                          <th>Student Name</th>
-                          <th>Activity</th>
-                          <th>Time</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredRecentViews.slice(0, 4).map((row, idx) => (
-                          <tr key={`${row.student}-${idx}`} className="light-recent-activity-row">
-                            <td>
-                              <div className="student-cell-profile">
-                                <div className="avatar-circle">
-                                  {row.student.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()}
-                                </div>
-                                <span style={{ fontWeight: 600, color: "var(--p-text-primary)" }}>{row.student}</span>
-                              </div>
-                            </td>
-                            <td style={{ fontWeight: 500, color: "var(--p-text-primary)" }}>Watched: {row.video}</td>
-                            <td style={{ color: "var(--p-text-muted)", fontSize: 12.5 }}>{row.lastViewed}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
               {/* Latest Published Videos Table Card */}
               <div className="corp-card table-card-corp light-latest-videos-card">
                 <div className="corp-card-header light-latest-videos-header">
@@ -912,7 +941,7 @@ export default function HodDashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredLatestVideos.slice(0, 4).map((video, idx) => (
+                        {filteredLatestVideos.map((video, idx) => (
                           <tr key={`${video.title}-${idx}`} className="light-latest-videos-row">
                             <td style={{ width: 70 }}>
                               <div className="table-media-thumb">
