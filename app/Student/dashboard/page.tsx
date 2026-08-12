@@ -137,6 +137,11 @@ export default function StudentDashboardPage() {
           ? Math.round((stats.completed / stats.totalVideos) * 100)
           : 0);
 
+  const pendingPct =
+    stats && stats.totalVideos > 0
+      ? Math.round((stats.pending / stats.totalVideos) * 100)
+      : 0;
+
   const formattedWatchTime = formatWatchTime(stats?.totalWatchSeconds, stats?.watchHours);
 
   const studentName = typeof student?.full_name === "string" && student.full_name.trim()
@@ -281,7 +286,7 @@ export default function StudentDashboardPage() {
               <span className="sdb-stat-val">{stats?.pending ?? 0}</span>
               <span className="sdb-stat-sub text-amber-400">Videos remaining</span>
               <div className="sdb-stat-bar-track">
-                <div className="sdb-stat-bar-fill bg-amber-500" style={{ width: stats?.totalVideos ? `${Math.round((stats.pending / stats.totalVideos) * 100)}%` : "0%" }}></div>
+                <div className="sdb-stat-bar-fill bg-amber-500" style={{ width: `${pendingPct}%` }}></div>
               </div>
             </div>
 
