@@ -17,6 +17,7 @@ export async function studentFetch(path: string, options: RequestInit = {}): Pro
     ...options,
     headers,
     credentials: "include",
+    cache: "no-store",
   };
 
   let res: Response;
