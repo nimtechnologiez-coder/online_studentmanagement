@@ -56,9 +56,16 @@ export default function ContinueWatchingPage() {
       setLoading(true);
       setError("");
 
-      // 1. Fetch watched videos & active sessions
-      const vRes = await studentFetch("/api/student/videos/");
-      const vData = await vRes.json();
+      // Fetch watched videos & active sessions, and live student watch statistics in parallel
+      const [vRes, pRes] = await Promise.all([
+        studentFetch("/api/student/videos/"),
+        studentFetch("/api/student/progress/")
+      ]);
+
+      const [vData, pData] = await Promise.all([
+        vRes.json(),
+        pRes.json()
+      ]);
 
       let vList: any[] = [];
       if (vData.status === "success") {
@@ -75,9 +82,6 @@ export default function ContinueWatchingPage() {
         setActiveVideo(vList[0]);
       }
 
-      // 2. Fetch live student watch statistics
-      const pRes = await studentFetch("/api/student/progress/");
-      const pData = await pRes.json();
       if (pData.status === "success") {
         if (pData.stats) setWatchStats(pData.stats);
         if (pData.recentVideos) setRecentHistory(pData.recentVideos);

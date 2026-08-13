@@ -42,6 +42,25 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const keysToClear = [
+        "student",
+        "hod",
+        "principal",
+        "user",
+        "student_watch_later",
+        "student_favorites",
+        "hod_dash_cache",
+        "principal_dash_cache"
+      ];
+      keysToClear.forEach((key) => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
         setScrolled(true);

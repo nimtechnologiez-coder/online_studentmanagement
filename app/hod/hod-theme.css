@@ -226,3 +226,17 @@ html.dark {
     width: calc(100% - 264px);
   }
 }
+
+.principal-layout-root-full {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.principal-layout-main-full {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--p-bg-main);
+  overflow-x: hidden;
+}

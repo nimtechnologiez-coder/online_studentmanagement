@@ -70,22 +70,44 @@ export default function StudentDashboardPage() {
         typeof window !== "undefined"
           ? localStorage.getItem("student") || sessionStorage.getItem("student")
           : null;
+      
+      let parsedStudent = null;
       if (saved) {
-        const parsed = JSON.parse(saved);
-        setStudent(parsed);
-        fetchDashboardData(parsed.id);
-      } else {
-        fetchDashboardData(0);
+        parsedStudent = JSON.parse(saved);
+        setStudent(parsedStudent);
       }
+
+      // Try loading cached dashboard data to render UI immediately
+      if (typeof window !== "undefined") {
+        const cached = sessionStorage.getItem("student_dash_cache");
+        if (cached) {
+          try {
+            const data = JSON.parse(cached);
+            if (data.student) {
+              setStudent((prev: any) => (prev ? { ...prev, ...data.student } : data.student));
+            }
+            setStats(data.stats);
+            setContinueWatching(data.continueWatching || []);
+            setRecentlyAdded(data.recentlyAdded || []);
+            setTopCategories(data.topCategories || []);
+            setRecommendedForYou(data.recommendedVideos || []);
+            setLoading(false);
+          } catch (_) {}
+        }
+      }
+
+      fetchDashboardData(parsedStudent?.id || 0, !sessionStorage.getItem("student_dash_cache"));
     } catch (e) {
       console.error("Failed to parse student data:", e);
       setLoading(false);
     }
   }, []);
 
-  async function fetchDashboardData(studentId: number) {
+  async function fetchDashboardData(studentId: number, showLoading = true) {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       setError("");
       const res = await studentFetch("/api/student/dashboard/");
       const data = await res.json();
@@ -99,6 +121,15 @@ export default function StudentDashboardPage() {
         setTopCategories(data.topCategories || []);
         setRecommendedForYou(data.recommendedVideos || []);
         setError("");
+
+        // Cache the result for instant hydration next time
+        if (typeof window !== "undefined") {
+          try {
+            sessionStorage.setItem("student_dash_cache", JSON.stringify(data));
+            // Trigger student sidebar to read updated progress from cache
+            window.dispatchEvent(new Event("student_progress_updated"));
+          } catch (_) {}
+        }
       } else {
         setError(data.message || "Failed to load dashboard data.");
       }

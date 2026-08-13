@@ -69,10 +69,34 @@ export default function StudentSidebar() {
 
   async function fetchSidebarProgress() {
     try {
+      // 1. Try reading from sessionStorage cache first
+      if (typeof window !== "undefined") {
+        const cached = sessionStorage.getItem("student_dash_cache");
+        if (cached) {
+          try {
+            const data = JSON.parse(cached);
+            if (data?.stats) {
+              setMonthlyProgress(data.stats.monthlyProgress ?? 0);
+              return;
+            }
+          } catch (_) {}
+        }
+      }
+
+      // 2. If on dashboard page and no cache exists yet, let the dashboard fetch it
+      if (pathname === "/Student/dashboard") {
+        return;
+      }
+
       const res = await studentFetch("/api/student/dashboard/");
       const data = await res.json();
       if (res.ok && data.status === "success" && data.stats) {
         setMonthlyProgress(data.stats.monthlyProgress ?? 0);
+        if (typeof window !== "undefined") {
+          try {
+            sessionStorage.setItem("student_dash_cache", JSON.stringify(data));
+          } catch (_) {}
+        }
       } else {
         setMonthlyProgress(0);
       }
