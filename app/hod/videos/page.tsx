@@ -48,11 +48,9 @@ type SubmittedEntry = {
 
 const CATEGORIES = [
   "Programming",
-  "Web Development",
-  "Database",
-  "Computer Networks",
-  "Data Structures",
-  "Operating Systems",
+  "Mathematics",
+  "Physics",
+  "Soft Skills",
 ];
 
 const SAMPLE_VIDEO_URL =
@@ -62,7 +60,7 @@ const SAMPLE_VIDEOS: Video[] = [
   {
     id: 1,
     title: "Introduction to Data Structures & Algorithms",
-    category: "Data Structures",
+    category: "Programming",
     duration: "45:20",
     description: "Comprehensive guide to fundamental data structures, arrays, linked lists, and time complexity.",
     thumbnail: "https://picsum.photos/seed/ds/160/90",
@@ -75,10 +73,10 @@ const SAMPLE_VIDEOS: Video[] = [
   },
   {
     id: 2,
-    title: "React & Next.js Full Course & Best Practices",
-    category: "Web Development",
+    title: "Linear Algebra & Calculus Fundamentals",
+    category: "Mathematics",
     duration: "1:15:00",
-    description: "Learn server components, Turbopack, client state management, and modern UI engineering.",
+    description: "Learn matrices, vectors, derivatives, and mathematical principles for engineering.",
     thumbnail: "https://picsum.photos/seed/web/160/90",
     isMine: true,
     videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
@@ -89,10 +87,10 @@ const SAMPLE_VIDEOS: Video[] = [
   },
   {
     id: 3,
-    title: "Database Normalization & SQL Queries Masterclass",
-    category: "Database",
+    title: "Applied Physics & Thermodynamics Masterclass",
+    category: "Physics",
     duration: "38:15",
-    description: "1NF, 2NF, 3NF, BCNF rules with hands-on PostgreSQL and MySQL queries.",
+    description: "Core physical laws, energy equations, and practical mechanics.",
     thumbnail: "https://picsum.photos/seed/db/160/90",
     isMine: false,
     videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
@@ -530,19 +528,133 @@ function makeEmptyEntry(): VideoEntry {
   };
 }
 
+function uploadWithProgress(
+  url: string,
+  formData: FormData,
+  headers: Record<string, string>,
+  onProgress?: (progress: { loaded: number; total: number; percentage: number; speedMBs: number }) => void
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    let lastLoaded = 0;
+    let lastTime = Date.now();
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const now = Date.now();
+        const timeDiffSeconds = (now - lastTime) / 1000;
+        const loadedDiff = e.loaded - lastLoaded;
+
+        let speedMBs = 0;
+        if (timeDiffSeconds > 0) {
+          speedMBs = parseFloat(((loadedDiff / (1024 * 1024)) / timeDiffSeconds).toFixed(2));
+        }
+
+        const percentage = Math.round((e.loaded / e.total) * 100);
+
+        if (onProgress) {
+          onProgress({
+            loaded: e.loaded,
+            total: e.total,
+            percentage,
+            speedMBs: speedMBs || 0.1,
+          });
+        }
+
+        lastLoaded = e.loaded;
+        lastTime = now;
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const json = JSON.parse(xhr.responseText);
+          resolve(json);
+        } catch {
+          resolve({ status: "success" });
+        }
+      } else {
+        try {
+          const json = JSON.parse(xhr.responseText);
+          reject(new Error(json?.message || `Upload failed with status ${xhr.status}`));
+        } catch {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Network error during video upload. Please try again."));
+    xhr.ontimeout = () => reject(new Error("Upload timed out. Please try again."));
+
+    xhr.open("POST", url, true);
+    xhr.withCredentials = true;
+
+    Object.entries(headers).forEach(([key, val]) => {
+      if (val) xhr.setRequestHeader(key, val);
+    });
+
+    xhr.send(formData);
+  });
+}
+
 type UploadModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (entries: SubmittedEntry[]) => Promise<void> | void;
+  onSubmit: (
+    entries: SubmittedEntry[],
+    onProgress?: (index: number, total: number, pct: number, speed: number) => void
+  ) => Promise<void> | void;
   initialData?: UploadFormData | null;
   submitError?: string | null;
 };
+
+function calculateVideoDuration(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    const url = URL.createObjectURL(file);
+    video.src = url;
+
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      const secondsTotal = Math.floor(video.duration || 0);
+      if (!secondsTotal || isNaN(secondsTotal)) {
+        resolve("00:00");
+        return;
+      }
+      const hrs = Math.floor(secondsTotal / 3600);
+      const mins = Math.floor((secondsTotal % 3600) / 60);
+      const secs = secondsTotal % 60;
+
+      if (hrs > 0) {
+        resolve(
+          `${hrs.toString().padStart(2, "0")}:${mins
+            .toString()
+            .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+        );
+      } else {
+        resolve(
+          `${mins.toString().padStart(2, "0")}:${secs
+            .toString()
+            .padStart(2, "0")}`
+        );
+      }
+    };
+
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve("00:00");
+    };
+  });
+}
 
 function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: UploadModalProps) {
   const { mounted, closing } = useModalTransition(isOpen);
 
   const [entries, setEntries] = useState<VideoEntry[]>([makeEmptyEntry()]);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ index: number; total: number; pct: number; speed: number } | null>(null);
 
   const isEdit = Boolean(initialData?.id);
 
@@ -562,6 +674,7 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: Up
         setEntries([makeEmptyEntry()]);
       }
       setIsUploading(false);
+      setUploadProgress(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialData]);
@@ -575,7 +688,24 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: Up
   };
 
   const setVideoFile = (entryId: string, file: File | null) => {
+    if (!file) {
+      setEntries((prev) =>
+        prev.map((en) =>
+          en.entryId === entryId ? { ...en, videoFile: null, form: { ...en.form, duration: "" } } : en
+        )
+      );
+      return;
+    }
+
     setEntries((prev) => prev.map((en) => (en.entryId === entryId ? { ...en, videoFile: file } : en)));
+
+    calculateVideoDuration(file).then((dur) => {
+      setEntries((prev) =>
+        prev.map((en) =>
+          en.entryId === entryId ? { ...en, form: { ...en.form, duration: dur } } : en
+        )
+      );
+    });
   };
 
   const setThumbnailFile = (entryId: string, file: File | null) => {
@@ -606,16 +736,21 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: Up
     if (isUploading) return;
 
     setIsUploading(true);
+    setUploadProgress(null);
     try {
       await onSubmit(
         entries.map((en) => ({
           data: en.form,
           videoFile: en.videoFile,
           thumbnailFile: en.thumbnailFile,
-        }))
+        })),
+        (index, total, pct, speed) => {
+          setUploadProgress({ index, total, pct, speed });
+        }
       );
     } finally {
       setIsUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -672,24 +807,15 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: Up
                     value={entry.form.category}
                     onChange={(e) => updateForm(entry.entryId, "category", e.target.value)}
                   >
-                    <option value="">Select Category</option>
+                    <option value="" disabled>
+                      Select Category
+                    </option>
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c}>
                         {c}
                       </option>
                     ))}
                   </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Duration</label>
-                  <input
-                    type="text"
-                    required
-                    value={entry.form.duration}
-                    onChange={(e) => updateForm(entry.entryId, "duration", e.target.value)}
-                    placeholder="e.g. 18:45"
-                  />
                 </div>
 
                 <div className="form-group form-group-full">
@@ -725,7 +851,7 @@ function UploadModal({ isOpen, onClose, onSubmit, initialData, submitError }: Up
                   </p>
                   <span className="dropzone-hint">
                     {entry.videoFile
-                      ? `${(entry.videoFile.size / (1024 * 1024)).toFixed(1)} MB — click to change`
+                      ? `${(entry.videoFile.size / (1024 * 1024)).toFixed(1)} MB${entry.form.duration ? ` • Auto Duration: ${entry.form.duration}` : ''} — click to change`
                       : "or click to browse (mp4, mov, etc.)"}
                   </span>
                 </label>
@@ -921,8 +1047,11 @@ export default function VideosPage() {
   };
 
   // Handles both create (multi-entry) and edit (single-entry) submissions,
-  // sending real requests to the backend instead of only updating local state.
-  const handleUploadSubmit = async (entries: SubmittedEntry[]) => {
+  // sending real requests to the backend with live XHR upload progress.
+  const handleUploadSubmit = async (
+    entries: SubmittedEntry[],
+    onProgress?: (index: number, total: number, pct: number, speed: number) => void
+  ) => {
     setUploadError(null);
     const isEditMode = Boolean(entries[0]?.data.id);
 
@@ -956,37 +1085,32 @@ export default function VideosPage() {
         const updated = mapVideo(json.video ?? { ...data, id: data.id });
         setVideos((prev) => prev.map((v) => (v.id === data.id ? { ...v, ...updated } : v)));
       } else {
-        // Upload each entry sequentially so large video files don't
-        // saturate the connection all at once.
         const created: Video[] = [];
 
-        for (const entry of entries) {
+        for (let i = 0; i < entries.length; i++) {
+          const entry = entries[i];
           const { data, videoFile, thumbnailFile } = entry;
           const formData = new FormData();
           formData.append("title", data.title);
           formData.append("category", data.category);
-          formData.append("duration", data.duration);
+          formData.append("duration", data.duration || "00:00");
           formData.append("description", data.description);
           if (videoFile) formData.append("video", videoFile);
           if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
 
-          const response = await fetch(`${API_BASE}/api/hod/videos/upload/`, {
-            method: "POST",
-            headers: { ...authHeaders() }, // no Content-Type: browser sets multipart boundary
-            credentials: "include",
-            body: formData,
-          });
+          if (onProgress) onProgress(i + 1, entries.length, 0, 0);
 
-          const text = await response.text();
-          let json: any = null;
-          try {
-            json = text ? JSON.parse(text) : null;
-          } catch {
-            throw new Error("The server returned an invalid response.");
-          }
+          const json = await uploadWithProgress(
+            `${API_BASE}/api/hod/videos/upload/`,
+            formData,
+            authHeaders(),
+            (p) => {
+              if (onProgress) onProgress(i + 1, entries.length, p.percentage, p.speedMBs);
+            }
+          );
 
-          if (!response.ok || !json || json.status !== "success") {
-            throw new Error(json?.message || `Request failed with status ${response.status}`);
+          if (!json || json.status !== "success") {
+            throw new Error(json?.message || `Request failed during video upload`);
           }
 
           created.push(mapVideo(json.video));
