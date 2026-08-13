@@ -62,10 +62,19 @@ function getCategoryColor(cat: string) {
 
 const CustomWeeklyTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
+    const item = payload[0]?.payload;
+    const isToday = item?.isToday;
+    const hours = payload[0]?.value || 0;
+    const formattedTime = hours >= 1 
+      ? `${hours.toFixed(1)}h` 
+      : `${Math.round(hours * 60)}m`;
+
     return (
       <div className="sp-tooltip-box">
-        <p className="sp-tooltip-label">{payload[0]?.payload?.date || label}</p>
-        <p className="sp-tooltip-val">{payload[0]?.value?.toFixed(2)}h watched</p>
+        <p className="sp-tooltip-label">
+          {item?.day || label} ({item?.date}) {isToday ? "• Today" : ""}
+        </p>
+        <p className="sp-tooltip-val">{formattedTime} watched</p>
       </div>
     );
   }
@@ -337,7 +346,7 @@ export default function MyProgressPage() {
                 <span className="sp-chart-tag">This Week</span>
               </div>
               <div className="sp-chart-body" style={{ minHeight: 220 }}>
-                {mounted && weeklyWatchTime.some(w => w.hours > 0) ? (
+                {mounted && weeklyWatchTime.length > 0 ? (
                   <ResponsiveContainer width="100%" height={220}>
                     <AreaChart data={weeklyWatchTime} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                       <defs>

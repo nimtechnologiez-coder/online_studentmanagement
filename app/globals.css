@@ -809,7 +809,15 @@ html.dark .sp-completion-bar-card {
   border-color: var(--card-border) !important;
 }
 
-html.dark .sp-big-progress-track {
+html.dark .sp-big-progress-track,
+html.dark .sp-bar-track,
+html.dark .sp-mini-track,
+html.dark .sdb-stat-bar-track,
+html.dark .sdb-cw-fprog-track,
+html.dark .sdb-cw-side-prog,
+html.dark .progress-track,
+html.dark .cw-side-track,
+html.dark .cw-tbl-track {
   background-color: var(--progress-track, rgba(255, 255, 255, 0.08)) !important;
   border: none !important;
 }
