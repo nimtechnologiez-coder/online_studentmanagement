@@ -1,0 +1,304 @@
+/* ── VIDEOLY PREMIUM CORPORATE GOLD LANDING CSS ────────── */
+
+:root {
+  --primary-navy: #0B1220;
+  --primary-gold: #D5A63F;
+  --secondary-gold: #C5A059;
+  --amber-accent: #B45309;
+  --soft-slate: #F8FAFC;
+  --border-gold-tint: rgba(213, 166, 63, 0.14);
+  --shadow-premium: 0 10px 30px -10px rgba(11, 18, 32, 0.04), 0 1px 3px rgba(11, 18, 32, 0.02);
+  --shadow-hover: 0 20px 40px -12px rgba(213, 166, 63, 0.08), 0 4px 12px -4px rgba(213, 166, 63, 0.03);
+}
+
+/* Base structural wraps */
+.saas-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .saas-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Card classes with 18-24px rounded borders and soft gold shadows */
+.saas-card {
+  background-color: #ffffff;
+  border: 1.5px solid rgba(213, 166, 63, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -10px rgba(11, 18, 32, 0.03), 0 1px 3px rgba(11, 18, 32, 0.01);
+  padding: 20px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .saas-card {
+    padding: 32px;
+  }
+}
+
+/* Faint default border except active card */
+.saas-card:not(.active) {
+  border-color: rgba(213, 166, 63, 0.08);
+}
+
+/* Active middle HOD card by default matches the reference layout */
+.saas-card.active {
+  border-color: var(--primary-gold);
+  box-shadow: 0 20px 40px -12px rgba(213, 166, 63, 0.08), 0 4px 12px -4px rgba(213, 166, 63, 0.03);
+}
+
+.saas-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary-gold);
+  box-shadow: 0 20px 40px -12px rgba(213, 166, 63, 0.12), 0 4px 12px -4px rgba(213, 166, 63, 0.05);
+}
+
+/* Portal checklist container */
+.portal-checklist {
+  padding-top: 12px;
+  border-top: 1px solid rgba(11, 18, 32, 0.05);
+}
+
+/* Vertical child spacing inside checklist (replaces space-y-3) */
+.portal-checklist > * + * {
+  margin-top: 10px;
+}
+
+/* Portal button container */
+.portal-button-wrap {
+  padding-top: 12px;
+  border-top: 1px solid rgba(11, 18, 32, 0.05);
+}
+
+/* Layered Overlay for Background image in Hero Section */
+.hero-overlay-layered {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #0B1220 25%, rgba(11, 18, 32, 0.88) 55%, rgba(11, 18, 32, 0.35) 100%);
+  z-index: 1;
+}
+
+/* Glass Feature Panels in Hero Section */
+.highlight-glass-panel {
+  background-color: rgba(11, 18, 32, 0.45);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(213, 166, 63, 0.16);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.highlight-glass-panel:hover {
+  border-color: rgba(213, 166, 63, 0.35);
+  background-color: rgba(11, 18, 32, 0.55);
+}
+
+/* Wave blobs for final CTA section using CSS gradients */
+.gradient-wave-bg-gold {
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-wave-bg-gold::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 80%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(213, 166, 63, 0.16) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gradient-wave-bg-gold::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  right: -20%;
+  width: 80%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(197, 160, 89, 0.14) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Active navigation gold underliner hook */
+.nav-active-line-gold {
+  position: relative;
+}
+
+.nav-active-line-gold::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-gold);
+  border-radius: 2px;
+}
+
+/* Gold button templates */
+.btn-gold-primary {
+  background: linear-gradient(135deg, var(--primary-gold) 0%, var(--secondary-gold) 100%);
+  color: var(--primary-navy);
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px 0 rgba(213, 166, 63, 0.2);
+}
+
+.btn-gold-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(213, 166, 63, 0.3);
+}
+
+.btn-gold-secondary {
+  border: 1px solid var(--border-gold-tint);
+  background-color: #ffffff;
+  color: var(--primary-navy);
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-gold-secondary:hover {
+  background-color: #fcfdf9;
+  border-color: var(--primary-gold);
+}
+
+.btn-gold-outline {
+  border: 1.5px solid var(--primary-gold);
+  color: var(--primary-gold);
+  font-weight: 750;
+  padding: 8px 20px;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-gold-outline:hover {
+  background-color: rgba(213, 166, 63, 0.05);
+}
+
+/* ── UNIQUE HERO SECTION IMPROVEMENTS ── */
+
+.college-hero-section {
+
+  position: relative;
+
+
+
+
+  height: 770px;
+
+
+
+
+  margin-top: -76px;
+
+  padding-top: 76px;
+
+
+
+
+  overflow: hidden;
+
+
+
+
+  background-image: url("/hero_corporate_gold.png");
+  background-size: cover;
+  background-position: center 80%;
+  background-repeat: no-repeat;
+}
+
+.college-hero-content h1 {
+  text-shadow: 0 4px 16px rgba(7, 15, 28, 0.7);
+}
+
+.college-hero-content p {
+  text-shadow: 0 2px 10px rgba(7, 15, 28, 0.6);
+}
+
+/* Stable full-cover background */
+
+/* Overlay */
+.college-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background: linear-gradient(90deg,
+      rgba(7, 15, 28, 0.90) 0%,
+      rgba(7, 15, 28, 0.76) 38%,
+      rgba(7, 15, 28, 0.48) 68%,
+      rgba(7, 15, 28, 0.16) 100%);
+}
+
+/* Content */
+.college-hero-grid {
+  position: relative;
+  z-index: 2;
+
+  width: min(1180px, calc(100% - 48px));
+  height: 100%;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+}
+
+.college-hero-content {
+  width: 60%;
+}
+
+.college-hero-space {
+  width: 40%;
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .college-hero-section {
+    height: auto;
+    min-height: 680px;
+    margin-top: -76px;
+    padding-top: 108px;
+  }
+
+  .college-hero-grid {
+    width: 100%;
+    height: auto;
+    min-height: 680px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .college-hero-content {
+    width: 100%;
+  }
+
+  .college-hero-space {
+    display: none;
+  }
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

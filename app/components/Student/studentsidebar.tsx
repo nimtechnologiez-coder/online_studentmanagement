@@ -241,18 +241,20 @@ export default function StudentSidebar() {
             <button
               className="menu-item logout-menu-item mt-1 w-full"
               title={collapsed && !mobileOpen ? "Logout" : undefined}
-              onClick={async () => {
-                try {
-                  await studentFetch("/api/student/logout/", { method: "POST" });
-                } catch (e) {
+              onClick={() => {
+                // Background backend logout call, do not block the UI redirect
+                studentFetch("/api/student/logout/", { method: "POST" }).catch((e) => {
                   console.error("Backend logout error:", e);
-                }
+                });
+
+                // Immediate client-side clear & redirect
                 try {
                   localStorage.removeItem("student");
                   localStorage.removeItem("student_token");
                   sessionStorage.removeItem("student");
                   sessionStorage.removeItem("student_token");
-                } catch { }
+                } catch (_) {}
+
                 router.push("/Student/login");
               }}
             >
