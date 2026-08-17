@@ -99,9 +99,9 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white text-[#111827] font-sans antialiased relative overflow-x-hidden">
 
       {/* ── NAVBAR ─────────────────────────────────────────── */}
-      <nav className={`h-[76px] flex items-center border-b sticky top-0 z-50 transition-all duration-300 ${scrolled
-          ? "bg-[#0B1220]/95 backdrop-blur-md border-slate-800 shadow-md"
-          : "bg-transparent border-white/10"
+      <nav className={`h-[76px] flex items-center border-b fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled
+        ? "bg-[#0B1220]/95 backdrop-blur-md border-slate-800 shadow-md"
+        : "bg-transparent border-white/10"
         }`}>
         <div className="saas-container w-full flex items-center justify-between">
 
@@ -181,35 +181,35 @@ export default function LandingPage() {
             <div className="w-full h-[1px] bg-slate-800/60 my-6" />
 
             {/* 3 Horizontal Highlights Dark Glass Panels */}
-            <div className="flex overflow-x-auto md:grid md:grid-cols-3 gap-4 w-full snap-x snap-mandatory scrollbar-none pb-2 md:pb-0">
+            <div className="flex items-stretch overflow-x-auto md:grid md:grid-cols-3 gap-4 w-full snap-x snap-mandatory scrollbar-none pb-2 md:pb-0">
 
-              <div className="highlight-glass-panel flex items-start gap-3 min-w-[270px] md:min-w-0 flex-shrink-0 snap-start">
+              <div className="highlight-glass-panel flex items-center gap-3 min-w-[270px] md:min-w-0 flex-shrink-0 snap-start h-full">
                 <div className="h-7 w-7 rounded-lg bg-amber-50/10 text-[#D5A63F] flex items-center justify-center flex-shrink-0 border border-[#D5A63F]/20">
                   <Video className="h-4 w-4" />
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black text-white uppercase tracking-wide mb-0.5">01 — Unified Video Platform</h4>
-                  <p className="text-[9px] text-slate-400 font-bold leading-tight">One connected academic ecosystem</p>
+                <div className="min-w-0">
+                  <h4 className="text-[9.5px] font-black text-white uppercase tracking-wider mb-0.5 whitespace-nowrap">01 — Unified Video Platform</h4>
+                  <p className="text-[9px] text-slate-400 font-bold leading-tight whitespace-nowrap">One connected academic ecosystem</p>
                 </div>
               </div>
 
-              <div className="highlight-glass-panel flex items-start gap-3 min-w-[270px] md:min-w-0 flex-shrink-0 snap-start">
+              <div className="highlight-glass-panel flex items-center gap-3 min-w-[270px] md:min-w-0 flex-shrink-0 snap-start h-full">
                 <div className="h-7 w-7 rounded-lg bg-amber-50/10 text-[#D5A63F] flex items-center justify-center flex-shrink-0 border border-[#D5A63F]/20">
                   <Activity className="h-4 w-4" />
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black text-white uppercase tracking-wide mb-0.5">02 — Better Engagement</h4>
-                  <p className="text-[9px] text-slate-400 font-bold leading-tight">Track meaningful learning activity</p>
+                <div className="min-w-0">
+                  <h4 className="text-[9.5px] font-black text-white uppercase tracking-wider mb-0.5 whitespace-nowrap">02 — Better Engagement</h4>
+                  <p className="text-[9px] text-slate-400 font-bold leading-tight whitespace-nowrap">Track meaningful learning activity</p>
                 </div>
               </div>
 
-              <div className="highlight-glass-panel flex items-start gap-3 min-w-[270px] md:min-w-0 flex-shrink-0 snap-start">
+              <div className="highlight-glass-panel flex items-center gap-3 min-w-[270px] md:min-w-0 flex-shrink-0 snap-start h-full">
                 <div className="h-7 w-7 rounded-lg bg-amber-50/10 text-[#D5A63F] flex items-center justify-center flex-shrink-0 border border-[#D5A63F]/20">
                   <CheckCircle2 className="h-4 w-4" />
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black text-white uppercase tracking-wide mb-0.5">03 — Stronger Outcomes</h4>
-                  <p className="text-[9px] text-slate-400 font-bold leading-tight">Turn activity into useful insights</p>
+                <div className="min-w-0">
+                  <h4 className="text-[9.5px] font-black text-white uppercase tracking-wider mb-0.5 whitespace-nowrap">03 — Stronger Outcomes</h4>
+                  <p className="text-[9px] text-slate-400 font-bold leading-tight whitespace-nowrap">Turn activity into useful insights</p>
                 </div>
               </div>
 

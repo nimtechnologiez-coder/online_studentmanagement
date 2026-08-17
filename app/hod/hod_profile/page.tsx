@@ -77,6 +77,9 @@ export default function HodProfilePage() {
         setEditEmail(json.data.email || "hod@college.edu");
         setEditPhone(json.data.phone || "+91 98765 43210");
         setEditBio(json.data.bio || "");
+        if (json.data.cover_photo) {
+          setCoverBg(`url(${json.data.cover_photo}) center/cover no-repeat`);
+        }
       }
     } catch (err) {
       console.error("Failed to load HOD profile from API:", err);
@@ -313,18 +316,18 @@ export default function HodProfilePage() {
               <Mail size={18} style={{ color: "var(--p-indigo)" }} />
               Quick Contact
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Email</span>
-                <span className="text-sm font-semibold text-right truncate" style={{ color: "var(--p-text-primary)" }}>{email}</span>
+            <div className="hod-profile-rows-container">
+              <div className="hod-profile-data-row">
+                <span className="hod-profile-row-label">Email</span>
+                <span className="hod-profile-row-value truncate">{email}</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Phone</span>
-                <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{phone}</span>
+              <div className="hod-profile-data-row">
+                <span className="hod-profile-row-label">Phone</span>
+                <span className="hod-profile-row-value">{phone}</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Joined</span>
-                <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{joined}</span>
+              <div className="hod-profile-data-row">
+                <span className="hod-profile-row-label">Joined</span>
+                <span className="hod-profile-row-value">{joined}</span>
               </div>
             </div>
           </div>
@@ -336,19 +339,19 @@ export default function HodProfilePage() {
               Account Details
             </h3>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Username</span>
-                <span className="text-sm font-semibold text-right" style={{ color: "var(--p-text-primary)" }}>{profile?.username || "hod_admin"}</span>
+            <div className="hod-profile-rows-container">
+              <div className="hod-profile-data-row">
+                <span className="hod-profile-row-label">Username</span>
+                <span className="hod-profile-row-value">{profile?.username || "hod_admin"}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Department</span>
-                <span className="text-sm font-semibold text-right leading-snug" style={{ color: "var(--p-text-primary)", maxWidth: "60%" }}>{department}</span>
+              <div className="hod-profile-data-row">
+                <span className="hod-profile-row-label">Department</span>
+                <span className="hod-profile-row-value leading-snug" style={{ maxWidth: "60%" }}>{department}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl gap-4 border" style={{ background: "var(--p-bg-subtle)", borderColor: "var(--p-border, #cbd5e1)" }}>
-                <span className="text-xs font-bold uppercase shrink-0" style={{ color: "var(--p-text-muted)" }}>Status</span>
+              <div className="hod-profile-data-row">
+                <span className="hod-profile-row-label">Status</span>
                 <span className="status-badge status-active">
                   <span className="status-dot" />
                   {profile?.status || "Active"}

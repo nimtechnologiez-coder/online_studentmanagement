@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   Activity,
+  AlertCircle,
+  X
 } from "lucide-react";
 import "./loginpage.css";
 
@@ -29,6 +31,10 @@ export default function HODLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Modal alert states
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
+  const [modalType, setModalType] = useState<"error" | "success">("error");
 
   // Check if HOD is already logged in
   useEffect(() => {
@@ -65,7 +71,8 @@ export default function HODLoginPage() {
     e.preventDefault();
 
     if (!formData.username.trim() || !formData.password.trim()) {
-      alert("Please enter Username and Password");
+      setModalType("error");
+      setModalMessage("Please enter Username and Password");
       return;
     }
 
@@ -110,16 +117,16 @@ export default function HODLoginPage() {
           sessionStorage.setItem("hod", JSON.stringify(data.user));
         }
 
-        alert(data.message || "HOD Login Successful");
-
         // Redirect ONLY to HOD Dashboard
         router.push("/hod/dashboard");
       } else {
-        alert(data.message || "Invalid Username or Password");
+        setModalType("error");
+        setModalMessage(data.message || "Invalid Username or Password");
       }
     } catch (error) {
       console.error("HOD Login failed:", error);
-      alert("Unable to connect to the server.");
+      setModalType("error");
+      setModalMessage("Unable to connect to the server.");
     } finally {
       setIsLoading(false);
     }
@@ -134,102 +141,102 @@ export default function HODLoginPage() {
   }
 
   return (
-    <div className="login-page">
+    <div className="hod-login-page-shell">
       {/* Background Glow Meshes */}
-      <div className="bg-glow-orb glow-1"></div>
-      <div className="bg-glow-orb glow-2"></div>
+      <div className="hod-login-bg-glow-orb hod-login-glow-1"></div>
+      <div className="hod-login-bg-glow-orb hod-login-glow-2"></div>
 
       {/* Main Split Layout Container */}
-      <div className="login-wrapper">
+      <div className="hod-login-wrapper">
 
         {/* Left Branding & Visual Panel */}
-        <div className="left-section">
-          <div className="left-grid-pattern"></div>
-          <div className="left-overlay"></div>
+        <div className="hod-login-left-section">
+          <div className="hod-login-left-grid-pattern"></div>
+          <div className="hod-login-left-overlay"></div>
 
-          <div className="left-content">
+          <div className="hod-login-left-content">
             {/* Top Status Pill */}
-            <div className="system-status-pill">
-              <span className="status-dot"></span>
+            <div className="hod-login-system-status-pill">
+              <span className="hod-login-status-dot"></span>
               <span>Department Governance • HOD Portal v2.4</span>
             </div>
 
             {/* Brand Header */}
-            <div className="brand-header">
-              <div className="brand-icon-box">
-                <GraduationCap className="brand-icon" size={26} />
+            <div className="hod-login-brand-header">
+              <div className="hod-login-brand-icon-box">
+                <GraduationCap className="hod-login-brand-icon" size={26} />
               </div>
-              <div className="brand-title-wrap">
-                <span className="brand-eyebrow">Academic Management</span>
-                <h2 className="brand-name">EduFlow Portal</h2>
+              <div className="hod-login-brand-title-wrap">
+                <span className="hod-login-brand-eyebrow">Academic Management</span>
+                <h2 className="hod-login-brand-name">EduFlow Portal</h2>
               </div>
             </div>
 
             <h1>Department Head Governance</h1>
 
-            <p className="description-text">
+            <p className="hod-login-description-text">
               Empowering department heads with centralized academic monitoring, faculty management, student attendance tracking, and data-driven performance analytics.
             </p>
 
             {/* Core Feature List */}
-            <div className="features-list">
-              <div className="feature-item">
-                <CheckCircle2 size={18} className="feature-icon" />
+            <div className="hod-login-features-list">
+              <div className="hod-login-feature-item">
+                <CheckCircle2 size={18} className="hod-login-feature-icon" />
                 <span>Departmental Video & Attendance Supervision</span>
               </div>
-              <div className="feature-item">
-                <CheckCircle2 size={18} className="feature-icon" />
+              <div className="hod-login-feature-item">
+                <CheckCircle2 size={18} className="hod-login-feature-icon" />
                 <span>Faculty Lecture Tracking & Doubt Resolution Auditing</span>
               </div>
-              <div className="feature-item">
-                <CheckCircle2 size={18} className="feature-icon" />
+              <div className="hod-login-feature-item">
+                <CheckCircle2 size={18} className="hod-login-feature-icon" />
                 <span>Encrypted Academic Progress & Performance Metrics</span>
               </div>
             </div>
 
             {/* Left Footer Stats */}
-            <div className="left-footer">
-              <div className="stat-card">
-                <div className="stat-header">
-                  <ShieldCheck size={18} className="stat-icon" />
-                  <span className="stat-value">256-bit AES</span>
+            <div className="hod-login-left-footer">
+              <div className="hod-login-stat-card">
+                <div className="hod-login-stat-header">
+                  <ShieldCheck size={18} className="hod-login-stat-icon" />
+                  <span className="hod-login-stat-value">256-bit AES</span>
                 </div>
-                <span className="stat-label">Secure Authentication</span>
+                <span className="hod-login-stat-label">Secure Authentication</span>
               </div>
 
-              <div className="stat-card">
-                <div className="stat-header">
-                  <Activity size={18} className="stat-icon" />
-                  <span className="stat-value">99.9% SLA</span>
+              <div className="hod-login-stat-card">
+                <div className="hod-login-stat-header">
+                  <Activity size={18} className="hod-login-stat-icon" />
+                  <span className="hod-login-stat-value">99.9% SLA</span>
                 </div>
-                <span className="stat-label">Institutional Uptime</span>
+                <span className="hod-login-stat-label">Institutional Uptime</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Form Card Panel */}
-        <div className="right-section">
-          <div className="login-card">
+        <div className="hod-login-right-section">
+          <div className="hod-login-card">
 
-            <div className="login-card-header">
-              <div className="security-tag">
+            <div className="hod-login-card-header">
+              <div className="hod-login-security-tag">
                 <Lock size={13} />
                 <span>HOD Secure Access</span>
               </div>
               <h2>HOD Sign In</h2>
-              <p className="subtitle">
+              <p className="hod-login-subtitle">
                 Enter your HOD credentials to access your department dashboard.
               </p>
             </div>
 
-            <form onSubmit={handleLogin} className="login-form">
+            <form onSubmit={handleLogin} className="hod-login-form">
 
               {/* Username Field */}
-              <div className="input-group">
+              <div className="hod-login-input-group">
                 <label htmlFor="username">Username</label>
-                <div className="input-wrapper">
-                  <User size={18} className="field-icon" />
+                <div className="hod-login-input-wrapper">
+                  <User size={18} className="hod-login-field-icon" />
                   <input
                     id="username"
                     name="username"
@@ -244,10 +251,10 @@ export default function HODLoginPage() {
               </div>
 
               {/* Password Field */}
-              <div className="input-group">
+              <div className="hod-login-input-group">
                 <label htmlFor="password">Password</label>
-                <div className="input-wrapper">
-                  <Lock size={18} className="field-icon" />
+                <div className="hod-login-input-wrapper">
+                  <Lock size={18} className="hod-login-field-icon" />
                   <input
                     id="password"
                     name="password"
@@ -260,7 +267,7 @@ export default function HODLoginPage() {
                   />
                   <button
                     type="button"
-                    className="toggle-password-btn"
+                    className="hod-login-toggle-password-btn"
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
                     aria-label={showPassword ? "Hide password" : "Show password"}
@@ -271,38 +278,38 @@ export default function HODLoginPage() {
               </div>
 
               {/* Remember Me Option */}
-              <div className="form-options">
-                <label className="remember-checkbox">
+              <div className="hod-login-form-options">
+                <label className="hod-login-remember-checkbox">
                   <input
                     type="checkbox"
                     name="rememberMe"
                     checked={formData.rememberMe}
                     onChange={handleChange}
                   />
-                  <span className="checkbox-custom"></span>
-                  <span className="remember-label">Keep me signed in</span>
+                  <span className="hod-login-checkbox-custom"></span>
+                  <span className="hod-login-remember-label">Keep me signed in</span>
                 </label>
               </div>
 
               {/* Submit Button */}
-              <button type="submit" className="submit-btn" disabled={isLoading}>
+              <button type="submit" className="hod-login-submit-btn" disabled={isLoading}>
                 {isLoading ? (
-                  <span className="btn-loading">
-                    <span className="spinner"></span>
+                  <span className="hod-login-btn-loading">
+                    <span className="hod-login-spinner"></span>
                     Authenticating...
                   </span>
                 ) : (
-                  <span className="btn-content">
+                  <span className="hod-login-btn-content">
                     Sign In to HOD Dashboard
-                    <ArrowRight size={18} className="btn-arrow" />
+                    <ArrowRight size={18} className="hod-login-btn-arrow" />
                   </span>
                 )}
               </button>
 
             </form>
 
-            <div className="card-footer-note">
-              <ShieldCheck size={14} className="footer-shield" />
+            <div className="hod-login-card-footer-note">
+              <ShieldCheck size={14} className="hod-login-footer-shield" />
               <span>Institutional HOD Access. Need help? Contact IT Admin.</span>
             </div>
 
@@ -310,6 +317,36 @@ export default function HODLoginPage() {
         </div>
 
       </div>
+
+      {/* Modern Custom Dialog Modal without page blur */}
+      {modalMessage && (
+        <div 
+          className="hod-login-modal-backdrop"
+          onClick={() => setModalMessage(null)}
+        >
+          <div 
+            className="hod-login-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={modalType === 'error' ? "hod-login-modal-icon-box" : "hod-login-modal-icon-box success"}>
+              {modalType === 'error' ? <AlertCircle size={24} /> : <CheckCircle2 size={24} />}
+            </div>
+            <h3 className="hod-login-modal-title">
+              {modalType === 'error' ? 'Authentication Alert' : 'Success'}
+            </h3>
+            <p className="hod-login-modal-message">
+              {modalMessage}
+            </p>
+            <button
+              type="button"
+              onClick={() => setModalMessage(null)}
+              className={modalType === 'error' ? "hod-login-modal-dismiss-btn" : "hod-login-modal-dismiss-btn success"}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

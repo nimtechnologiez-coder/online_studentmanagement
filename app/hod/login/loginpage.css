@@ -1,5 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+/* ============================================================
+   HOD PORTAL LOGIN PAGE — Scoped and Conflict-Free Design System
+   ============================================================ */
 
+/* --- Theme Tokens & Root Variables --- */
 :root {
   --hod-bg-dark: #070913;
   --hod-panel-dark: #0f172a;
@@ -18,13 +21,8 @@
   --hod-accent-indigo: #818cf8;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-.login-page {
+/* --- Layout Page Shell --- */
+.hod-login-page-shell {
   position: relative;
   min-height: 100vh;
   width: 100%;
@@ -37,8 +35,8 @@
   overflow: hidden;
 }
 
-/* Ambient Animated Glow Orbs */
-.bg-glow-orb {
+/* --- Ambient Background Glow Orbs --- */
+.hod-login-bg-glow-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(120px);
@@ -46,32 +44,32 @@
   pointer-events: none;
 }
 
-.glow-1 {
+.hod-login-glow-1 {
   width: 580px;
   height: 580px;
   background: radial-gradient(circle, #4f46e5 0%, rgba(79, 70, 229, 0) 70%);
   top: -10%;
   left: -8%;
-  animation: floatGlow 14s ease-in-out infinite alternate;
+  animation: hodLoginFloatGlow 14s ease-in-out infinite alternate;
 }
 
-.glow-2 {
+.hod-login-glow-2 {
   width: 480px;
   height: 480px;
   background: radial-gradient(circle, #0284c7 0%, rgba(2, 132, 199, 0) 70%);
   bottom: -10%;
   right: -5%;
-  animation: floatGlow 18s ease-in-out infinite alternate-reverse;
+  animation: hodLoginFloatGlow 18s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes floatGlow {
+@keyframes hodLoginFloatGlow {
   0% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(35px, 25px) scale(1.08); }
   100% { transform: translate(-25px, 45px) scale(0.95); }
 }
 
-/* Main Split Wrapper Container */
-.login-wrapper {
+/* --- Inner Page Split Layout --- */
+.hod-login-wrapper {
   position: relative;
   z-index: 10;
   display: flex;
@@ -89,8 +87,8 @@
   overflow: hidden;
 }
 
-/* ---------------- LEFT PANEL: BRANDING ---------------- */
-.left-section {
+/* --- Left Section Branding Banner --- */
+.hod-login-left-section {
   position: relative;
   flex: 1.15;
   padding: 4rem 4.5rem;
@@ -102,7 +100,7 @@
   overflow: hidden;
 }
 
-.left-grid-pattern {
+.hod-login-left-grid-pattern {
   position: absolute;
   inset: 0;
   background-image: 
@@ -113,21 +111,21 @@
   pointer-events: none;
 }
 
-.left-overlay {
+.hod-login-left-overlay {
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 0% 100%, rgba(99, 102, 241, 0.15), transparent 50%);
   pointer-events: none;
 }
 
-.left-content {
+.hod-login-left-content {
   position: relative;
   z-index: 2;
   max-width: 540px;
 }
 
-/* Top System Status Pill */
-.system-status-pill {
+/* --- System Status & Eyebrows --- */
+.hod-login-system-status-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -142,29 +140,28 @@
   margin-bottom: 2rem;
 }
 
-.status-dot {
+.hod-login-status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background-color: #22c55e;
   box-shadow: 0 0 8px #22c55e;
-  animation: pulseDot 2s infinite;
+  animation: hodLoginPulseDot 2s infinite;
 }
 
-@keyframes pulseDot {
+@keyframes hodLoginPulseDot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.85); }
 }
 
-/* Brand Header */
-.brand-header {
+.hod-login-brand-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.75rem;
 }
 
-.brand-icon-box {
+.hod-login-brand-icon-box {
   width: 48px;
   height: 48px;
   border-radius: 14px;
@@ -177,12 +174,12 @@
   box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.35);
 }
 
-.brand-title-wrap {
+.hod-login-brand-title-wrap {
   display: flex;
   flex-direction: column;
 }
 
-.brand-eyebrow {
+.hod-login-brand-eyebrow {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -190,14 +187,14 @@
   color: var(--hod-text-muted);
 }
 
-.brand-name {
+.hod-login-brand-name {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--hod-text-main);
   letter-spacing: -0.01em;
 }
 
-.left-content h1 {
+.hod-login-left-content h1 {
   font-size: clamp(2.1rem, 3.2vw, 2.75rem);
   font-weight: 800;
   line-height: 1.18;
@@ -209,22 +206,22 @@
   -webkit-text-fill-color: transparent;
 }
 
-.description-text {
+.hod-login-description-text {
   font-size: 0.96rem;
   line-height: 1.65;
   color: var(--hod-text-muted);
   margin-bottom: 2.25rem;
 }
 
-/* Core Feature Checklist */
-.features-list {
+/* --- Features Checklists --- */
+.hod-login-features-list {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
   margin-bottom: 3rem;
 }
 
-.feature-item {
+.hod-login-feature-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -233,20 +230,20 @@
   color: #e2e8f0;
 }
 
-.feature-icon {
+.hod-login-feature-icon {
   color: var(--hod-accent-indigo);
   flex-shrink: 0;
 }
 
-/* Left Footer Stats */
-.left-footer {
+/* --- Left Branding Panel Footer Stats --- */
+.hod-login-left-footer {
   display: flex;
   gap: 1.5rem;
   padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.stat-card {
+.hod-login-stat-card {
   flex: 1;
   padding: 1rem 1.2rem;
   background: rgba(255, 255, 255, 0.03);
@@ -257,23 +254,23 @@
   gap: 0.25rem;
 }
 
-.stat-header {
+.hod-login-stat-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.stat-icon {
+.hod-login-stat-icon {
   color: var(--hod-accent-indigo);
 }
 
-.stat-value {
+.hod-login-stat-value {
   font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff;
 }
 
-.stat-label {
+.hod-login-stat-label {
   font-size: 0.72rem;
   color: var(--hod-text-dim);
   text-transform: uppercase;
@@ -281,9 +278,8 @@
   font-weight: 600;
 }
 
-
-/* ---------------- RIGHT PANEL: LOGIN FORM CARD ---------------- */
-.right-section {
+/* ---------------- RIGHT PANEL: SIGN IN FORM CARD ---------------- */
+.hod-login-right-section {
   flex: 1;
   padding: 4rem 3.5rem;
   display: flex;
@@ -292,16 +288,16 @@
   background: rgba(15, 23, 42, 0.4);
 }
 
-.login-card {
+.hod-login-card {
   width: 100%;
   max-width: 420px;
 }
 
-.login-card-header {
+.hod-login-card-header {
   margin-bottom: 2.25rem;
 }
 
-.security-tag {
+.hod-login-security-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -317,7 +313,7 @@
   margin-bottom: 1rem;
 }
 
-.login-card-header h2 {
+.hod-login-card-header h2 {
   font-size: 1.85rem;
   font-weight: 800;
   color: #ffffff;
@@ -325,39 +321,39 @@
   margin-bottom: 0.5rem;
 }
 
-.subtitle {
+.hod-login-subtitle {
   font-size: 0.9rem;
   color: var(--hod-text-muted);
   line-height: 1.5;
 }
 
-/* Form Styling */
-.login-form {
+/* --- Input Groups & Elements --- */
+.hod-login-form {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
 }
 
-.input-group {
+.hod-login-input-group {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
 }
 
-.input-group label {
+.hod-login-input-group label {
   font-size: 0.78rem;
   font-weight: 600;
   color: #cbd5e1;
   letter-spacing: 0.02em;
 }
 
-.input-wrapper {
+.hod-login-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.field-icon {
+.hod-login-field-icon {
   position: absolute;
   left: 1rem;
   color: var(--hod-text-dim);
@@ -365,7 +361,7 @@
   transition: color 0.2s ease;
 }
 
-.input-wrapper input {
+.hod-login-input-wrapper input {
   width: 100%;
   height: 48px;
   padding: 0 2.75rem 0 2.75rem;
@@ -379,23 +375,23 @@
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.input-wrapper input::placeholder {
+.hod-login-input-wrapper input::placeholder {
   color: var(--hod-text-dim);
 }
 
-.input-wrapper input:focus {
+.hod-login-input-wrapper input:focus {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--hod-input-focus);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
 }
 
-.input-wrapper input:focus ~ .field-icon,
-.input-wrapper:focus-within .field-icon {
+.hod-login-input-wrapper input:focus ~ .hod-login-field-icon,
+.hod-login-input-wrapper:focus-within .hod-login-field-icon {
   color: var(--hod-accent-indigo);
 }
 
-/* Password Toggle Button */
-.toggle-password-btn {
+/* --- Password Toggle Buttons --- */
+.hod-login-toggle-password-btn {
   position: absolute;
   right: 0.85rem;
   background: transparent;
@@ -410,19 +406,19 @@
   transition: color 0.2s ease;
 }
 
-.toggle-password-btn:hover {
+.hod-login-toggle-password-btn:hover {
   color: #ffffff;
 }
 
-/* Remember Me Checkbox */
-.form-options {
+/* --- Remember me Checkboxes --- */
+.hod-login-form-options {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 0.2rem;
 }
 
-.remember-checkbox {
+.hod-login-remember-checkbox {
   display: flex;
   align-items: center;
   gap: 0.65rem;
@@ -430,7 +426,7 @@
   user-select: none;
 }
 
-.remember-checkbox input {
+.hod-login-remember-checkbox input {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -438,7 +434,7 @@
   width: 0;
 }
 
-.checkbox-custom {
+.hod-login-checkbox-custom {
   position: relative;
   width: 18px;
   height: 18px;
@@ -448,16 +444,16 @@
   transition: all 0.2s ease;
 }
 
-.remember-checkbox:hover input ~ .checkbox-custom {
+.hod-login-remember-checkbox:hover input ~ .hod-login-checkbox-custom {
   border-color: var(--hod-accent-indigo);
 }
 
-.remember-checkbox input:checked ~ .checkbox-custom {
+.hod-login-remember-checkbox input:checked ~ .hod-login-checkbox-custom {
   background: var(--hod-accent-primary);
   border-color: var(--hod-accent-primary);
 }
 
-.checkbox-custom::after {
+.hod-login-checkbox-custom::after {
   content: "";
   position: absolute;
   display: none;
@@ -470,17 +466,17 @@
   transform: rotate(45deg);
 }
 
-.remember-checkbox input:checked ~ .checkbox-custom::after {
+.hod-login-remember-checkbox input:checked ~ .hod-login-checkbox-custom::after {
   display: block;
 }
 
-.remember-label {
+.hod-login-remember-label {
   font-size: 0.84rem;
   color: var(--hod-text-muted);
 }
 
-/* Submit Button */
-.submit-btn {
+/* --- Submission Action Button --- */
+.hod-login-submit-btn {
   width: 100%;
   height: 50px;
   margin-top: 0.5rem;
@@ -497,60 +493,60 @@
   overflow: hidden;
 }
 
-.submit-btn:hover:not(:disabled) {
+.hod-login-submit-btn:hover:not(:disabled) {
   background: var(--hod-accent-hover);
   box-shadow: 0 14px 30px -5px rgba(79, 70, 229, 0.55);
   transform: translateY(-1px);
 }
 
-.submit-btn:active:not(:disabled) {
+.hod-login-submit-btn:active:not(:disabled) {
   transform: translateY(0);
   box-shadow: 0 6px 15px -3px rgba(79, 70, 229, 0.4);
 }
 
-.submit-btn:disabled {
+.hod-login-submit-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
-.btn-content {
+.hod-login-btn-content {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
 }
 
-.btn-arrow {
+.hod-login-btn-arrow {
   transition: transform 0.2s ease;
 }
 
-.submit-btn:hover .btn-arrow {
+.hod-login-submit-btn:hover .hod-login-btn-arrow {
   transform: translateX(4px);
 }
 
-/* Loading Spinner */
-.btn-loading {
+/* --- Submit Load Spinner --- */
+.hod-login-btn-loading {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
 }
 
-.spinner {
+.hod-login-spinner {
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: hodLoginSpin 0.8s linear infinite;
 }
 
-@keyframes spin {
+@keyframes hodLoginSpin {
   to { transform: rotate(360deg); }
 }
 
-/* Security Note Footer */
-.card-footer-note {
+/* --- Bottom Security Disclaimer Footer --- */
+.hod-login-card-footer-note {
   margin-top: 2.25rem;
   display: flex;
   align-items: center;
@@ -561,49 +557,144 @@
   text-align: center;
 }
 
-.footer-shield {
+.hod-login-footer-shield {
   color: var(--hod-accent-indigo);
   flex-shrink: 0;
 }
 
+/* --- Custom Alert Dialog Modal Styles (Without page blur) --- */
+.hod-login-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(2, 4, 12, 0.85); /* Solid dark backdrop overlay without page-blur */
+  animation: hodModalFadeIn 0.22s ease-out;
+}
+
+.hod-login-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px 28px;
+  border-radius: 20px;
+  text-align: center;
+  background: #0f172a; 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.85);
+  animation: hodModalScaleIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hod-login-modal-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.hod-login-modal-icon-box.success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+}
+
+.hod-login-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.hod-login-modal-message {
+  font-size: 0.9rem;
+  line-height: 1.58;
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
+.hod-login-modal-dismiss-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  transition: all 0.2s ease;
+}
+
+.hod-login-modal-dismiss-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.hod-login-modal-dismiss-btn:active {
+  transform: translateY(0);
+}
+
+.hod-login-modal-dismiss-btn.success {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+@keyframes hodModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hodModalScaleIn {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
 
 /* ---------------- RESPONSIVE MEDIA QUERIES ---------------- */
 @media (max-width: 1024px) {
-  .login-wrapper {
+  .hod-login-wrapper {
     flex-direction: column;
     min-height: auto;
-    margin: 1rem;
+    margin: 1.5rem;
     border-radius: 20px;
+    max-width: 480px; /* Centered card width on tablet/large mobile */
+    width: 100%;
   }
 
-  .left-section {
-    padding: 3rem 2.5rem;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  .hod-login-left-section {
+    display: none; /* Hide branding banner on responsive screens */
   }
 
-  .right-section {
+  .hod-login-right-section {
     padding: 3rem 2rem;
   }
 }
 
 @media (max-width: 640px) {
-  .login-wrapper {
+  .hod-login-wrapper {
     margin: 0;
     border-radius: 0;
     min-height: 100vh;
     border: none;
+    max-width: 100%;
+    width: 100%;
   }
 
-  .left-section {
-    padding: 2.5rem 1.5rem;
+  .hod-login-left-section {
+    display: none; /* Keep hidden on mobile */
   }
 
-  .left-content h1 {
-    font-size: 1.8rem;
-  }
-
-  .right-section {
+  .hod-login-right-section {
     padding: 2.5rem 1.25rem;
   }
 }

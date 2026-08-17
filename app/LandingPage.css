@@ -67,7 +67,7 @@
 }
 
 /* Vertical child spacing inside checklist (replaces space-y-3) */
-.portal-checklist > * + * {
+.portal-checklist>*+* {
   margin-top: 10px;
 }
 
@@ -199,7 +199,7 @@
 
 
 
-  height: 770px;
+  height: 850px;
 
 
 
@@ -298,7 +298,10 @@
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-none {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
